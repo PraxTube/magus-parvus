@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_simple_text_input::{TextInput, TextInputPlugin, TextInputSubmitEvent};
 
-use crate::{GameState, PlayerChangedState, PlayerState};
+use crate::{GameState, Player, PlayerChangedState, PlayerState};
 
 pub const BORANGE: Color = Color::rgb(
     0xDF as f32 / 255.0,
@@ -15,11 +15,7 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(TextInputPlugin).add_systems(
             Update,
-            (
-                text_input_listener,
-                spawn_casting_text,
-                despawn_casting_text,
-            )
+            (cast_spell, spawn_casting_text, despawn_casting_text)
                 .run_if(in_state(GameState::Gaming)),
         );
     }
@@ -49,7 +45,7 @@ fn spawn_text_field(commands: &mut Commands) {
         .spawn((
             NodeBundle {
                 style: Style {
-                    width: Val::Px(200.0),
+                    width: Val::Vw(35.0),
                     border: UiRect::all(Val::Px(5.0)),
                     padding: UiRect::all(Val::Px(5.0)),
                     ..default()
@@ -96,8 +92,13 @@ fn despawn_casting_text(
     }
 }
 
-fn text_input_listener(mut events: EventReader<TextInputSubmitEvent>) {
-    for event in events.read() {
+fn cast_spell(
+    mut q_player: Query<&mut Player>,
+    mut ev_input_submitted: EventReader<TextInputSubmitEvent>,
+) {
+    for event in ev_input_submitted.read() {
+        let mut player = q_player.single_mut();
+        player.state = PlayerState::Idling;
         info!("{:?} submitted: {}", event.entity, event.value);
     }
 }

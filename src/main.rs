@@ -5,6 +5,7 @@ use std::time::Duration;
 
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use bevy::window::{PresentMode, Window, WindowMode};
 
 use bevy_asset_loader::prelude::*;
 
@@ -18,7 +19,17 @@ pub enum GameState {
 fn main() {
     App::new()
         .add_plugins((
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        present_mode: PresentMode::Fifo,
+                        mode: WindowMode::Windowed,
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(ImagePlugin::default_nearest())
+                .build(),
             LogDiagnosticsPlugin::default(),
             FrameTimeDiagnosticsPlugin::default(),
         ))
@@ -180,7 +191,7 @@ fn spawn_player(
 ) {
     let texture_handle = asset_server.load("mage.png");
     let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 6, 3, None, None);
+        TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 6, 3, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     commands.spawn((
         Player::default(),

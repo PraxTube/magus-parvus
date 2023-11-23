@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::{PrimaryWindow, WindowMode};
 
-use crate::GameState;
+use crate::{GameState, Player, PlayerState};
 
 pub struct CameraPlugin;
 
@@ -30,6 +30,7 @@ fn toggle_full_screen(
     keys: Res<Input<KeyCode>>,
     gamepads: Res<Gamepads>,
     button_inputs: Res<Input<GamepadButton>>,
+    q_player: Query<&Player>,
 ) {
     let mut window = match main_window.get_single_mut() {
         Ok(w) => w,
@@ -38,6 +39,11 @@ fn toggle_full_screen(
             return;
         }
     };
+
+    let player = q_player.single();
+    if player.state == PlayerState::Casting {
+        return;
+    }
 
     let mut pressed = keys.just_pressed(KeyCode::B);
     for gamepad in gamepads.iter() {
