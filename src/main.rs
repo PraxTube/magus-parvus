@@ -1,5 +1,10 @@
+mod assets;
+mod spell;
 mod ui;
+mod utils;
 mod world;
+
+pub use assets::GameAssets;
 
 use std::time::Duration;
 
@@ -33,12 +38,19 @@ fn main() {
             LogDiagnosticsPlugin::default(),
             FrameTimeDiagnosticsPlugin::default(),
         ))
+        .insert_resource(Msaa::Off)
         .add_state::<GameState>()
         .add_loading_state(
             LoadingState::new(GameState::AssetLoading).continue_to_state(GameState::Gaming),
         )
+        .add_collection_to_loading_state::<_, GameAssets>(GameState::AssetLoading)
         .add_event::<PlayerChangedState>()
-        .add_plugins((ui::UiPlugin, world::WorldPlugin))
+        .add_plugins((
+            ui::UiPlugin,
+            world::WorldPlugin,
+            spell::SpellPlugin,
+            utils::UtilsPlugin,
+        ))
         .add_systems(Startup, spawn_player)
         .add_systems(
             Update,
@@ -180,7 +192,7 @@ fn player_movement(
 
     player.state = PlayerState::Moving;
     player.current_direction = direction;
-    let speed = 300.0;
+    let speed = 150.0;
     transform.translation += direction.extend(0.0) * speed * time.delta_seconds();
 }
 
@@ -196,9 +208,9 @@ fn spawn_player(
     commands.spawn((
         Player::default(),
         SpriteSheetBundle {
+            transform: Transform::from_scale(Vec3::splat(2.0)),
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(0),
-            transform: Transform::from_scale(Vec3::splat(6.0)),
             ..default()
         },
         AnimationIndices { first: 0, last: 5 },
