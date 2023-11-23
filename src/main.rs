@@ -6,8 +6,6 @@ mod world;
 
 pub use assets::GameAssets;
 
-use std::time::Duration;
-
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowMode};
@@ -60,9 +58,7 @@ fn main() {
                 adjust_sprite_flip,
                 player_movement,
                 switch_player_mode,
-                cast_spell,
                 signal_player_state_change,
-                double_j_escape,
             ),
         )
         .run();
@@ -236,58 +232,6 @@ fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player
             if keys.just_pressed(KeyCode::Escape) {
                 player.state = PlayerState::Idling;
             }
-        }
-    }
-}
-
-fn double_j_escape(
-    keys: Res<Input<KeyCode>>,
-    time: Res<Time>,
-    mut q_player: Query<&mut Player>,
-    mut timer: Local<Timer>,
-) {
-    let mut player = q_player.single_mut();
-    let duration = Duration::from_secs_f32(0.2);
-
-    if player.state != PlayerState::Casting {
-        timer.set_elapsed(duration);
-        return;
-    }
-
-    timer.tick(time.delta());
-    if keys.just_pressed(KeyCode::J) {
-        if timer.finished() {
-            timer.set_duration(duration);
-            timer.reset();
-            return;
-        }
-
-        player.state = PlayerState::Idling;
-    }
-}
-
-fn cast_spell(
-    keys: Res<Input<KeyCode>>,
-    q_player: Query<&Player>,
-    mut string: Local<String>,
-    mut ev_received_char: EventReader<ReceivedCharacter>,
-) {
-    let player = q_player.single();
-    if player.state != PlayerState::Casting {
-        return;
-    }
-
-    if keys.just_pressed(KeyCode::Return) {
-        println!("Text input: {}", &*string);
-        string.clear();
-    }
-    if keys.just_pressed(KeyCode::Back) {
-        string.pop();
-    }
-    for ev in ev_received_char.read() {
-        // ignore control (special) characters
-        if !ev.char.is_control() {
-            string.push(ev.char);
         }
     }
 }
