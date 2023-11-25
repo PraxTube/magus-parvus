@@ -1,4 +1,5 @@
 mod assets;
+mod player;
 mod spell;
 mod ui;
 mod utils;
@@ -48,6 +49,7 @@ fn main() {
             world::WorldPlugin,
             spell::SpellPlugin,
             utils::UtilsPlugin,
+            player::PlayerPlugin,
         ))
         .add_systems(Startup, spawn_player)
         .add_systems(

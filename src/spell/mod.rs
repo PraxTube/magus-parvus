@@ -92,7 +92,7 @@ fn submit_spell(
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Fireball,
             });
-        } else if ev.value.to_lowercase() == "fireballs" {
+        } else if ev.value.to_lowercase() == "ignis pila" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::FireballCircle,
             });
