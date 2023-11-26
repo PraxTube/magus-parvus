@@ -34,8 +34,11 @@ fn write_spell(
     mut string: Local<String>,
     mut ev_received_char: EventReader<ReceivedCharacter>,
 ) {
-    let player = q_player.single();
-    if player.state != PlayerState::Casting {
+    let player_state = match q_player.get_single() {
+        Ok(p) => p.state,
+        Err(_) => return,
+    };
+    if player_state != PlayerState::Casting {
         return;
     }
 
@@ -59,9 +62,12 @@ fn double_j_escape(
     mut q_player: Query<&mut Player>,
     mut timer: Local<Timer>,
 ) {
-    let mut player = q_player.single_mut();
-    let duration = Duration::from_secs_f32(0.2);
+    let mut player = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
 
+    let duration = Duration::from_secs_f32(0.2);
     if player.state != PlayerState::Casting {
         timer.set_elapsed(duration);
         return;
@@ -84,8 +90,12 @@ fn submit_spell(
     mut ev_input_submitted: EventReader<TextInputSubmitEvent>,
     mut ev_spell_casted: EventWriter<SpellCasted>,
 ) {
+    let mut player = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
     for ev in ev_input_submitted.read() {
-        let mut player = q_player.single_mut();
         player.state = PlayerState::Idling;
 
         if ev.value.to_lowercase() == "fireball" {

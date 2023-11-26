@@ -13,8 +13,14 @@ pub fn fetch_mouse_world_coords(
     q_window: Query<&Window, With<PrimaryWindow>>,
     q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
-    let (camera, camera_transform) = q_camera.single();
-    let window = q_window.single();
+    let (camera, camera_transform) = match q_camera.get_single() {
+        Ok(c) => (c.0, c.1),
+        Err(_) => return,
+    };
+    let window = match q_window.get_single() {
+        Ok(w) => w,
+        Err(_) => return,
+    };
 
     if let Some(world_position) = window
         .cursor_position()
@@ -29,8 +35,12 @@ fn fetch_scroll_events(
     mut scroll_evr: EventReader<MouseWheel>,
     mut q_projection: Query<&mut OrthographicProjection, With<MainCamera>>,
 ) {
+    let mut projection = match q_projection.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
     for ev in scroll_evr.read() {
-        let mut projection = q_projection.single_mut();
         match ev.unit {
             MouseScrollUnit::Line => {
                 let scroll = if ev.y > 0.0 { -1.0 } else { 1.0 };

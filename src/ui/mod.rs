@@ -84,9 +84,13 @@ fn despawn_casting_text(
     q_casting_text: Query<Entity, With<CastingText>>,
     mut ev_player_changed_state: EventReader<PlayerChangedState>,
 ) {
+    let entity = match q_casting_text.get_single() {
+        Ok(e) => e,
+        Err(_) => return,
+    };
+
     for ev in ev_player_changed_state.read() {
         if ev.old_state == PlayerState::Casting {
-            let entity = q_casting_text.single();
             commands.entity(entity).despawn_recursive();
         }
     }

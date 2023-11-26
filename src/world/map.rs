@@ -60,7 +60,10 @@ fn adjust_chunks(
     q_player: Query<&Transform, With<Player>>,
     q_chunks: Query<(Entity, &Chunk)>,
 ) {
-    let player_pos = q_player.single().translation;
+    let player_pos = match q_player.get_single() {
+        Ok(p) => p.translation,
+        Err(_) => return,
+    };
 
     let unique_indices: HashSet<_> = [
         world_coords_to_map_indices(player_pos + Vec3::new(CAMERA_SIZE_X, CAMERA_SIZE_Y, 0.0)),

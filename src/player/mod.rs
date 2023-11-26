@@ -22,7 +22,7 @@ impl Plugin for PlayerPlugin {
         )
         .add_plugins(input::InputPlugin)
         .add_event::<PlayerChangedState>()
-        .add_systems(Startup, spawn_player);
+        .add_systems(OnEnter(GameState::Gaming), spawn_player);
     }
 }
 
@@ -60,7 +60,10 @@ fn signal_player_state_change(
     mut ev_changed_state: EventWriter<PlayerChangedState>,
     mut old_state: Local<PlayerState>,
 ) {
-    let player = q_player.single();
+    let player = match q_player.get_single() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
 
     if player.state != *old_state {
         ev_changed_state.send(PlayerChangedState {
@@ -80,7 +83,11 @@ fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
 }
 
 fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut TextureAtlasSprite, &Player)>) {
-    let (mut indices, mut sprite, player) = q_player.single_mut();
+    let (mut indices, mut sprite, player) = match q_player.get_single_mut() {
+        Ok(p) => (p.0, p.1, p.2),
+        Err(_) => return,
+    };
+
     let new_indices = player_sprite_indicies(&player.state);
 
     if new_indices.0 != indices.first {
@@ -97,7 +104,10 @@ fn animate_sprite(
         With<Player>,
     >,
 ) {
-    let (indices, mut timer, mut sprite) = q_player.single_mut();
+    let (indices, mut timer, mut sprite) = match q_player.get_single_mut() {
+        Ok(p) => (p.0, p.1, p.2),
+        Err(_) => return,
+    };
 
     timer.tick(time.delta());
     if timer.just_finished() {
@@ -110,7 +120,10 @@ fn animate_sprite(
 }
 
 fn adjust_sprite_flip(mut q_player: Query<(&mut TextureAtlasSprite, &Player)>) {
-    let (mut sprite, player) = q_player.single_mut();
+    let (mut sprite, player) = match q_player.get_single_mut() {
+        Ok(p) => (p.0, p.1),
+        Err(_) => return,
+    };
     if player.current_direction.x == 0.0 {
         return;
     }
@@ -123,7 +136,10 @@ pub fn player_movement(
     time: Res<Time>,
     mut q_player: Query<(&mut Transform, &mut Player)>,
 ) {
-    let (mut transform, mut player) = q_player.single_mut();
+    let (mut transform, mut player) = match q_player.get_single_mut() {
+        Ok(p) => (p.0, p.1),
+        Err(_) => return,
+    };
     if player.state != PlayerState::Moving && player.state != PlayerState::Idling {
         return;
     }
@@ -178,7 +194,10 @@ fn spawn_player(
 }
 
 fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player>) {
-    let mut player = q_player.single_mut();
+    let mut player = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
 
     match player.state {
         PlayerState::Idling => {

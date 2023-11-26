@@ -33,8 +33,12 @@ fn spawn_fireballs(
     q_player: Query<(&Transform, &Player)>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
+    let (player_transform, player) = match q_player.get_single() {
+        Ok(p) => (p.0, p.1),
+        Err(_) => return,
+    };
+
     for ev in ev_spell_casted.read() {
-        let (player_transform, player) = q_player.single();
         if ev.spell == Spell::Fireball {
             let transform = Transform::from_translation(player_transform.translation)
                 .with_scale(Vec3::splat(SCALE))
@@ -47,11 +51,15 @@ fn spawn_fireballs(
 fn spawn_fireball_circles(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    q_player: Query<(&Transform, &Player)>,
+    q_player: Query<&Transform, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
+    let player_pos = match q_player.get_single() {
+        Ok(p) => p.translation,
+        Err(_) => return,
+    };
+
     for ev in ev_spell_casted.read() {
-        let (player_transform, _player) = q_player.single();
         if ev.spell == Spell::FireballCircle {
             for dir in [
                 Vec2::new(1.0, 0.0),
@@ -59,11 +67,11 @@ fn spawn_fireball_circles(
                 Vec2::new(1.0, 1.0),
                 Vec2::new(-1.0, 1.0),
             ] {
-                let transform = Transform::from_translation(player_transform.translation)
+                let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
                     .with_rotation(quat_from_vec2(dir));
                 spawn_fireball(&mut commands, &assets, transform);
-                let transform = Transform::from_translation(player_transform.translation)
+                let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
                     .with_rotation(quat_from_vec2(-dir));
                 spawn_fireball(&mut commands, &assets, transform);

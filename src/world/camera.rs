@@ -41,7 +41,13 @@ fn move_camera(
         }
     };
 
-    let mut camera_transform = q_camera.single_mut();
+    let mut camera_transform = match q_camera.get_single_mut() {
+        Ok(c) => c,
+        Err(err) => {
+            error!("there is not exactly one main camera, {}", err);
+            return;
+        }
+    };
     camera_transform.translation = player_pos;
 }
 
@@ -60,8 +66,11 @@ fn toggle_full_screen(
         }
     };
 
-    let player = q_player.single();
-    if player.state == PlayerState::Casting {
+    let player_state = match q_player.get_single() {
+        Ok(p) => p.state,
+        Err(_) => return,
+    };
+    if player_state == PlayerState::Casting {
         return;
     }
 
