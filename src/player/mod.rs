@@ -4,6 +4,8 @@ use bevy::prelude::*;
 
 use crate::GameState;
 
+use self::input::PlayerInput;
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -132,9 +134,9 @@ fn adjust_sprite_flip(mut q_player: Query<(&mut TextureAtlasSprite, &Player)>) {
 }
 
 pub fn player_movement(
-    keys: Res<Input<KeyCode>>,
     time: Res<Time>,
     mut q_player: Query<(&mut Transform, &mut Player)>,
+    player_input: Res<PlayerInput>,
 ) {
     let (mut transform, mut player) = match q_player.get_single_mut() {
         Ok(p) => (p.0, p.1),
@@ -144,21 +146,7 @@ pub fn player_movement(
         return;
     }
 
-    let mut direction = Vec2::default();
-    if keys.pressed(KeyCode::J) {
-        direction += Vec2::new(0.0, -1.0);
-    }
-    if keys.pressed(KeyCode::K) {
-        direction += Vec2::new(0.0, 1.0);
-    }
-    if keys.pressed(KeyCode::F) {
-        direction += Vec2::new(1.0, 0.0);
-    }
-    if keys.pressed(KeyCode::A) {
-        direction += Vec2::new(-1.0, 0.0);
-    }
-    let direction = direction.normalize_or_zero();
-
+    let direction = player_input.move_direction;
     if direction == Vec2::default() {
         player.state = PlayerState::Idling;
         return;

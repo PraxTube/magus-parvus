@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::{PrimaryWindow, WindowMode};
 
+use crate::player::input::PlayerInput;
 use crate::player::{player_movement, Player, PlayerState};
 use crate::GameState;
 
@@ -11,9 +12,7 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            move_camera
-                .after(player_movement)
-                .run_if(in_state(GameState::Gaming)),
+            (move_camera.after(player_movement), zoom_camera).run_if(in_state(GameState::Gaming)),
         )
         .add_systems(OnEnter(GameState::Gaming), spawn_camera)
         .add_systems(Update, toggle_full_screen);
@@ -51,13 +50,27 @@ fn move_camera(
     camera_transform.translation = player_pos;
 }
 
+fn zoom_camera(
+    mut q_projection: Query<&mut OrthographicProjection, With<MainCamera>>,
+    player_input: Res<PlayerInput>,
+) {
+    let mut projection = match q_projection.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    projection.scale = (projection.scale + player_input.zoom).clamp(1.0, 10.0);
+}
+
 fn toggle_full_screen(
     mut main_window: Query<&mut Window, With<PrimaryWindow>>,
-    keys: Res<Input<KeyCode>>,
-    gamepads: Res<Gamepads>,
-    button_inputs: Res<Input<GamepadButton>>,
     q_player: Query<&Player>,
+    player_input: Res<PlayerInput>,
 ) {
+    if !player_input.toggle_fullscreen {
+        return;
+    }
+
     let mut window = match main_window.get_single_mut() {
         Ok(w) => w,
         Err(err) => {
@@ -71,17 +84,6 @@ fn toggle_full_screen(
         Err(_) => return,
     };
     if player_state == PlayerState::Casting {
-        return;
-    }
-
-    let mut pressed = keys.just_pressed(KeyCode::B);
-    for gamepad in gamepads.iter() {
-        if button_inputs.just_pressed(GamepadButton::new(gamepad, GamepadButtonType::DPadUp)) {
-            pressed = true;
-        }
-    }
-
-    if !pressed {
         return;
     }
 
