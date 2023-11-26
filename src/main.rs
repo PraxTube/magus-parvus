@@ -206,7 +206,8 @@ fn spawn_player(
     commands.spawn((
         Player::default(),
         SpriteSheetBundle {
-            transform: Transform::from_scale(Vec3::splat(2.0)),
+            transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
+                .with_scale(Vec3::splat(2.0)),
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(0),
             ..default()

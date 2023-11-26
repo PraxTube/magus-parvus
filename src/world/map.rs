@@ -8,6 +8,15 @@ use crate::{GameAssets, GameState, Player};
 const CHUNK_SIZE: f32 = 32.0 * 32.0;
 const CAMERA_SIZE_X: f32 = 400.0;
 const CAMERA_SIZE_Y: f32 = 300.0;
+const CHUNK_ROWS: usize = 2;
+const IIDS: [&str; 6] = [
+    "4561cae1-8990-11ee-bdb7-27b92e7f0bd1",
+    "4c5c13d0-8990-11ee-bb97-5335be5f091d",
+    "30c12d00-8990-11ee-8c0e-1f466f38a0b0",
+    "09bdb020-8990-11ee-8c0e-83df39a96f91",
+    "39c4ea40-8990-11ee-8c0e-f5477a2dc37e",
+    "54eaef30-8990-11ee-bb97-69638b6a5187",
+];
 
 #[derive(Component)]
 pub struct Chunk {
@@ -29,37 +38,19 @@ fn world_coords_to_map_indices(position: Vec3) -> (i32, i32) {
     (x_index, y_index)
 }
 
-fn i32_to_usize(z: i32) -> usize {
-    if z > 0 {
-        2 * z as usize - 1
-    } else if z < 0 {
-        2 * z.abs() as usize
-    } else {
-        0
-    }
-}
-
 fn map_indices_to_index(x_index: i32, y_index: i32) -> usize {
-    let m = i32_to_usize(x_index);
-    let n = i32_to_usize(y_index);
+    let m = x_index.abs() as usize;
+    let n = y_index.abs() as usize;
 
-    // Cantor Pair
-    (m + n) * (m + n + 1) / 2 + m
+    m + n * CHUNK_ROWS
 }
 
 fn level_set_from_map_indices(x_index: i32, y_index: i32) -> LevelSet {
-    let iids = [
-        "4561cae1-8990-11ee-bdb7-27b92e7f0bd1",
-        "30c12d00-8990-11ee-8c0e-1f466f38a0b0",
-        "09bdb020-8990-11ee-8c0e-83df39a96f91",
-        "39c4ea40-8990-11ee-8c0e-f5477a2dc37e",
-    ];
-
     let index = map_indices_to_index(x_index, y_index);
-    if index >= iids.len() {
-        return LevelSet::from_iids([iids[0]]);
+    if index >= IIDS.len() {
+        return LevelSet::from_iids([IIDS[0]]);
     }
-    LevelSet::from_iids([iids[index]])
+    LevelSet::from_iids([IIDS[index]])
 }
 
 fn adjust_chunks(
