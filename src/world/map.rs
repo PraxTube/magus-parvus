@@ -5,7 +5,7 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{GameAssets, GameState, Player};
 
-const MAP_SIZE: f32 = 32.0 * 32.0;
+const CHUNK_SIZE: f32 = 32.0 * 32.0;
 const CAMERA_SIZE_X: f32 = 400.0;
 const CAMERA_SIZE_Y: f32 = 300.0;
 
@@ -17,16 +17,49 @@ pub struct Chunk {
 
 fn map_indices_to_world_coords(x_index: i32, y_index: i32) -> Vec3 {
     Vec3::new(
-        x_index as f32 * MAP_SIZE,
-        y_index as f32 * MAP_SIZE,
+        x_index as f32 * CHUNK_SIZE,
+        y_index as f32 * CHUNK_SIZE,
         -1000.0,
     )
 }
 
 fn world_coords_to_map_indices(position: Vec3) -> (i32, i32) {
-    let x_index = (position.x / MAP_SIZE) as i32 + if position.x < 0.0 { -1 } else { 0 };
-    let y_index = (position.y / MAP_SIZE) as i32 + if position.y < 0.0 { -1 } else { 0 };
+    let x_index = (position.x / CHUNK_SIZE) as i32 + if position.x < 0.0 { -1 } else { 0 };
+    let y_index = (position.y / CHUNK_SIZE) as i32 + if position.y < 0.0 { -1 } else { 0 };
     (x_index, y_index)
+}
+
+fn i32_to_usize(z: i32) -> usize {
+    if z > 0 {
+        2 * z as usize - 1
+    } else if z < 0 {
+        2 * z.abs() as usize
+    } else {
+        0
+    }
+}
+
+fn map_indices_to_index(x_index: i32, y_index: i32) -> usize {
+    let m = i32_to_usize(x_index);
+    let n = i32_to_usize(y_index);
+
+    // Cantor Pair
+    (m + n) * (m + n + 1) / 2 + m
+}
+
+fn level_set_from_map_indices(x_index: i32, y_index: i32) -> LevelSet {
+    let iids = [
+        "4561cae1-8990-11ee-bdb7-27b92e7f0bd1",
+        "30c12d00-8990-11ee-8c0e-1f466f38a0b0",
+        "09bdb020-8990-11ee-8c0e-83df39a96f91",
+        "39c4ea40-8990-11ee-8c0e-f5477a2dc37e",
+    ];
+
+    let index = map_indices_to_index(x_index, y_index);
+    if index >= iids.len() {
+        return LevelSet::from_iids([iids[0]]);
+    }
+    LevelSet::from_iids([iids[index]])
 }
 
 fn adjust_chunks(
@@ -76,8 +109,9 @@ fn adjust_chunks(
                 y_index: j,
             },
             LdtkWorldBundle {
-                ldtk_handle: assets.level.clone(),
                 transform: Transform::from_translation(map_indices_to_world_coords(i, j)),
+                ldtk_handle: assets.level.clone(),
+                level_set: LevelSet::from_iids(level_set_from_map_indices(i, j)),
                 ..Default::default()
             },
         ));
@@ -89,7 +123,10 @@ pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(LdtkPlugin)
-            .insert_resource(LevelSelection::index(0))
+            .insert_resource(LdtkSettings {
+                level_spawn_behavior: LevelSpawnBehavior::UseZeroTranslation,
+                ..default()
+            })
             .add_systems(Update, (adjust_chunks).run_if(in_state(GameState::Gaming)));
     }
 }
