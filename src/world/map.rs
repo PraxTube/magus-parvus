@@ -3,7 +3,8 @@ use std::collections::HashSet;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::{GameAssets, GameState, Player};
+use crate::player::Player;
+use crate::{GameAssets, GameState};
 
 const CHUNK_SIZE: f32 = 32.0 * 32.0;
 const CAMERA_SIZE_X: f32 = 400.0;
@@ -39,8 +40,8 @@ fn world_coords_to_map_indices(position: Vec3) -> (i32, i32) {
 }
 
 fn map_indices_to_index(x_index: i32, y_index: i32) -> usize {
-    let m = x_index.abs() as usize;
-    let n = y_index.abs() as usize;
+    let m = x_index.unsigned_abs() as usize;
+    let n = y_index.unsigned_abs() as usize;
 
     m + n * CHUNK_ROWS
 }

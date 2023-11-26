@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use bevy_simple_text_input::{TextInput, TextInputPlugin};
 
-use crate::{GameState, PlayerChangedState, PlayerState};
+use crate::player::{PlayerChangedState, PlayerState};
+use crate::GameState;
 
 pub const BORANGE: Color = Color::rgb(
     0xDF as f32 / 255.0,

@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 
+use crate::player::Player;
 use crate::utils::anim_sprite::{AnimSprite, AnimSpriteTimer};
 use crate::utils::quat_from_vec2;
-use crate::{GameAssets, GameState, Player};
+use crate::{GameAssets, GameState};
 
 use super::{Spell, SpellCasted};
 

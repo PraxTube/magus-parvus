@@ -2,7 +2,8 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::{PrimaryWindow, WindowMode};
 
-use crate::{player_movement, GameState, Player, PlayerState};
+use crate::player::{player_movement, Player, PlayerState};
+use crate::GameState;
 
 pub struct CameraPlugin;
 

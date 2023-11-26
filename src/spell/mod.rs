@@ -5,7 +5,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_simple_text_input::TextInputSubmitEvent;
 
-use crate::{Player, PlayerState};
+use crate::player::{Player, PlayerState};
 
 pub struct SpellPlugin;
 
