@@ -19,7 +19,7 @@ impl Plugin for PlayerPlugin {
                 adjust_sprite_flip,
                 player_movement,
                 switch_player_mode,
-                signal_player_state_change,
+                player_changed_state,
             )
                 .run_if(in_state(GameState::Gaming)),
         )
@@ -58,7 +58,7 @@ pub struct PlayerChangedState {
     pub new_state: PlayerState,
 }
 
-fn signal_player_state_change(
+fn player_changed_state(
     q_player: Query<&Player>,
     mut ev_changed_state: EventWriter<PlayerChangedState>,
     mut old_state: Local<PlayerState>,
