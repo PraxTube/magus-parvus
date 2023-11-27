@@ -1,10 +1,11 @@
 pub mod input;
+pub mod stats;
 
 use bevy::prelude::*;
 
-use crate::GameState;
+use crate::{GameAssets, GameState};
 
-use self::input::PlayerInput;
+use self::{input::PlayerInput, stats::Stats};
 
 pub struct PlayerPlugin;
 
@@ -135,11 +136,11 @@ fn adjust_sprite_flip(mut q_player: Query<(&mut TextureAtlasSprite, &Player)>) {
 
 pub fn player_movement(
     time: Res<Time>,
-    mut q_player: Query<(&mut Transform, &mut Player)>,
+    mut q_player: Query<(&mut Transform, &mut Player, &Stats)>,
     player_input: Res<PlayerInput>,
 ) {
-    let (mut transform, mut player) = match q_player.get_single_mut() {
-        Ok(p) => (p.0, p.1),
+    let (mut transform, mut player, stats) = match q_player.get_single_mut() {
+        Ok(p) => (p.0, p.1, p.2),
         Err(_) => return,
     };
     if player.state != PlayerState::Moving && player.state != PlayerState::Idling {
@@ -154,25 +155,17 @@ pub fn player_movement(
 
     player.state = PlayerState::Moving;
     player.current_direction = direction;
-    let speed = 150.0;
-    transform.translation += direction.extend(0.0) * speed * time.delta_seconds();
+    transform.translation += direction.extend(0.0) * stats.move_speed * time.delta_seconds();
 }
 
-fn spawn_player(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-) {
-    let texture_handle = asset_server.load("mage.png");
-    let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 6, 3, None, None);
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
     commands.spawn((
         Player::default(),
+        Stats::default(),
         SpriteSheetBundle {
             transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
                 .with_scale(Vec3::splat(2.0)),
-            texture_atlas: texture_atlas_handle,
+            texture_atlas: assets.player.clone(),
             sprite: TextureAtlasSprite::new(0),
             ..default()
         },

@@ -1,0 +1,74 @@
+use std::time::Duration;
+
+use bevy::prelude::*;
+
+use crate::player::stats::Stats;
+use crate::player::Player;
+use crate::GameState;
+
+use super::{Spell, SpellCasted};
+
+#[derive(Component)]
+struct SpeedBoostTimer {
+    timer: Timer,
+    reset_value: f32,
+}
+
+impl Default for SpeedBoostTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::new(Duration::from_secs_f32(10.0), TimerMode::Once),
+            reset_value: Stats::default().move_speed,
+        }
+    }
+}
+
+fn activate_speed_boost(
+    mut commands: Commands,
+    mut q_player: Query<&mut Stats, With<Player>>,
+    mut ev_spell_casted: EventReader<SpellCasted>,
+) {
+    let mut player_stats = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    for ev in ev_spell_casted.read() {
+        if ev.spell == Spell::SpeedBoost {
+            player_stats.move_speed *= 2.0;
+            commands.spawn(SpeedBoostTimer::default());
+        };
+    }
+}
+
+fn deactivate_speed_boost(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut q_player: Query<&mut Stats, With<Player>>,
+    mut q_timers: Query<(Entity, &mut SpeedBoostTimer)>,
+) {
+    let mut player_stats = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    for (entity, mut timer) in &mut q_timers {
+        timer.timer.tick(time.delta());
+
+        if timer.timer.just_finished() {
+            player_stats.move_speed = timer.reset_value;
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
+pub struct SpeedBoostPlugin;
+
+impl Plugin for SpeedBoostPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            (activate_speed_boost, deactivate_speed_boost).run_if(in_state(GameState::Gaming)),
+        );
+    }
+}

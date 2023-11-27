@@ -107,7 +107,6 @@ impl Plugin for FireballPlugin {
                 scale_fireballs,
                 move_fireballs,
             ),
-        )
-        .add_event::<SpellCasted>();
+        );
     }
 }

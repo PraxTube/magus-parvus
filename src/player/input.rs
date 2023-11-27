@@ -70,10 +70,10 @@ fn fetch_scroll_events(
 fn zoom_camera(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
     let mut zoom = 0.0;
     if keys.just_pressed(KeyCode::Plus) {
-        zoom += 1.0;
+        zoom -= 1.0;
     }
     if keys.just_pressed(KeyCode::Minus) {
-        zoom -= 1.0;
+        zoom += 1.0;
     }
 
     if zoom != 0.0 {

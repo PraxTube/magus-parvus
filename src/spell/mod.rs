@@ -1,4 +1,5 @@
 mod fireball;
+mod speed_boost;
 
 use std::time::Duration;
 
@@ -13,7 +14,7 @@ impl Plugin for SpellPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (write_spell, double_j_escape, submit_spell))
             .add_event::<SpellCasted>()
-            .add_plugins(fireball::FireballPlugin);
+            .add_plugins((fireball::FireballPlugin, speed_boost::SpeedBoostPlugin));
     }
 }
 
@@ -21,6 +22,7 @@ impl Plugin for SpellPlugin {
 enum Spell {
     Fireball,
     FireballCircle,
+    SpeedBoost,
 }
 
 #[derive(Event)]
@@ -105,6 +107,10 @@ fn submit_spell(
         } else if ev.value.to_lowercase() == "ignis pila" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::FireballCircle,
+            });
+        } else if ev.value.to_lowercase() == "cito" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::SpeedBoost,
             });
         }
     }
