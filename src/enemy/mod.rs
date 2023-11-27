@@ -23,4 +23,13 @@ fn spawn_enemies(mut commands: Commands, assets: Res<GameAssets>) {
             ..default()
         },
     ));
+
+    commands.spawn((
+        Enemy,
+        SpriteSheetBundle {
+            transform: Transform::from_translation(Vec3::default()).with_scale(Vec3::splat(1.5)),
+            texture_atlas: assets.enemy.clone(),
+            ..default()
+        },
+    ));
 }
