@@ -3,6 +3,7 @@ pub mod stats;
 
 use bevy::prelude::*;
 
+use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::{GameAssets, GameState};
 
 use self::{input::PlayerInput, stats::Stats};
@@ -15,7 +16,6 @@ impl Plugin for PlayerPlugin {
             Update,
             (
                 update_indicies,
-                animate_sprite,
                 adjust_sprite_flip,
                 player_movement,
                 switch_player_mode,
@@ -28,15 +28,6 @@ impl Plugin for PlayerPlugin {
         .add_systems(OnEnter(GameState::Gaming), spawn_player);
     }
 }
-
-#[derive(Component)]
-struct AnimationIndices {
-    first: usize,
-    last: usize,
-}
-
-#[derive(Component, Deref, DerefMut)]
-struct FrameTimer(Timer);
 
 #[derive(Default, PartialEq, Clone, Copy)]
 pub enum PlayerState {
@@ -97,28 +88,6 @@ fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut TextureAtlas
         indices.first = new_indices.0;
         indices.last = new_indices.1;
         sprite.index = indices.first;
-    }
-}
-
-fn animate_sprite(
-    time: Res<Time>,
-    mut q_player: Query<
-        (&AnimationIndices, &mut FrameTimer, &mut TextureAtlasSprite),
-        With<Player>,
-    >,
-) {
-    let (indices, mut timer, mut sprite) = match q_player.get_single_mut() {
-        Ok(p) => (p.0, p.1, p.2),
-        Err(_) => return,
-    };
-
-    timer.tick(time.delta());
-    if timer.just_finished() {
-        sprite.index = if sprite.index == indices.last {
-            indices.first
-        } else {
-            sprite.index + 1
-        };
     }
 }
 

@@ -4,6 +4,7 @@ use rand::{self, Rng};
 
 use bevy::prelude::*;
 
+use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::{player::Player, GameAssets, GameState};
 
 use super::Enemy;
@@ -40,10 +41,33 @@ impl Default for SlimeEnemy {
     }
 }
 
+fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
+    match state {
+        SlimeState::Idling => (0, 5),
+        SlimeState::Jumping => (6, 11),
+    }
+}
+
+fn update_indicies(
+    mut q_slimes: Query<(&mut AnimationIndices, &mut TextureAtlasSprite, &SlimeEnemy)>,
+) {
+    for (mut indices, mut sprite, slime) in &mut q_slimes {
+        let new_indices = slime_sprite_indices(&slime.state);
+
+        if new_indices.0 != indices.first {
+            indices.first = new_indices.0;
+            indices.last = new_indices.1;
+            sprite.index = indices.first;
+        }
+    }
+}
+
 fn spawn_slimes(mut commands: Commands, assets: Res<GameAssets>) {
     commands.spawn((
         Enemy,
         SlimeEnemy::default(),
+        AnimationIndices { first: 0, last: 5 },
+        FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
         SpriteSheetBundle {
             transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
                 .with_scale(Vec3::splat(1.5)),
@@ -55,6 +79,8 @@ fn spawn_slimes(mut commands: Commands, assets: Res<GameAssets>) {
     commands.spawn((
         Enemy,
         SlimeEnemy::default(),
+        AnimationIndices { first: 0, last: 5 },
+        FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
         SpriteSheetBundle {
             transform: Transform::from_translation(Vec3::default()).with_scale(Vec3::splat(1.5)),
             texture_atlas: assets.enemy.clone(),
@@ -123,7 +149,12 @@ impl Plugin for SlimeEnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (tick_slime_timers, move_slimes, update_jump_position)
+            (
+                update_indicies,
+                tick_slime_timers,
+                move_slimes,
+                update_jump_position,
+            )
                 .run_if(in_state(GameState::Gaming)),
         )
         .add_systems(OnEnter(GameState::Gaming), spawn_slimes);

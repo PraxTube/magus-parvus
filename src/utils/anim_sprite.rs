@@ -43,6 +43,15 @@ impl AnimSpriteTimer {
     }
 }
 
+#[derive(Component)]
+pub struct AnimationIndices {
+    pub first: usize,
+    pub last: usize,
+}
+
+#[derive(Component, Deref, DerefMut)]
+pub struct FrameTimer(pub Timer);
+
 fn animate_sprites(
     time: Res<Time>,
     mut query: Query<(
@@ -72,6 +81,22 @@ fn animate_sprites(
     }
 }
 
+fn animate_complex_sprites(
+    time: Res<Time>,
+    mut q_sprites: Query<(&AnimationIndices, &mut FrameTimer, &mut TextureAtlasSprite)>,
+) {
+    for (indices, mut timer, mut sprite) in &mut q_sprites {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            sprite.index = if sprite.index == indices.last {
+                indices.first
+            } else {
+                sprite.index + 1
+            };
+        }
+    }
+}
+
 fn despawn_anim_sprites(mut commands: Commands, q_anim_sprites: Query<(Entity, &AnimSprite)>) {
     for (entity, asprite) in &q_anim_sprites {
         if asprite.disabled {
@@ -86,7 +111,12 @@ impl Plugin for AnimSpritePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (animate_sprites, despawn_anim_sprites).run_if(in_state(GameState::Gaming)),
+            (
+                animate_sprites,
+                animate_complex_sprites,
+                despawn_anim_sprites,
+            )
+                .run_if(in_state(GameState::Gaming)),
         );
     }
 }
