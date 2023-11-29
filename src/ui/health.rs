@@ -205,13 +205,11 @@ impl Plugin for HealthPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (
-                move_health_bars,
-                fill_health_bars,
-                spawn_health_bars,
-                despawn_health_bars,
-            )
-                .run_if(in_state(GameState::Gaming)),
+            (spawn_health_bars, despawn_health_bars).run_if(in_state(GameState::Gaming)),
+        )
+        .add_systems(
+            PostUpdate,
+            (move_health_bars, fill_health_bars).run_if(in_state(GameState::Gaming)),
         );
     }
 }

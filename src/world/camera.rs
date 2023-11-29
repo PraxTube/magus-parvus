@@ -3,7 +3,7 @@ use bevy::render::camera::ScalingMode;
 use bevy::window::{PrimaryWindow, WindowMode};
 
 use crate::player::input::PlayerInput;
-use crate::player::{player_movement, Player, PlayerState};
+use crate::player::{Player, PlayerState};
 use crate::GameState;
 
 pub struct CameraPlugin;
@@ -12,7 +12,7 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (move_camera.after(player_movement), zoom_camera).run_if(in_state(GameState::Gaming)),
+            (move_camera, zoom_camera).run_if(in_state(GameState::Gaming)),
         )
         .add_systems(OnEnter(GameState::Gaming), spawn_camera)
         .add_systems(Update, toggle_full_screen);

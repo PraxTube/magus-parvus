@@ -2,8 +2,11 @@ pub mod input;
 pub mod stats;
 
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
+use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
+use crate::world::game_entity::SpawnGameEntity;
 use crate::{GameAssets, GameState};
 
 use self::{input::PlayerInput, stats::Stats};
@@ -104,11 +107,10 @@ fn adjust_sprite_flip(mut q_player: Query<(&mut TextureAtlasSprite, &Player)>) {
 }
 
 pub fn player_movement(
-    time: Res<Time>,
-    mut q_player: Query<(&mut Transform, &mut Player, &Stats)>,
+    mut q_player: Query<(&mut Velocity, &mut Player, &Stats)>,
     player_input: Res<PlayerInput>,
 ) {
-    let (mut transform, mut player, stats) = match q_player.get_single_mut() {
+    let (mut velocity, mut player, stats) = match q_player.get_single_mut() {
         Ok(p) => (p.0, p.1, p.2),
         Err(_) => return,
     };
@@ -119,27 +121,54 @@ pub fn player_movement(
     let direction = player_input.move_direction;
     if direction == Vec2::default() {
         player.state = PlayerState::Idling;
+        velocity.linvel = Vec2::ZERO;
         return;
     }
 
     player.state = PlayerState::Moving;
     player.current_direction = direction;
-    transform.translation += direction.extend(0.0) * stats.move_speed * time.delta_seconds();
+    velocity.linvel = direction * stats.move_speed;
 }
 
-fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
-    commands.spawn((
-        Player::default(),
-        Stats::default(),
-        SpriteSheetBundle {
-            transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
-                .with_scale(Vec3::splat(2.0)),
-            texture_atlas: assets.player.clone(),
-            ..default()
-        },
-        AnimationIndices { first: 0, last: 5 },
-        FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
-    ));
+fn spawn_player(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    mut ev_spawn_game_entity: EventWriter<SpawnGameEntity>,
+) {
+    let entity = commands
+        .spawn((
+            RigidBody::Dynamic,
+            LockedAxes::ROTATION_LOCKED,
+            Velocity::zero(),
+            Player::default(),
+            Stats::default(),
+            SpriteSheetBundle {
+                transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
+                    .with_scale(Vec3::splat(2.0)),
+                texture_atlas: assets.player.clone(),
+                ..default()
+            },
+            AnimationIndices { first: 0, last: 5 },
+            FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
+        ))
+        .id();
+
+    let health = Health::new(entity, 10.0, 0.60);
+    ev_spawn_game_entity.send(SpawnGameEntity { entity, health });
+
+    let collider = commands
+        .spawn((
+            Collider::ball(4.0),
+            ActiveEvents::COLLISION_EVENTS,
+            // CollisionGroups::new(
+            //     Group::from_bits(0b1100).unwrap(),
+            //     Group::from_bits(0b1100).unwrap(),
+            // ),
+            TransformBundle::from_transform(Transform::from_translation(Vec3::new(0.0, -5.0, 0.0))),
+        ))
+        .id();
+
+    commands.entity(entity).push_children(&[collider]);
 }
 
 fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player>) {

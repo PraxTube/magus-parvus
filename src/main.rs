@@ -13,6 +13,7 @@ use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowMode};
 
 use bevy_asset_loader::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 #[derive(States, Clone, Eq, PartialEq, Debug, Hash, Default)]
 pub enum GameState {
@@ -37,6 +38,8 @@ fn main() {
                 .build(),
             LogDiagnosticsPlugin::default(),
             FrameTimeDiagnosticsPlugin,
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default(),
         ))
         .insert_resource(Msaa::Off)
         .add_state::<GameState>()

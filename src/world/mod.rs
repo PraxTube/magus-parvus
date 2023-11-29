@@ -5,6 +5,7 @@ mod map;
 pub use camera::MainCamera;
 
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 pub struct WorldPlugin;
 
@@ -14,6 +15,11 @@ impl Plugin for WorldPlugin {
             camera::CameraPlugin,
             map::MapPlugin,
             game_entity::GameEntityPlugin,
-        ));
+        ))
+        .add_systems(Startup, configure_physics);
     }
+}
+
+fn configure_physics(mut rapier_config: ResMut<RapierConfiguration>) {
+    rapier_config.gravity = Vec2::ZERO;
 }

@@ -3,6 +3,7 @@ use std::time::Duration;
 use rand::{self, Rng};
 
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
@@ -41,7 +42,7 @@ impl Default for SlimeEnemy {
             jump_direction: Vec3::default(),
             jumping_timer: Timer::new(Duration::from_secs_f32(JUMP_TIME), TimerMode::Repeating),
             jump_cooldown_timer: Timer::new(Duration::from_secs_f32(3.5), TimerMode::Repeating),
-            death_timer: Timer::new(Duration::from_secs_f32(0.075 * 6.0), TimerMode::Once),
+            death_timer: Timer::new(Duration::from_secs_f32(0.070 * 6.0), TimerMode::Once),
         }
     }
 }
@@ -88,20 +89,23 @@ fn spawn_slimes(
         ))
         .id();
 
-    let health = Health::new(entity, 10.0, 0.75);
+    let health = Health::new(entity, 10.0, 0.60);
     ev_spawn_game_entity.send(SpawnGameEntity { entity, health });
 
-    commands.spawn((
-        Enemy,
-        SlimeEnemy::default(),
-        AnimationIndices { first: 0, last: 5 },
-        FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
-        SpriteSheetBundle {
-            transform: Transform::from_translation(Vec3::default()).with_scale(Vec3::splat(1.5)),
-            texture_atlas: assets.enemy.clone(),
-            ..default()
-        },
-    ));
+    let collider = commands
+        .spawn((
+            Collider::ball(6.0),
+            // CollisionGroups::new(
+            //     Group::from_bits(0b0100).unwrap(),
+            //     Group::from_bits(0b1000).unwrap(),
+            // ),
+            TransformBundle::from_transform(Transform::from_translation(Vec3::new(
+                0.0, -10.0, 0.0,
+            ))),
+        ))
+        .id();
+
+    commands.entity(entity).push_children(&[collider]);
 }
 
 fn tick_slime_timers(time: Res<Time>, mut q_slimes: Query<&mut SlimeEnemy, With<Enemy>>) {
@@ -162,7 +166,7 @@ fn move_slimes(time: Res<Time>, mut q_enemies: Query<(&mut Transform, &SlimeEnem
 
 fn damage_slimes(time: Res<Time>, mut q_slimes: Query<&mut Health, With<SlimeEnemy>>) {
     for mut health in &mut q_slimes {
-        health.health -= 10.0 * time.delta_seconds();
+        health.health -= 0.2 * time.delta_seconds();
     }
 }
 
