@@ -28,7 +28,7 @@ pub enum SlimeState {
 struct SlimeEnemy {
     state: SlimeState,
     jump_speed: f32,
-    jump_direction: Vec3,
+    jump_direction: Vec2,
     jumping_timer: Timer,
     jump_cooldown_timer: Timer,
     death_timer: Timer,
@@ -39,7 +39,7 @@ impl Default for SlimeEnemy {
         Self {
             state: SlimeState::Idling,
             jump_speed: MAX_JUMP_SPEED,
-            jump_direction: Vec3::default(),
+            jump_direction: Vec2::ZERO,
             jumping_timer: Timer::new(Duration::from_secs_f32(JUMP_TIME), TimerMode::Repeating),
             jump_cooldown_timer: Timer::new(Duration::from_secs_f32(3.5), TimerMode::Repeating),
             death_timer: Timer::new(Duration::from_secs_f32(0.070 * 6.0), TimerMode::Once),
@@ -76,6 +76,9 @@ fn spawn_slimes(
 ) {
     let entity = commands
         .spawn((
+            RigidBody::Dynamic,
+            LockedAxes::ROTATION_LOCKED,
+            Velocity::zero(),
             Enemy,
             SlimeEnemy::default(),
             AnimationIndices { first: 0, last: 5 },
@@ -95,6 +98,7 @@ fn spawn_slimes(
     let collider = commands
         .spawn((
             Collider::ball(6.0),
+            ActiveEvents::COLLISION_EVENTS,
             // CollisionGroups::new(
             //     Group::from_bits(0b0100).unwrap(),
             //     Group::from_bits(0b1000).unwrap(),
@@ -146,21 +150,21 @@ fn update_jump_position(
 
         let mut rng = rand::thread_rng();
         let dir = (player_transform.translation - enemy_transform.translation).normalize_or_zero();
-        let random_offset = Vec3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0)
-            * RANDOM_OFFSET_INTENSITY;
+        let random_offset =
+            Vec2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0)) * RANDOM_OFFSET_INTENSITY;
 
         slime.jump_speed = ratio * MAX_JUMP_SPEED;
-        slime.jump_direction = dir + random_offset;
+        slime.jump_direction = dir.truncate() + random_offset;
     }
 }
 
-fn move_slimes(time: Res<Time>, mut q_enemies: Query<(&mut Transform, &SlimeEnemy)>) {
-    for (mut enemy_transform, slime) in &mut q_enemies {
+fn move_slimes(mut q_slimes: Query<(&mut Velocity, &SlimeEnemy)>) {
+    for (mut velocity, slime) in &mut q_slimes {
         if slime.state != SlimeState::Jumping {
+            velocity.linvel = Vec2::ZERO;
             continue;
         }
-        enemy_transform.translation +=
-            slime.jump_direction * slime.jump_speed * time.delta_seconds();
+        velocity.linvel = slime.jump_direction * slime.jump_speed;
     }
 }
 

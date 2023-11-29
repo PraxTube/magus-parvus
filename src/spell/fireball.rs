@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 use crate::enemy::Enemy;
 use crate::player::Player;
@@ -17,16 +18,30 @@ const SCALE_TIME: f32 = 0.35;
 const DELTA_STEERING: f32 = 2.0;
 
 fn spawn_fireball(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
-    commands.spawn((
-        Fireball,
-        SpriteSheetBundle {
-            transform,
-            texture_atlas: assets.fireball.clone(),
-            ..default()
-        },
-        AnimSprite::new(60, true),
-        AnimSpriteTimer::new(0.05),
-    ));
+    let entity = commands
+        .spawn((
+            Fireball,
+            SpriteSheetBundle {
+                transform,
+                texture_atlas: assets.fireball.clone(),
+                ..default()
+            },
+            AnimSprite::new(60, true),
+            AnimSpriteTimer::new(0.05),
+        ))
+        .id();
+
+    let collider = commands
+        .spawn((
+            Collider::ball(5.0),
+            Sensor,
+            TransformBundle::from_transform(Transform::from_translation(Vec3::new(
+                -25.0, 0.0, 0.0,
+            ))),
+        ))
+        .id();
+
+    commands.entity(entity).push_children(&[collider]);
 }
 
 fn spawn_fireballs(
