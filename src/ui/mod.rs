@@ -1,3 +1,5 @@
+pub mod health;
+
 use bevy::prelude::*;
 use bevy_simple_text_input::{TextInput, TextInputPlugin};
 
@@ -14,10 +16,11 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(TextInputPlugin).add_systems(
+        app.add_systems(
             Update,
             (spawn_casting_text, despawn_casting_text).run_if(in_state(GameState::Gaming)),
-        );
+        )
+        .add_plugins((TextInputPlugin, health::HealthPlugin));
     }
 }
 
