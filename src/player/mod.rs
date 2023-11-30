@@ -1,5 +1,9 @@
 pub mod input;
+pub mod state;
 pub mod stats;
+
+pub use state::PlayerChangedState;
+pub use state::PlayerState;
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -9,7 +13,8 @@ use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::world::game_entity::SpawnGameEntity;
 use crate::{GameAssets, GameState};
 
-use self::{input::PlayerInput, stats::Stats};
+use input::PlayerInput;
+use stats::Stats;
 
 pub struct PlayerPlugin;
 
@@ -17,58 +22,18 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (
-                update_indicies,
-                adjust_sprite_flip,
-                player_movement,
-                switch_player_mode,
-                player_changed_state,
-            )
+            (update_indicies, adjust_sprite_flip, player_movement)
                 .run_if(in_state(GameState::Gaming)),
         )
-        .add_plugins(input::InputPlugin)
-        .add_event::<PlayerChangedState>()
+        .add_plugins((input::InputPlugin, state::PlayerStatePlugin))
         .add_systems(OnEnter(GameState::Gaming), spawn_player);
     }
-}
-
-#[derive(Default, PartialEq, Clone, Copy)]
-pub enum PlayerState {
-    #[default]
-    Idling,
-    Moving,
-    Casting,
 }
 
 #[derive(Component, Default)]
 pub struct Player {
     pub state: PlayerState,
     pub current_direction: Vec2,
-}
-
-#[derive(Event)]
-pub struct PlayerChangedState {
-    pub old_state: PlayerState,
-    pub new_state: PlayerState,
-}
-
-fn player_changed_state(
-    q_player: Query<&Player>,
-    mut ev_changed_state: EventWriter<PlayerChangedState>,
-    mut old_state: Local<PlayerState>,
-) {
-    let player = match q_player.get_single() {
-        Ok(p) => p,
-        Err(_) => return,
-    };
-
-    if player.state != *old_state {
-        ev_changed_state.send(PlayerChangedState {
-            old_state: *old_state,
-            new_state: player.state,
-        });
-        *old_state = player.state;
-    }
 }
 
 fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
@@ -169,29 +134,4 @@ fn spawn_player(
         .id();
 
     commands.entity(entity).push_children(&[collider]);
-}
-
-fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player>) {
-    let mut player = match q_player.get_single_mut() {
-        Ok(p) => p,
-        Err(_) => return,
-    };
-
-    match player.state {
-        PlayerState::Idling => {
-            if keys.just_pressed(KeyCode::I) {
-                player.state = PlayerState::Casting;
-            }
-        }
-        PlayerState::Moving => {
-            if keys.just_pressed(KeyCode::I) {
-                player.state = PlayerState::Casting;
-            }
-        }
-        PlayerState::Casting => {
-            if keys.just_pressed(KeyCode::Escape) {
-                player.state = PlayerState::Idling;
-            }
-        }
-    }
 }
