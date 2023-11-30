@@ -10,6 +10,7 @@ pub enum PlayerState {
     Idling,
     Moving,
     Casting,
+    Staggering,
 }
 
 #[derive(Event)]
@@ -59,6 +60,22 @@ fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player
                 player.state = PlayerState::Idling;
             }
         }
+        PlayerState::Staggering => {
+            if player.staggering_timer.just_finished() {
+                player.state = PlayerState::Idling;
+            }
+        }
+    }
+}
+
+fn tick_staggering_timer(time: Res<Time>, mut q_player: Query<&mut Player>) {
+    let mut player = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    if player.state == PlayerState::Staggering {
+        player.staggering_timer.tick(time.delta());
     }
 }
 
@@ -68,7 +85,12 @@ impl Plugin for PlayerStatePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (switch_player_mode, player_changed_state).run_if(in_state(GameState::Gaming)),
+            (
+                switch_player_mode,
+                player_changed_state,
+                tick_staggering_timer,
+            )
+                .run_if(in_state(GameState::Gaming)),
         )
         .add_event::<PlayerChangedState>();
     }

@@ -17,6 +17,9 @@ use crate::{GameAssets, GameState};
 use input::PlayerInput;
 use stats::Stats;
 
+const STAGGERING_TIME: f32 = 0.25;
+const STAGGERING_INTENSITY: f32 = 200.0;
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -41,6 +44,7 @@ pub struct Player {
     pub state: PlayerState,
     pub current_direction: Vec2,
     pub collider_entity: Entity,
+    pub staggering_timer: Timer,
 }
 
 impl Player {
@@ -49,6 +53,7 @@ impl Player {
             state: PlayerState::default(),
             current_direction: Vec2::ZERO,
             collider_entity,
+            staggering_timer: Timer::from_seconds(STAGGERING_TIME, TimerMode::Repeating),
         }
     }
 }
@@ -58,6 +63,7 @@ fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
         PlayerState::Idling => (0, 5),
         PlayerState::Moving => (6, 11),
         PlayerState::Casting => (12, 17),
+        PlayerState::Staggering => (18, 18),
     }
 }
 
@@ -156,12 +162,12 @@ fn spawn_player(
 }
 
 fn apply_contact_damage(
-    mut q_player: Query<(&Player, &mut Health)>,
+    mut q_player: Query<(&mut Velocity, &mut Player, &mut Health, &Transform)>,
     q_enemies: Query<(&Transform, &Enemy), Without<Player>>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>, Without<Player>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
-    let (player, mut health) = match q_player.get_single_mut() {
+    let (mut velocity, mut player, mut health, player_transform) = match q_player.get_single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -186,11 +192,19 @@ fn apply_contact_damage(
             continue;
         };
 
-        let (_enemy_transform, enemy) = match q_enemies.get(enemy_parent.get()) {
+        let (enemy_transform, enemy) = match q_enemies.get(enemy_parent.get()) {
             Ok(e) => (e.0, e.1),
             Err(_) => continue,
         };
 
         health.health -= enemy.damage;
+        player.state = PlayerState::Staggering;
+
+        let dir = (player_transform.translation - enemy_transform.translation)
+            .truncate()
+            .normalize_or_zero();
+        // This makes the player look towards the impact
+        player.current_direction = -dir;
+        velocity.linvel = dir * STAGGERING_INTENSITY;
     }
 }
