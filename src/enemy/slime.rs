@@ -79,7 +79,7 @@ fn spawn_slimes(
             RigidBody::Dynamic,
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
-            Enemy,
+            Enemy { damage: 1.0 },
             SlimeEnemy::default(),
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),

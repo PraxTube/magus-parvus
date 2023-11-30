@@ -8,6 +8,7 @@ pub use state::PlayerState;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use crate::enemy::Enemy;
 use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::world::game_entity::SpawnGameEntity;
@@ -22,7 +23,12 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (update_indicies, adjust_sprite_flip, player_movement)
+            (
+                update_indicies,
+                adjust_sprite_flip,
+                player_movement,
+                apply_contact_damage,
+            )
                 .run_if(in_state(GameState::Gaming)),
         )
         .add_plugins((input::InputPlugin, state::PlayerStatePlugin))
@@ -30,10 +36,21 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component)]
 pub struct Player {
     pub state: PlayerState,
     pub current_direction: Vec2,
+    pub collider_entity: Entity,
+}
+
+impl Player {
+    fn new(collider_entity: Entity) -> Self {
+        Self {
+            state: PlayerState::default(),
+            current_direction: Vec2::ZERO,
+            collider_entity,
+        }
+    }
 }
 
 fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
@@ -105,7 +122,6 @@ fn spawn_player(
             RigidBody::Dynamic,
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
-            Player::default(),
             Stats::default(),
             SpriteSheetBundle {
                 transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
@@ -133,5 +149,48 @@ fn spawn_player(
         ))
         .id();
 
-    commands.entity(entity).push_children(&[collider]);
+    commands
+        .entity(entity)
+        .insert(Player::new(collider))
+        .push_children(&[collider]);
+}
+
+fn apply_contact_damage(
+    mut q_player: Query<(&Player, &mut Health)>,
+    q_enemies: Query<(&Transform, &Enemy), Without<Player>>,
+    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>, Without<Player>)>,
+    mut ev_collision_events: EventReader<CollisionEvent>,
+) {
+    let (player, mut health) = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    for ev in ev_collision_events.read() {
+        let (source, target) = match ev {
+            CollisionEvent::Started(source, target, _) => (source, target),
+            CollisionEvent::Stopped(_, _, _) => continue,
+        };
+
+        let enemy_parent = if &player.collider_entity == source {
+            match q_colliders.get(*target) {
+                Ok(parent) => parent,
+                Err(_) => continue,
+            }
+        } else if &player.collider_entity == target {
+            match q_colliders.get(*source) {
+                Ok(parent) => parent,
+                Err(_) => continue,
+            }
+        } else {
+            continue;
+        };
+
+        let (_enemy_transform, enemy) = match q_enemies.get(enemy_parent.get()) {
+            Ok(e) => (e.0, e.1),
+            Err(_) => continue,
+        };
+
+        health.health -= enemy.damage;
+    }
 }
