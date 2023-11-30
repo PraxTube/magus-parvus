@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use rand::{self, Rng};
 
 use bevy::prelude::*;
@@ -16,11 +14,15 @@ const MAX_JUMP_SPEED: f32 = 200.0;
 const RANDOM_OFFSET_INTENSITY: f32 = 0.25;
 const JUMP_TIME: f32 = 0.5;
 
+const STAGGERING_TIME: f32 = 0.25;
+const STAGGERING_INTENSITY: f32 = 100.0;
+
 #[derive(Default, PartialEq, Clone, Copy)]
 pub enum SlimeState {
     #[default]
     Idling,
     Jumping,
+    Staggering,
     Dying,
 }
 
@@ -32,6 +34,7 @@ struct SlimeEnemy {
     jumping_timer: Timer,
     jump_cooldown_timer: Timer,
     death_timer: Timer,
+    staggering_timer: Timer,
 }
 
 impl Default for SlimeEnemy {
@@ -40,9 +43,10 @@ impl Default for SlimeEnemy {
             state: SlimeState::Idling,
             jump_speed: MAX_JUMP_SPEED,
             jump_direction: Vec2::ZERO,
-            jumping_timer: Timer::new(Duration::from_secs_f32(JUMP_TIME), TimerMode::Repeating),
-            jump_cooldown_timer: Timer::new(Duration::from_secs_f32(3.5), TimerMode::Repeating),
-            death_timer: Timer::new(Duration::from_secs_f32(0.070 * 6.0), TimerMode::Once),
+            jumping_timer: Timer::from_seconds(JUMP_TIME, TimerMode::Repeating),
+            jump_cooldown_timer: Timer::from_seconds(3.5, TimerMode::Repeating),
+            death_timer: Timer::from_seconds(0.070 * 6.0, TimerMode::Once),
+            staggering_timer: Timer::from_seconds(STAGGERING_TIME, TimerMode::Repeating),
         }
     }
 }
@@ -51,6 +55,7 @@ fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
     match state {
         SlimeState::Idling => (0, 5),
         SlimeState::Jumping => (6, 11),
+        SlimeState::Staggering => (0, 0),
         SlimeState::Dying => (12, 17),
     }
 }
@@ -84,8 +89,12 @@ fn spawn_slimes(
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             SpriteSheetBundle {
-                transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
-                    .with_scale(Vec3::splat(1.5)),
+                transform: Transform::from_translation(Vec3::new(
+                    32.0 * 32.0,
+                    32.0 * 32.0 - 500.0,
+                    0.0,
+                ))
+                .with_scale(Vec3::splat(1.5)),
                 texture_atlas: assets.enemy.clone(),
                 ..default()
             },
@@ -114,19 +123,29 @@ fn spawn_slimes(
 
 fn tick_slime_timers(time: Res<Time>, mut q_slimes: Query<&mut SlimeEnemy, With<Enemy>>) {
     for mut slime in &mut q_slimes {
-        if slime.state == SlimeState::Idling {
-            slime.jump_cooldown_timer.tick(time.delta());
-            if slime.jump_cooldown_timer.just_finished() {
-                slime.state = SlimeState::Jumping;
+        match slime.state {
+            SlimeState::Idling => {
+                slime.jump_cooldown_timer.tick(time.delta());
+                if slime.jump_cooldown_timer.just_finished() {
+                    slime.state = SlimeState::Jumping;
+                }
             }
-        } else if slime.state == SlimeState::Jumping {
-            slime.jumping_timer.tick(time.delta());
-            if slime.jumping_timer.just_finished() {
-                slime.state = SlimeState::Idling;
+            SlimeState::Jumping => {
+                slime.jumping_timer.tick(time.delta());
+                if slime.jumping_timer.just_finished() {
+                    slime.state = SlimeState::Idling;
+                }
             }
-        } else if slime.state == SlimeState::Dying {
-            slime.death_timer.tick(time.delta());
-        }
+            SlimeState::Staggering => {
+                slime.staggering_timer.tick(time.delta());
+                if slime.staggering_timer.just_finished() {
+                    slime.state = SlimeState::Idling;
+                }
+            }
+            SlimeState::Dying => {
+                slime.death_timer.tick(time.delta());
+            }
+        };
     }
 }
 
@@ -160,17 +179,14 @@ fn update_jump_position(
 
 fn move_slimes(mut q_slimes: Query<(&mut Velocity, &SlimeEnemy)>) {
     for (mut velocity, slime) in &mut q_slimes {
+        if slime.state == SlimeState::Staggering {
+            continue;
+        }
         if slime.state != SlimeState::Jumping {
             velocity.linvel = Vec2::ZERO;
             continue;
         }
         velocity.linvel = slime.jump_direction * slime.jump_speed;
-    }
-}
-
-fn damage_slimes(time: Res<Time>, mut q_slimes: Query<&mut Health, With<SlimeEnemy>>) {
-    for mut health in &mut q_slimes {
-        health.health -= 0.2 * time.delta_seconds();
     }
 }
 
@@ -185,6 +201,57 @@ fn despawn_slimes(mut commands: Commands, mut q_slimes: Query<(Entity, &Health, 
     }
 }
 
+fn check_player_collision(
+    q_player: Query<(&Transform, &Player), With<Player>>,
+    mut q_enemies: Query<(&Transform, &mut SlimeEnemy, &mut Velocity), Without<Player>>,
+    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>, Without<Player>)>,
+    mut ev_collision_events: EventReader<CollisionEvent>,
+) {
+    let (player_transform, player) = match q_player.get_single() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    for ev in ev_collision_events.read() {
+        let (source, target) = match ev {
+            CollisionEvent::Started(source, target, _) => (source, target),
+            CollisionEvent::Stopped(_, _, _) => continue,
+        };
+
+        let enemy_parent = if &player.collider_entity == source {
+            match q_colliders.get(*target) {
+                Ok(parent) => parent,
+                Err(_) => continue,
+            }
+        } else if &player.collider_entity == target {
+            match q_colliders.get(*source) {
+                Ok(parent) => parent,
+                Err(_) => continue,
+            }
+        } else {
+            continue;
+        };
+
+        let (enemy_transform, mut slime, mut velocity) = match q_enemies.get_mut(enemy_parent.get())
+        {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+
+        // Slime is jumping, don't apply any knockback
+        if slime.state == SlimeState::Jumping {
+            continue;
+        }
+
+        let dir = (enemy_transform.translation - player_transform.translation)
+            .truncate()
+            .normalize_or_zero();
+        velocity.linvel = dir * STAGGERING_INTENSITY;
+        slime.jump_cooldown_timer.reset();
+        slime.state = SlimeState::Staggering;
+    }
+}
+
 pub struct SlimeEnemyPlugin;
 
 impl Plugin for SlimeEnemyPlugin {
@@ -196,8 +263,8 @@ impl Plugin for SlimeEnemyPlugin {
                 tick_slime_timers,
                 move_slimes,
                 update_jump_position,
-                damage_slimes,
                 despawn_slimes,
+                check_player_collision,
             )
                 .run_if(in_state(GameState::Gaming)),
         )

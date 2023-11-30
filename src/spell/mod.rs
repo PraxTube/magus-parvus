@@ -21,7 +21,8 @@ impl Plugin for SpellPlugin {
 #[derive(PartialEq)]
 enum Spell {
     Fireball,
-    FireballCircle,
+    IgnisPila,
+    InfernoPila,
     SpeedBoost,
 }
 
@@ -106,7 +107,11 @@ fn submit_spell(
             });
         } else if ev.value.to_lowercase() == "ignis pila" {
             ev_spell_casted.send(SpellCasted {
-                spell: Spell::FireballCircle,
+                spell: Spell::IgnisPila,
+            });
+        } else if ev.value.to_lowercase() == "inferno pila" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::InfernoPila,
             });
         } else if ev.value.to_lowercase() == "cito" {
             ev_spell_casted.send(SpellCasted {

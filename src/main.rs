@@ -8,6 +8,7 @@ mod world;
 
 pub use assets::GameAssets;
 
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowMode};
 
@@ -35,6 +36,8 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest())
                 .build(),
+            LogDiagnosticsPlugin::default(),
+            FrameTimeDiagnosticsPlugin,
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default(),
         ))

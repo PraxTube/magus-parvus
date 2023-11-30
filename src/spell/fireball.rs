@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -16,6 +18,7 @@ const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.5;
 const SCALE_TIME: f32 = 0.35;
 const DELTA_STEERING: f32 = 2.0;
+const INFERNO_COUNT: usize = 100;
 
 fn spawn_fireball(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
     let entity = commands
@@ -65,7 +68,7 @@ fn spawn_fireballs(
     }
 }
 
-fn spawn_fireball_circles(
+fn spawn_ignis_pila(
     mut commands: Commands,
     assets: Res<GameAssets>,
     q_player: Query<&Transform, With<Player>>,
@@ -77,7 +80,7 @@ fn spawn_fireball_circles(
     };
 
     for ev in ev_spell_casted.read() {
-        if ev.spell == Spell::FireballCircle {
+        if ev.spell == Spell::IgnisPila {
             for dir in [
                 Vec2::new(1.0, 0.0),
                 Vec2::new(0.0, 1.0),
@@ -91,6 +94,29 @@ fn spawn_fireball_circles(
                 let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
                     .with_rotation(quat_from_vec2(-dir));
+                spawn_fireball(&mut commands, &assets, transform);
+            }
+        }
+    }
+}
+
+fn spawn_inferno_pila(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    q_player: Query<&Transform, With<Player>>,
+    mut ev_spell_casted: EventReader<SpellCasted>,
+) {
+    let player_pos = match q_player.get_single() {
+        Ok(p) => p.translation,
+        Err(_) => return,
+    };
+
+    for ev in ev_spell_casted.read() {
+        if ev.spell == Spell::InfernoPila {
+            for i in 0..INFERNO_COUNT {
+                let transform = Transform::from_translation(player_pos)
+                    .with_scale(Vec3::ZERO)
+                    .with_rotation(Quat::from_rotation_z(TAU * i as f32 / INFERNO_COUNT as f32));
                 spawn_fireball(&mut commands, &assets, transform);
             }
         }
@@ -154,7 +180,8 @@ impl Plugin for FireballPlugin {
             Update,
             (
                 spawn_fireballs.run_if(in_state(GameState::Gaming)),
-                spawn_fireball_circles.run_if(in_state(GameState::Gaming)),
+                spawn_ignis_pila.run_if(in_state(GameState::Gaming)),
+                spawn_inferno_pila.run_if(in_state(GameState::Gaming)),
                 scale_fireballs,
                 move_fireballs,
                 steer_fireballs,
