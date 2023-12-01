@@ -62,6 +62,7 @@ fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player
         }
         PlayerState::Staggering => {
             if player.staggering_timer.just_finished() {
+                player.staggering_timer.reset();
                 player.state = PlayerState::Idling;
             }
         }

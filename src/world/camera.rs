@@ -12,7 +12,7 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (move_camera, zoom_camera).run_if(in_state(GameState::Gaming)),
+            (move_camera, zoom_camera, apply_y_sort).run_if(in_state(GameState::Gaming)),
         )
         .add_systems(OnEnter(GameState::Gaming), spawn_camera)
         .add_systems(Update, toggle_full_screen);
@@ -21,6 +21,15 @@ impl Plugin for CameraPlugin {
 
 #[derive(Component)]
 pub struct MainCamera;
+
+#[derive(Component)]
+pub struct YSort(pub f32);
+
+pub fn apply_y_sort(mut q_transforms: Query<(&mut Transform, &YSort)>) {
+    for (mut transform, ysort) in &mut q_transforms {
+        transform.translation.z = ysort.0 - transform.translation.y * 0.0001;
+    }
+}
 
 fn spawn_camera(mut commands: Commands) {
     let mut camera = Camera2dBundle::default();
@@ -47,7 +56,8 @@ fn move_camera(
             return;
         }
     };
-    camera_transform.translation = player_pos;
+    camera_transform.translation =
+        Vec3::new(player_pos.x, player_pos.y, camera_transform.translation.z);
 }
 
 fn zoom_camera(

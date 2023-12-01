@@ -29,7 +29,7 @@ fn map_indices_to_world_coords(x_index: i32, y_index: i32) -> Vec3 {
     Vec3::new(
         x_index as f32 * CHUNK_SIZE,
         y_index as f32 * CHUNK_SIZE,
-        -1000.0,
+        -1_000.0,
     )
 }
 

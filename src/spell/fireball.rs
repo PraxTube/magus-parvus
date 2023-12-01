@@ -12,7 +12,19 @@ use crate::{GameAssets, GameState};
 use super::{Spell, SpellCasted};
 
 #[derive(Component)]
-struct Fireball;
+pub struct Fireball {
+    pub disabled: bool,
+    pub damage: f32,
+}
+
+impl Default for Fireball {
+    fn default() -> Self {
+        Self {
+            disabled: false,
+            damage: 1.0,
+        }
+    }
+}
 
 const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.5;
@@ -23,7 +35,7 @@ const INFERNO_COUNT: usize = 100;
 fn spawn_fireball(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
     let entity = commands
         .spawn((
-            Fireball,
+            Fireball::default(),
             SpriteSheetBundle {
                 transform,
                 texture_atlas: assets.fireball.clone(),
@@ -172,6 +184,14 @@ fn steer_fireballs(
     }
 }
 
+fn despawn_fireballs(mut commands: Commands, q_fireballs: Query<(Entity, &Fireball)>) {
+    for (entity, fireball) in &q_fireballs {
+        if fireball.disabled {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 pub struct FireballPlugin;
 
 impl Plugin for FireballPlugin {
@@ -179,13 +199,15 @@ impl Plugin for FireballPlugin {
         app.add_systems(
             Update,
             (
-                spawn_fireballs.run_if(in_state(GameState::Gaming)),
-                spawn_ignis_pila.run_if(in_state(GameState::Gaming)),
-                spawn_inferno_pila.run_if(in_state(GameState::Gaming)),
+                spawn_fireballs,
+                spawn_ignis_pila,
+                spawn_inferno_pila,
+                despawn_fireballs,
                 scale_fireballs,
                 move_fireballs,
                 steer_fireballs,
-            ),
+            )
+                .run_if(in_state(GameState::Gaming)),
         );
     }
 }

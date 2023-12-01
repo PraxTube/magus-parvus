@@ -11,6 +11,7 @@ use bevy_rapier2d::prelude::*;
 use crate::enemy::Enemy;
 use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
+use crate::world::camera::YSort;
 use crate::world::game_entity::SpawnGameEntity;
 use crate::{GameAssets, GameState};
 
@@ -129,14 +130,15 @@ fn spawn_player(
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
             Stats::default(),
+            YSort(0.0),
+            AnimationIndices { first: 0, last: 5 },
+            FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             SpriteSheetBundle {
                 transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
                     .with_scale(Vec3::splat(2.0)),
                 texture_atlas: assets.player.clone(),
                 ..default()
             },
-            AnimationIndices { first: 0, last: 5 },
-            FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
         ))
         .id();
 

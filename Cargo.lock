@@ -2357,18 +2357,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "little-mage"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy_asset_loader",
- "bevy_ecs_ldtk",
- "bevy_rapier2d",
- "bevy_simple_text_input",
- "rand",
-]
-
-[[package]]
 name = "lock_api"
 version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2391,6 +2379,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6d0d1830bcd151a6fc4aea1369af235b36c1528fe976b8ff678683c9995eade8"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "magus-parvus"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_asset_loader",
+ "bevy_ecs_ldtk",
+ "bevy_rapier2d",
+ "bevy_simple_text_input",
+ "rand",
 ]
 
 [[package]]

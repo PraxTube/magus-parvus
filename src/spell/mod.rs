@@ -1,4 +1,4 @@
-mod fireball;
+pub mod fireball;
 mod speed_boost;
 
 use std::time::Duration;
