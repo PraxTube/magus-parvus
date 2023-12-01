@@ -8,12 +8,14 @@ mod world;
 
 pub use assets::GameAssets;
 
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowMode};
 
 use bevy_asset_loader::prelude::*;
 use bevy_rapier2d::prelude::*;
+use bevy_screen_diagnostics::{
+    ScreenDiagnosticsPlugin, ScreenEntityDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin,
+};
 
 #[derive(States, Clone, Eq, PartialEq, Debug, Hash, Default)]
 pub enum GameState {
@@ -36,8 +38,18 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest())
                 .build(),
-            LogDiagnosticsPlugin::default(),
-            FrameTimeDiagnosticsPlugin,
+            ScreenDiagnosticsPlugin {
+                timestep: 1.0,
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    top: Val::Px(5.0),
+                    left: Val::Px(15.0),
+                    ..default()
+                },
+                ..default()
+            },
+            ScreenFrameDiagnosticsPlugin,
+            ScreenEntityDiagnosticsPlugin,
             RapierPhysicsPlugin::<NoUserData>::default(),
             // RapierDebugRenderPlugin::default(),
         ))

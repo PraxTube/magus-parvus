@@ -961,6 +961,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_screen_diagnostics"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8bbf77cc9e14ad65affe1ac0cf49956a1c42de4c167cd2d5a95dc0699009c3b4"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_simple_text_input"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2389,6 +2398,7 @@ dependencies = [
  "bevy_asset_loader",
  "bevy_ecs_ldtk",
  "bevy_rapier2d",
+ "bevy_screen_diagnostics",
  "bevy_simple_text_input",
  "rand",
 ]
