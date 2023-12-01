@@ -149,6 +149,7 @@ fn spawn_player(
         .spawn((
             Collider::ball(4.0),
             ActiveEvents::COLLISION_EVENTS,
+            CollisionGroups::default(),
             // CollisionGroups::new(
             //     Group::from_bits(0b1100).unwrap(),
             //     Group::from_bits(0b1100).unwrap(),

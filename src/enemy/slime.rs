@@ -21,7 +21,7 @@ const JUMP_TIME: f32 = 0.5;
 const STAGGERING_TIME: f32 = 0.25;
 const STAGGERING_INTENSITY: f32 = 100.0;
 
-const ENEMY_COUNT: usize = 10;
+const ENEMY_COUNT: usize = 100;
 
 #[derive(Default, PartialEq, Clone, Copy)]
 pub enum SlimeState {
