@@ -30,7 +30,7 @@ const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.5;
 const SCALE_TIME: f32 = 0.35;
 const DELTA_STEERING: f32 = 2.0;
-const INFERNO_COUNT: usize = 100;
+const INFERNO_COUNT: usize = 50;
 
 fn spawn_fireball(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
     let entity = commands

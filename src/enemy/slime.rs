@@ -120,7 +120,7 @@ fn spawn_slime(
 
     commands
         .entity(entity)
-        .insert(Health::new(entity, 10000.0, 0.60))
+        .insert(Health::new(entity, 1.0, 0.60))
         .push_children(&[collider]);
 }
 
@@ -260,6 +260,8 @@ fn check_player_collision(
         if slime.state == SlimeState::Jumping {
             slime.jump_direction = Vec2::ZERO;
             continue;
+        } else if slime.state == SlimeState::Dying {
+            continue;
         }
 
         let dir = (enemy_transform.translation - player_transform.translation)
@@ -272,7 +274,7 @@ fn check_player_collision(
 }
 
 fn check_fireball_collision(
-    mut q_enemies: Query<&mut Health, With<SlimeEnemy>>,
+    mut q_enemies: Query<(&SlimeEnemy, &mut Health)>,
     mut q_fireballs: Query<&mut Fireball>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
@@ -292,13 +294,18 @@ fn check_fireball_collision(
             Err(_) => continue,
         };
 
-        let mut slime_health = if let Ok(h) = q_enemies.get_mut(source_parent) {
+        let (slime, mut slime_health) = if let Ok(h) = q_enemies.get_mut(source_parent) {
             h
         } else if let Ok(h) = q_enemies.get_mut(target_parent) {
             h
         } else {
             continue;
         };
+
+        if slime.state == SlimeState::Dying {
+            continue;
+        }
+
         let mut fireball = if let Ok(f) = q_fireballs.get_mut(source_parent) {
             f
         } else if let Ok(f) = q_fireballs.get_mut(target_parent) {
