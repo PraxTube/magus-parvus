@@ -6,6 +6,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::spell::fireball::Fireball;
+use crate::spell::lightning::Lightning;
 use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::world::camera::YSort;
@@ -273,7 +274,7 @@ fn check_player_collision(
     }
 }
 
-fn check_fireball_collision(
+fn check_fireball_collisions(
     mut q_enemies: Query<(&SlimeEnemy, &mut Health)>,
     mut q_fireballs: Query<&mut Fireball>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
@@ -319,6 +320,51 @@ fn check_fireball_collision(
     }
 }
 
+fn check_lightning_collisions(
+    mut q_enemies: Query<(&SlimeEnemy, &mut Health)>,
+    q_lightnings: Query<&Lightning>,
+    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
+    mut ev_collision_events: EventReader<CollisionEvent>,
+) {
+    for ev in ev_collision_events.read() {
+        let (source, target) = match ev {
+            CollisionEvent::Started(source, target, _) => (source, target),
+            CollisionEvent::Stopped(_, _, _) => continue,
+        };
+
+        let source_parent = match q_colliders.get(*source) {
+            Ok(p) => p.get(),
+            Err(_) => continue,
+        };
+        let target_parent = match q_colliders.get(*target) {
+            Ok(p) => p.get(),
+            Err(_) => continue,
+        };
+
+        let (slime, mut slime_health) = if let Ok(h) = q_enemies.get_mut(source_parent) {
+            h
+        } else if let Ok(h) = q_enemies.get_mut(target_parent) {
+            h
+        } else {
+            continue;
+        };
+
+        if slime.state == SlimeState::Dying {
+            continue;
+        }
+
+        let lightning = if let Ok(l) = q_lightnings.get(source_parent) {
+            l
+        } else if let Ok(l) = q_lightnings.get(target_parent) {
+            l
+        } else {
+            continue;
+        };
+
+        slime_health.health -= lightning.damage;
+    }
+}
+
 pub struct SlimeEnemyPlugin;
 
 impl Plugin for SlimeEnemyPlugin {
@@ -332,7 +378,8 @@ impl Plugin for SlimeEnemyPlugin {
                 update_jump_position,
                 despawn_slimes,
                 check_player_collision,
-                check_fireball_collision,
+                check_fireball_collisions,
+                check_lightning_collisions,
             )
                 .run_if(in_state(GameState::Gaming)),
         )

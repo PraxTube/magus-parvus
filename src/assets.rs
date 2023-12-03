@@ -16,6 +16,10 @@ pub struct GameAssets {
     #[asset(path = "fireball.png")]
     pub fireball: Handle<TextureAtlas>,
 
+    #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 112.0, columns = 12, rows = 1))]
+    #[asset(path = "lightning.png")]
+    pub lightning: Handle<TextureAtlas>,
+
     #[asset(path = "level.ldtk")]
     pub level: Handle<LdtkProject>,
 
