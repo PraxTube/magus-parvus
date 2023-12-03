@@ -19,7 +19,7 @@ const MAX_JUMP_SPEED: f32 = 200.0;
 const RANDOM_OFFSET_INTENSITY: f32 = 0.25;
 const JUMP_TIME: f32 = 0.5;
 
-const STAGGERING_TIME: f32 = 0.25;
+const STAGGERING_TIME: f32 = 0.2;
 const STAGGERING_INTENSITY: f32 = 100.0;
 
 const ENEMY_COUNT: usize = 10;
@@ -62,7 +62,7 @@ fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
     match state {
         SlimeState::Idling => (0, 5),
         SlimeState::Jumping => (6, 11),
-        SlimeState::Staggering => (0, 0),
+        SlimeState::Staggering => (18, 18),
         SlimeState::Dying => (12, 17),
     }
 }
@@ -275,8 +275,8 @@ fn check_player_collision(
 }
 
 fn check_fireball_collisions(
-    mut q_enemies: Query<(&SlimeEnemy, &mut Health)>,
-    mut q_fireballs: Query<&mut Fireball>,
+    mut q_enemies: Query<(&Transform, &mut SlimeEnemy, &mut Health, &mut Velocity)>,
+    mut q_fireballs: Query<(&Transform, &mut Fireball)>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
@@ -295,19 +295,20 @@ fn check_fireball_collisions(
             Err(_) => continue,
         };
 
-        let (slime, mut slime_health) = if let Ok(h) = q_enemies.get_mut(source_parent) {
-            h
-        } else if let Ok(h) = q_enemies.get_mut(target_parent) {
-            h
-        } else {
-            continue;
-        };
+        let (enemy_transform, mut slime, mut slime_health, mut velocity) =
+            if let Ok(h) = q_enemies.get_mut(source_parent) {
+                h
+            } else if let Ok(h) = q_enemies.get_mut(target_parent) {
+                h
+            } else {
+                continue;
+            };
 
         if slime.state == SlimeState::Dying {
             continue;
         }
 
-        let mut fireball = if let Ok(f) = q_fireballs.get_mut(source_parent) {
+        let (fireball_transform, mut fireball) = if let Ok(f) = q_fireballs.get_mut(source_parent) {
             f
         } else if let Ok(f) = q_fireballs.get_mut(target_parent) {
             f
@@ -315,13 +316,19 @@ fn check_fireball_collisions(
             continue;
         };
 
-        slime_health.health -= fireball.damage;
         fireball.disabled = true;
+
+        let dir = (enemy_transform.translation - fireball_transform.translation)
+            .truncate()
+            .normalize_or_zero();
+        velocity.linvel = dir * STAGGERING_INTENSITY;
+        slime_health.health -= fireball.damage;
+        slime.state = SlimeState::Staggering;
     }
 }
 
 fn check_lightning_collisions(
-    mut q_enemies: Query<(&SlimeEnemy, &mut Health)>,
+    mut q_enemies: Query<(&mut SlimeEnemy, &mut Health, &mut Velocity)>,
     q_lightnings: Query<&Lightning>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
@@ -341,13 +348,14 @@ fn check_lightning_collisions(
             Err(_) => continue,
         };
 
-        let (slime, mut slime_health) = if let Ok(h) = q_enemies.get_mut(source_parent) {
-            h
-        } else if let Ok(h) = q_enemies.get_mut(target_parent) {
-            h
-        } else {
-            continue;
-        };
+        let (mut slime, mut slime_health, mut velocity) =
+            if let Ok(h) = q_enemies.get_mut(source_parent) {
+                h
+            } else if let Ok(h) = q_enemies.get_mut(target_parent) {
+                h
+            } else {
+                continue;
+            };
 
         if slime.state == SlimeState::Dying {
             continue;
@@ -361,7 +369,9 @@ fn check_lightning_collisions(
             continue;
         };
 
+        velocity.linvel = Vec2::ZERO;
         slime_health.health -= lightning.damage;
+        slime.state = SlimeState::Staggering;
     }
 }
 

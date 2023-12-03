@@ -8,7 +8,7 @@ pub struct GameAssets {
     #[asset(path = "mage.png")]
     pub player: Handle<TextureAtlas>,
 
-    #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 6, rows = 3))]
+    #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 6, rows = 4))]
     #[asset(path = "enemy.png")]
     pub enemy: Handle<TextureAtlas>,
 
