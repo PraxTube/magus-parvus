@@ -27,4 +27,7 @@ pub struct GameAssets {
     pub health_fill: Handle<Image>,
     #[asset(path = "health_background.png")]
     pub health_background: Handle<Image>,
+
+    #[asset(path = "fonts/PressStart2P.ttf")]
+    pub font: Handle<Font>,
 }

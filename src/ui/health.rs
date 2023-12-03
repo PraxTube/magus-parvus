@@ -3,10 +3,13 @@ use bevy::prelude::*;
 use crate::world::game_entity::SpawnGameEntity;
 use crate::{GameAssets, GameState};
 
+use super::damage_number::SpawnDamageText;
+
 #[derive(Component, Clone)]
 pub struct Health {
     pub entity: Entity,
     pub health: f32,
+    old_health: f32,
     pub max_health: f32,
     pub size: f32,
 }
@@ -16,6 +19,7 @@ impl Health {
         Self {
             entity,
             health: max_health,
+            old_health: max_health,
             max_health,
             size,
         }
@@ -199,13 +203,34 @@ fn despawn_health_bars(
     }
 }
 
+fn check_health_reduction(
+    mut q_healths: Query<(&Transform, &mut Health)>,
+    mut ev_spawn_damage_text: EventWriter<SpawnDamageText>,
+) {
+    for (transform, mut health) in &mut q_healths {
+        if health.health != health.old_health {
+            let damage = (health.health - health.old_health).abs() as u32;
+            ev_spawn_damage_text.send(SpawnDamageText {
+                pos: transform.translation,
+                damage,
+            });
+            health.old_health = health.health;
+        }
+    }
+}
+
 pub struct HealthPlugin;
 
 impl Plugin for HealthPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawn_health_bars, despawn_health_bars).run_if(in_state(GameState::Gaming)),
+            (
+                spawn_health_bars,
+                despawn_health_bars,
+                check_health_reduction,
+            )
+                .run_if(in_state(GameState::Gaming)),
         )
         .add_systems(
             PostUpdate,

@@ -1,3 +1,4 @@
+pub mod damage_number;
 pub mod health;
 
 use bevy::prelude::*;
@@ -20,7 +21,11 @@ impl Plugin for UiPlugin {
             Update,
             (spawn_casting_text, despawn_casting_text).run_if(in_state(GameState::Gaming)),
         )
-        .add_plugins((TextInputPlugin, health::HealthPlugin));
+        .add_plugins((
+            TextInputPlugin,
+            health::HealthPlugin,
+            damage_number::DamageNumberPlugin,
+        ));
     }
 }
 

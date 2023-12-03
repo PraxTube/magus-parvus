@@ -22,7 +22,7 @@ const JUMP_TIME: f32 = 0.5;
 const STAGGERING_TIME: f32 = 0.25;
 const STAGGERING_INTENSITY: f32 = 100.0;
 
-const ENEMY_COUNT: usize = 100;
+const ENEMY_COUNT: usize = 10;
 
 #[derive(Default, PartialEq, Clone, Copy)]
 pub enum SlimeState {
@@ -121,7 +121,7 @@ fn spawn_slime(
 
     commands
         .entity(entity)
-        .insert(Health::new(entity, 1.0, 0.60))
+        .insert(Health::new(entity, 10.0, 0.60))
         .push_children(&[collider]);
 }
 

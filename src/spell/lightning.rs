@@ -20,12 +20,12 @@ impl Default for Lightning {
     }
 }
 
-const SCALE: f32 = 1.5;
+const SCALE: f32 = 3.0;
 const FULGUR_COUNT: usize = 4;
 const SPRITES_COUNT: usize = 12;
 const SPRITES_TIME: f32 = 0.05;
-const SPRITE_HEIGHT: f32 = 112.0;
-const POSITION_OFFSET: Vec3 = Vec3::new(0.0, SPRITE_HEIGHT / 2.0, 0.0);
+const SPRITE_HEIGHT_HALF: f32 = 48.0;
+const POSITION_OFFSET: Vec3 = Vec3::new(0.0, SPRITE_HEIGHT_HALF * SCALE, 0.0);
 
 fn spawn_lightning(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
     let entity = commands
@@ -47,7 +47,7 @@ fn spawn_lightning(commands: &mut Commands, assets: &Res<GameAssets>, transform:
             Sensor,
             TransformBundle::from_transform(Transform::from_translation(Vec3::new(
                 0.0,
-                -SPRITE_HEIGHT / 2.0,
+                -SPRITE_HEIGHT_HALF,
                 0.0,
             ))),
         ))
