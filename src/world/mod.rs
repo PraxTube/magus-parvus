@@ -1,6 +1,7 @@
 pub mod camera;
 pub mod game_entity;
 mod map;
+mod map_colliders;
 
 pub use camera::MainCamera;
 
@@ -14,6 +15,7 @@ impl Plugin for WorldPlugin {
         app.add_plugins((
             camera::CameraPlugin,
             map::MapPlugin,
+            map_colliders::MapColliderPlugin,
             game_entity::GameEntityPlugin,
         ))
         .add_systems(Startup, configure_physics);

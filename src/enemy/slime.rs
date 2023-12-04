@@ -23,7 +23,7 @@ const JUMP_TIME: f32 = 0.5;
 const STAGGERING_TIME: f32 = 0.2;
 const STAGGERING_INTENSITY: f32 = 100.0;
 
-const ENEMY_COUNT: usize = 10;
+const ENEMY_COUNT: usize = 200;
 
 #[derive(Default, PartialEq, Clone, Copy)]
 pub enum SlimeState {
@@ -135,7 +135,7 @@ fn spawn_slimes(
 ) {
     for i in 0..ENEMY_COUNT {
         let pos = Vec3::new(1024.0, 1024.0, 0.0)
-            + Quat::from_rotation_z(TAU * i as f32 / ENEMY_COUNT as f32).mul_vec3(Vec3::X) * 300.0;
+            + Quat::from_rotation_z(TAU * i as f32 / ENEMY_COUNT as f32).mul_vec3(Vec3::X) * 600.0;
         spawn_slime(&mut commands, &assets, &mut ev_spawn_game_entity, pos);
     }
 }

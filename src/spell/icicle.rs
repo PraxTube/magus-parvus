@@ -11,7 +11,7 @@ use crate::{GameAssets, GameState};
 use super::{Spell, SpellCasted};
 
 const SCALE: f32 = 1.5;
-const SCUTUM_GLACIEI_COUNT: usize = 6;
+const SCUTUM_GLACIEI_COUNT: usize = 10;
 const DISTANCE_FROM_PLAYER: f32 = 75.0;
 const DELTA_ROTATION: f32 = TAU / 4.0;
 const TIME: f32 = 10.0;

@@ -51,7 +51,7 @@ fn main() {
             ScreenFrameDiagnosticsPlugin,
             ScreenEntityDiagnosticsPlugin,
             RapierPhysicsPlugin::<NoUserData>::default(),
-            // RapierDebugRenderPlugin::default(),
+            RapierDebugRenderPlugin::default(),
         ))
         .insert_resource(Msaa::Off)
         .add_state::<GameState>()

@@ -134,8 +134,12 @@ fn spawn_player(
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             SpriteSheetBundle {
-                transform: Transform::from_translation(Vec3::new(32.0 * 32.0, 32.0 * 32.0, 0.0))
-                    .with_scale(Vec3::splat(2.0)),
+                transform: Transform::from_translation(Vec3::new(
+                    32.0 * 32.0,
+                    32.0 * 32.0 + 16.0,
+                    0.0,
+                ))
+                .with_scale(Vec3::splat(2.0)),
                 texture_atlas: assets.player.clone(),
                 ..default()
             },

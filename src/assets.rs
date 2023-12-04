@@ -27,7 +27,7 @@ pub struct GameAssets {
     #[asset(path = "icicle_shatter.png")]
     pub icicle_shatter: Handle<TextureAtlas>,
 
-    #[asset(path = "level.ldtk")]
+    #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,
 
     #[asset(path = "health_fill.png")]
