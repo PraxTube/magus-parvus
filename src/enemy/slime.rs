@@ -6,6 +6,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::spell::fireball::Fireball;
+use crate::spell::icicle::Icicle;
 use crate::spell::lightning::Lightning;
 use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
@@ -251,7 +252,7 @@ fn check_player_collision(
             continue;
         };
 
-        let (enemy_transform, mut slime, mut velocity) = match q_enemies.get_mut(enemy_parent.get())
+        let (slime_transform, mut slime, mut velocity) = match q_enemies.get_mut(enemy_parent.get())
         {
             Ok(e) => e,
             Err(_) => continue,
@@ -265,7 +266,7 @@ fn check_player_collision(
             continue;
         }
 
-        let dir = (enemy_transform.translation - player_transform.translation)
+        let dir = (slime_transform.translation - player_transform.translation)
             .truncate()
             .normalize_or_zero();
         velocity.linvel = dir * STAGGERING_INTENSITY;
@@ -295,7 +296,7 @@ fn check_fireball_collisions(
             Err(_) => continue,
         };
 
-        let (enemy_transform, mut slime, mut slime_health, mut velocity) =
+        let (slime_transform, mut slime, mut slime_health, mut velocity) =
             if let Ok(h) = q_enemies.get_mut(source_parent) {
                 h
             } else if let Ok(h) = q_enemies.get_mut(target_parent) {
@@ -318,7 +319,7 @@ fn check_fireball_collisions(
 
         fireball.disabled = true;
 
-        let dir = (enemy_transform.translation - fireball_transform.translation)
+        let dir = (slime_transform.translation - fireball_transform.translation)
             .truncate()
             .normalize_or_zero();
         velocity.linvel = dir * STAGGERING_INTENSITY;
@@ -375,6 +376,63 @@ fn check_lightning_collisions(
     }
 }
 
+fn check_icicle_collisions(
+    q_player: Query<&Transform, With<Player>>,
+    mut q_enemies: Query<(&Transform, &mut SlimeEnemy, &mut Health, &mut Velocity)>,
+    q_icicles: Query<&Icicle>,
+    q_colliders: Query<&Parent, With<Collider>>,
+    mut ev_collision_events: EventReader<CollisionEvent>,
+) {
+    let player_pos = match q_player.get_single() {
+        Ok(p) => p.translation,
+        Err(_) => return,
+    };
+
+    for ev in ev_collision_events.read() {
+        let (source, target) = match ev {
+            CollisionEvent::Started(source, target, _) => (source, target),
+            CollisionEvent::Stopped(_, _, _) => continue,
+        };
+
+        let source_parent = match q_colliders.get(*source) {
+            Ok(p) => p.get(),
+            Err(_) => continue,
+        };
+        let target_parent = match q_colliders.get(*target) {
+            Ok(p) => p.get(),
+            Err(_) => continue,
+        };
+
+        let (slime_transform, mut slime, mut slime_health, mut velocity) =
+            if let Ok(h) = q_enemies.get_mut(source_parent) {
+                h
+            } else if let Ok(h) = q_enemies.get_mut(target_parent) {
+                h
+            } else {
+                continue;
+            };
+
+        if slime.state == SlimeState::Dying {
+            continue;
+        }
+
+        let icicle = if let Ok(i) = q_icicles.get(source_parent) {
+            i
+        } else if let Ok(i) = q_icicles.get(target_parent) {
+            i
+        } else {
+            continue;
+        };
+
+        let dir = (slime_transform.translation - player_pos)
+            .truncate()
+            .normalize_or_zero();
+        velocity.linvel = dir * STAGGERING_INTENSITY;
+        slime_health.health -= icicle.damage;
+        slime.state = SlimeState::Staggering;
+    }
+}
+
 pub struct SlimeEnemyPlugin;
 
 impl Plugin for SlimeEnemyPlugin {
@@ -390,6 +448,7 @@ impl Plugin for SlimeEnemyPlugin {
                 check_player_collision,
                 check_fireball_collisions,
                 check_lightning_collisions,
+                check_icicle_collisions,
             )
                 .run_if(in_state(GameState::Gaming)),
         )

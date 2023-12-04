@@ -1,4 +1,5 @@
 pub mod fireball;
+pub mod icicle;
 pub mod lightning;
 mod phantasma;
 mod speed_boost;
@@ -19,6 +20,7 @@ impl Plugin for SpellPlugin {
             .add_plugins((
                 fireball::FireballPlugin,
                 lightning::LightningPlugin,
+                icicle::IciclePlugin,
                 speed_boost::SpeedBoostPlugin,
                 phantasma::PhantasmaPlugin,
             ));
@@ -31,6 +33,7 @@ enum Spell {
     IgnisPila,
     InfernoPila,
     Fulgur,
+    ScutumGlaciei,
     SpeedBoost,
     Phantasma,
 }
@@ -125,6 +128,10 @@ fn submit_spell(
         } else if ev.value.to_lowercase() == "fulgur" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Fulgur,
+            });
+        } else if ev.value.to_lowercase() == "scutum glaciei" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::ScutumGlaciei,
             });
         } else if ev.value.to_lowercase() == "cito" {
             ev_spell_casted.send(SpellCasted {
