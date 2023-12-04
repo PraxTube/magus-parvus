@@ -23,6 +23,9 @@ pub struct GameAssets {
     #[asset(texture_atlas(tile_size_x = 64.0, tile_size_y = 64.0, columns = 30, rows = 1))]
     #[asset(path = "icicle.png")]
     pub icicle: Handle<TextureAtlas>,
+    #[asset(texture_atlas(tile_size_x = 96.0, tile_size_y = 96.0, columns = 49, rows = 1))]
+    #[asset(path = "icicle_shatter.png")]
+    pub icicle_shatter: Handle<TextureAtlas>,
 
     #[asset(path = "level.ldtk")]
     pub level: Handle<LdtkProject>,

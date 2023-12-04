@@ -10,12 +10,15 @@ use crate::{GameAssets, GameState};
 
 use super::{Spell, SpellCasted};
 
+const SCALE: f32 = 1.5;
 const SCUTUM_GLACIEI_COUNT: usize = 6;
 const DISTANCE_FROM_PLAYER: f32 = 75.0;
 const DELTA_ROTATION: f32 = TAU / 4.0;
+const TIME: f32 = 10.0;
 
 #[derive(Component)]
 pub struct Icicle {
+    timer: Timer,
     pub disabled: bool,
     pub damage: f32,
 }
@@ -23,13 +26,21 @@ pub struct Icicle {
 impl Default for Icicle {
     fn default() -> Self {
         Self {
+            timer: Timer::from_seconds(TIME, TimerMode::Once),
             disabled: false,
             damage: 1.0,
         }
     }
 }
 
-const SCALE: f32 = 1.5;
+fn tick_timers(time: Res<Time>, mut q_icicles: Query<&mut Icicle>) {
+    for mut icicle in &mut q_icicles {
+        icicle.timer.tick(time.delta());
+        if icicle.timer.just_finished() {
+            icicle.disabled = true;
+        }
+    }
+}
 
 fn spawn_icicle(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
     let entity = commands
@@ -83,6 +94,32 @@ fn spawn_scutum_glaciei(
     }
 }
 
+fn spawn_icicle_shatter(commands: &mut Commands, assets: &Res<GameAssets>, position: Vec3) {
+    commands.spawn((
+        SpriteSheetBundle {
+            transform: Transform::from_translation(position),
+            texture_atlas: assets.icicle_shatter.clone(),
+            ..default()
+        },
+        AnimSprite::new(49, false),
+        AnimSpriteTimer::new(0.02),
+        YSort(10.0),
+    ));
+}
+
+fn despawn_icicles(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    q_icicles: Query<(Entity, &Transform, &Icicle)>,
+) {
+    for (entity, transform, icicle) in &q_icicles {
+        if icicle.disabled {
+            spawn_icicle_shatter(&mut commands, &assets, transform.translation);
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 fn move_icicles(
     q_player: Query<&Transform, With<Player>>,
     mut q_icicles: Query<&mut Transform, (With<Icicle>, Without<Player>)>,
@@ -110,7 +147,13 @@ impl Plugin for IciclePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawn_scutum_glaciei, move_icicles, rotate_icicles)
+            (
+                tick_timers,
+                spawn_scutum_glaciei,
+                despawn_icicles,
+                move_icicles,
+                rotate_icicles,
+            )
                 .run_if(in_state(GameState::Gaming)),
         );
     }

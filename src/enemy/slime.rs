@@ -43,6 +43,7 @@ struct SlimeEnemy {
     jump_cooldown_timer: Timer,
     death_timer: Timer,
     staggering_timer: Timer,
+    disabled: bool,
 }
 
 impl Default for SlimeEnemy {
@@ -55,6 +56,7 @@ impl Default for SlimeEnemy {
             jump_cooldown_timer: Timer::from_seconds(3.5, TimerMode::Repeating),
             death_timer: Timer::from_seconds(0.070 * 6.0, TimerMode::Once),
             staggering_timer: Timer::from_seconds(STAGGERING_TIME, TimerMode::Repeating),
+            disabled: false,
         }
     }
 }
@@ -161,6 +163,9 @@ fn tick_slime_timers(time: Res<Time>, mut q_slimes: Query<&mut SlimeEnemy, With<
             }
             SlimeState::Dying => {
                 slime.death_timer.tick(time.delta());
+                if slime.death_timer.just_finished() {
+                    slime.disabled = true;
+                }
             }
         };
     }
@@ -215,7 +220,7 @@ fn despawn_slimes(mut commands: Commands, mut q_slimes: Query<(Entity, &Health, 
         if health.health <= 0.0 {
             slime.state = SlimeState::Dying;
         }
-        if slime.death_timer.just_finished() {
+        if slime.disabled {
             commands.entity(entity).despawn_recursive();
         }
     }
