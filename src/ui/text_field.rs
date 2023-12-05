@@ -1,6 +1,7 @@
 use bevy::{
     input::{keyboard::KeyCode, keyboard::KeyboardInput},
     prelude::*,
+    window::PrimaryWindow,
 };
 
 use crate::player::{Player, PlayerChangedState, PlayerState};
@@ -8,6 +9,9 @@ use crate::{GameAssets, GameState};
 
 const TRANSPARENT_BACKGROUND: Color = Color::rgba(0.0, 0.0, 0.0, 0.7);
 const FONT_SIZE_INPUT: f32 = 32.0;
+const CHAR_SIZE: f32 = 2.5;
+const CHAR_OFFSET: f32 = 1.5;
+const CHAR_PIXEL_FACTOR: f32 = 12.8;
 
 #[derive(Component)]
 pub struct CastingText;
@@ -37,7 +41,22 @@ fn trim_last_word(s: &str) -> String {
     }
 }
 
-fn spawn_text_field(commands: &mut Commands, assets: &Res<GameAssets>) {
+fn spawn_text_field(
+    commands: &mut Commands,
+    assets: &Res<GameAssets>,
+    q_window: &Query<&Window, With<PrimaryWindow>>,
+) {
+    let window = match q_window.get_single() {
+        Ok(w) => w,
+        Err(err) => {
+            error!(
+                "there is not exactly one primary window, not casting spel, {}",
+                err
+            );
+            return;
+        }
+    };
+
     let root = commands
         .spawn((
             CastingText,
@@ -45,11 +64,11 @@ fn spawn_text_field(commands: &mut Commands, assets: &Res<GameAssets>) {
                 style: Style {
                     justify_content: JustifyContent::FlexStart,
                     align_items: AlignItems::Center,
-                    width: Val::Percent(100.0),
+                    width: Val::Px((2.0 * CHAR_SIZE + CHAR_OFFSET) * CHAR_PIXEL_FACTOR),
                     height: Val::Px(42.0),
                     position_type: PositionType::Absolute,
-                    left: Val::Px(0.),
-                    bottom: Val::Px(0.),
+                    right: Val::Px(window.width() / 2.0 - 40.0),
+                    top: Val::Px(window.height() / 2.0 - 100.0),
                     ..default()
                 },
                 background_color: TRANSPARENT_BACKGROUND.into(),
@@ -117,14 +136,36 @@ fn spawn_text_field(commands: &mut Commands, assets: &Res<GameAssets>) {
         .push_children(&[input_pointer, text, cursor]);
 }
 
-fn update_buffer_text(state: Res<TypingState>, mut query: Query<&mut Text, With<TypingBuffer>>) {
-    if !state.is_changed() {
+fn update_buffer_container(
+    typing_state: Res<TypingState>,
+    mut q_buffer_container: Query<&mut Style, With<CastingText>>,
+) {
+    if !typing_state.is_changed() {
         return;
     }
 
-    for mut target in query.iter_mut() {
-        target.sections[0].value.clone_from(&state.buf);
+    let mut style = match q_buffer_container.get_single_mut() {
+        Ok(s) => s,
+        Err(_) => return,
+    };
+
+    let k = 2.0 + typing_state.buf.len() as f32;
+    style.width = Val::Px((k * CHAR_SIZE + CHAR_OFFSET) * CHAR_PIXEL_FACTOR);
+}
+
+fn update_buffer_text(
+    typing_state: Res<TypingState>,
+    mut q_typing_buffer_text: Query<&mut Text, With<TypingBuffer>>,
+) {
+    if !typing_state.is_changed() {
+        return;
     }
+
+    let mut text = match q_typing_buffer_text.get_single_mut() {
+        Ok(t) => t,
+        Err(_) => return,
+    };
+    text.sections[0].value.clone_from(&typing_state.buf);
 }
 
 fn update_cursor_text(
@@ -212,8 +253,6 @@ fn push_chars(
 
             if ev.key_code == Some(KeyCode::Return) {
                 let text = typing_state.buf.clone();
-
-                typing_state.buf.clear();
                 typing_submit_events.send(TypingSubmitEvent { value: text });
             }
 
@@ -232,12 +271,13 @@ fn spawn_casting_text(
     mut commands: Commands,
     assets: Res<GameAssets>,
     mut typing_state: ResMut<TypingState>,
+    q_window: Query<&Window, With<PrimaryWindow>>,
     mut ev_player_changed_state: EventReader<PlayerChangedState>,
 ) {
     for ev in ev_player_changed_state.read() {
         if ev.new_state == PlayerState::Casting {
             typing_state.buf.clear();
-            spawn_text_field(&mut commands, &assets);
+            spawn_text_field(&mut commands, &assets, &q_window);
         }
     }
 }
@@ -272,8 +312,9 @@ impl Plugin for TextFieldPlugin {
         .add_systems(
             Update,
             (
-                update_cursor_text,
                 push_chars,
+                update_cursor_text,
+                update_buffer_container.after(push_chars),
                 update_buffer_text.after(push_chars),
                 spawn_casting_text,
                 despawn_casting_text,

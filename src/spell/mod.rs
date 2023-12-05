@@ -114,32 +114,33 @@ fn submit_spell(
 
     for ev in ev_typing_submit_event.read() {
         player.state = PlayerState::Idling;
+        let spell_str = ev.value.trim_end().to_lowercase();
 
-        if ev.value.to_lowercase() == "fireball" {
+        if spell_str == "fireball" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Fireball,
             });
-        } else if ev.value.to_lowercase() == "ignis pila" {
+        } else if spell_str == "ignis pila" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::IgnisPila,
             });
-        } else if ev.value.to_lowercase() == "inferno pila" {
+        } else if spell_str == "inferno pila" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::InfernoPila,
             });
-        } else if ev.value.to_lowercase() == "fulgur" {
+        } else if spell_str == "fulgur" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Fulgur,
             });
-        } else if ev.value.to_lowercase() == "scutum glaciei" {
+        } else if spell_str == "scutum glaciei" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::ScutumGlaciei,
             });
-        } else if ev.value.to_lowercase() == "cito" {
+        } else if spell_str == "cito" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::SpeedBoost,
             });
-        } else if ev.value.to_lowercase() == "phantasma" {
+        } else if spell_str == "phantasma" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Phantasma,
             });
