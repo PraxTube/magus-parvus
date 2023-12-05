@@ -1,5 +1,6 @@
 mod assets;
 mod enemy;
+mod item;
 mod player;
 mod spell;
 mod ui;
@@ -64,6 +65,7 @@ fn main() {
             world::WorldPlugin,
             spell::SpellPlugin,
             utils::UtilsPlugin,
+            item::ItemPlugin,
             enemy::EnemyPlugin,
             player::PlayerPlugin,
         ))
