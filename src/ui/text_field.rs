@@ -3,10 +3,8 @@ use bevy::{
     prelude::*,
 };
 
-use crate::{
-    player::{Player, PlayerChangedState, PlayerState},
-    GameAssets, GameState,
-};
+use crate::player::{Player, PlayerChangedState, PlayerState};
+use crate::{GameAssets, GameState};
 
 const TRANSPARENT_BACKGROUND: Color = Color::rgba(0.0, 0.0, 0.0, 0.7);
 const FONT_SIZE_INPUT: f32 = 32.0;
@@ -31,8 +29,16 @@ pub struct TypingState {
     just_typed_char: bool,
 }
 
+fn trim_last_word(s: &str) -> String {
+    let trimmed_str = s.trim_end();
+    match trimmed_str.rfind(' ') {
+        Some(space_index) => trimmed_str[..space_index + 1].to_string(),
+        None => String::new(),
+    }
+}
+
 fn spawn_text_field(commands: &mut Commands, assets: &Res<GameAssets>) {
-    commands
+    let root = commands
         .spawn((
             CastingText,
             NodeBundle {
@@ -50,18 +56,35 @@ fn spawn_text_field(commands: &mut Commands, assets: &Res<GameAssets>) {
                 ..default()
             },
         ))
-        .with_children(|parent| {
-            parent.spawn(TextBundle {
-                style: Style {
-                    margin: UiRect {
-                        left: Val::Px(10.0),
-                        right: Val::Px(5.0),
-                        ..default()
-                    },
+        .id();
+
+    let input_pointer = commands
+        .spawn(TextBundle {
+            style: Style {
+                margin: UiRect {
+                    left: Val::Px(10.0),
+                    right: Val::Px(5.0),
                     ..default()
                 },
+                ..default()
+            },
+            text: Text::from_section(
+                ">".to_string(),
+                TextStyle {
+                    font: assets.font.clone(),
+                    font_size: FONT_SIZE_INPUT,
+                    color: Color::WHITE,
+                },
+            ),
+            ..default()
+        })
+        .id();
+    let text = commands
+        .spawn((
+            TypingBuffer,
+            TextBundle {
                 text: Text::from_section(
-                    ">".to_string(),
+                    "".to_string(),
                     TextStyle {
                         font: assets.font.clone(),
                         font_size: FONT_SIZE_INPUT,
@@ -69,38 +92,29 @@ fn spawn_text_field(commands: &mut Commands, assets: &Res<GameAssets>) {
                     },
                 ),
                 ..default()
-            });
-            parent.spawn((
-                TextBundle {
-                    style: Style { ..default() },
-                    text: Text::from_section(
-                        "".to_string(),
-                        TextStyle {
-                            font: assets.font.clone(),
-                            font_size: FONT_SIZE_INPUT,
-                            color: Color::WHITE,
-                        },
-                    ),
-                    ..default()
-                },
-                TypingBuffer,
-            ));
-            parent.spawn((
-                TextBundle {
-                    style: Style { ..default() },
-                    text: Text::from_section(
-                        "_".to_string(),
-                        TextStyle {
-                            font: assets.font.clone(),
-                            font_size: FONT_SIZE_INPUT,
-                            color: Color::RED,
-                        },
-                    ),
-                    ..default()
-                },
-                TypingCursor,
-            ));
-        });
+            },
+        ))
+        .id();
+    let cursor = commands
+        .spawn((
+            TypingCursor,
+            TextBundle {
+                text: Text::from_section(
+                    "_".to_string(),
+                    TextStyle {
+                        font: assets.font.clone(),
+                        font_size: FONT_SIZE_INPUT,
+                        color: Color::RED,
+                    },
+                ),
+                ..default()
+            },
+        ))
+        .id();
+
+    commands
+        .entity(root)
+        .push_children(&[input_pointer, text, cursor]);
 }
 
 fn update_buffer_text(state: Res<TypingState>, mut query: Query<&mut Text, With<TypingBuffer>>) {
@@ -131,10 +145,11 @@ fn update_cursor_text(
     }
 }
 
-fn keyboard(
+fn push_chars(
     mut typing_state: ResMut<TypingState>,
     mut typing_submit_events: EventWriter<TypingSubmitEvent>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
+    keys: Res<Input<KeyCode>>,
     q_player: Query<&Player>,
 ) {
     let player_state = match q_player.get_single() {
@@ -144,6 +159,8 @@ fn keyboard(
     if player_state != PlayerState::Casting {
         return;
     }
+
+    let control_active = keys.pressed(KeyCode::ControlLeft);
 
     for ev in keyboard_input_events.read() {
         if ev.state.is_pressed() {
@@ -170,7 +187,14 @@ fn keyboard(
                 Some(KeyCode::T) => Some('t'),
                 Some(KeyCode::U) => Some('u'),
                 Some(KeyCode::V) => Some('v'),
-                Some(KeyCode::W) => Some('w'),
+                Some(KeyCode::W) => {
+                    if !control_active {
+                        Some('w')
+                    } else {
+                        typing_state.buf = trim_last_word(&typing_state.buf);
+                        None
+                    }
+                }
                 Some(KeyCode::X) => Some('x'),
                 Some(KeyCode::Y) => Some('y'),
                 Some(KeyCode::Z) => Some('z'),
@@ -194,11 +218,11 @@ fn keyboard(
             }
 
             if ev.key_code == Some(KeyCode::Back) {
-                typing_state.buf.pop();
-            }
-
-            if ev.key_code == Some(KeyCode::Escape) {
-                typing_state.buf.clear();
+                if !control_active {
+                    typing_state.buf.pop();
+                } else {
+                    typing_state.buf = trim_last_word(&typing_state.buf);
+                }
             }
         }
     }
@@ -249,8 +273,8 @@ impl Plugin for TextFieldPlugin {
             Update,
             (
                 update_cursor_text,
-                keyboard,
-                update_buffer_text.after(keyboard),
+                push_chars,
+                update_buffer_text.after(push_chars),
                 spawn_casting_text,
                 despawn_casting_text,
             )
