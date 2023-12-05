@@ -7,9 +7,11 @@ mod speed_boost;
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_simple_text_input::TextInputSubmitEvent;
 
-use crate::player::{Player, PlayerState};
+use crate::{
+    player::{Player, PlayerState},
+    ui::text_field::TypingSubmitEvent,
+};
 
 pub struct SpellPlugin;
 
@@ -102,7 +104,7 @@ fn double_j_escape(
 
 fn submit_spell(
     mut q_player: Query<&mut Player>,
-    mut ev_input_submitted: EventReader<TextInputSubmitEvent>,
+    mut ev_typing_submit_event: EventReader<TypingSubmitEvent>,
     mut ev_spell_casted: EventWriter<SpellCasted>,
 ) {
     let mut player = match q_player.get_single_mut() {
@@ -110,7 +112,7 @@ fn submit_spell(
         Err(_) => return,
     };
 
-    for ev in ev_input_submitted.read() {
+    for ev in ev_typing_submit_event.read() {
         player.state = PlayerState::Idling;
 
         if ev.value.to_lowercase() == "fireball" {
