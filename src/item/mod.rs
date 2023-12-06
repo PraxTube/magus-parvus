@@ -1,21 +1,18 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
+use crate::world::camera::YSort;
 use crate::world::BACKGROUND_ZINDEX_ABS;
-use crate::GameState;
-
-// The index of the layer the items reside in.
-// If the LDtk layers are changed (rearanged or added/removed),
-// then this will need to be changed accordingly.
-const ITEM_LAYER_ZINDEX_ABS: f32 = 3.0;
+use crate::{GameAssets, GameState};
 
 pub struct ItemPlugin;
 
 impl Plugin for ItemPlugin {
     fn build(&self, app: &mut App) {
-        app.register_ldtk_entity::<ItemBundle>("Item")
-            .add_systems(Update, add_item_ysort.run_if(in_state(GameState::Gaming)));
+        app.register_ldtk_entity::<ItemBundle>("Item").add_systems(
+            Update,
+            (add_item_ysort, add_item_sprite_bundle).run_if(in_state(GameState::Gaming)),
+        );
     }
 }
 
@@ -46,15 +43,34 @@ impl Item {
 struct ItemBundle {
     #[with(Item::from_field)]
     item: Item,
-    #[sprite_sheet_bundle]
-    sprite_sheet_bundle: SpriteSheetBundle,
+    #[grid_coords]
+    grid_coords: GridCoords,
+    #[worldly]
+    worldy: Worldly,
 }
 
 fn add_item_ysort(mut commands: Commands, q_items: Query<Entity, (With<Item>, Without<YSort>)>) {
     for entity in &q_items {
-        let offset = -ITEM_LAYER_ZINDEX_ABS + BACKGROUND_ZINDEX_ABS;
         commands
             .entity(entity)
-            .insert(YSort(-10.0 * TRANSLATION_TO_PIXEL + offset));
+            .insert(YSort(0.0 + BACKGROUND_ZINDEX_ABS));
+    }
+}
+
+fn add_item_sprite_bundle(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    q_items: Query<(Entity, &GridCoords), (With<Item>, Without<Sprite>)>,
+) {
+    for (entity, grid_coords) in &q_items {
+        commands.entity(entity).insert(SpriteBundle {
+            texture: assets.statue.clone(),
+            transform: Transform::from_translation(Vec3::new(
+                grid_coords.x as f32 * 32.0,
+                grid_coords.y as f32 * 32.0,
+                0.0,
+            )),
+            ..default()
+        });
     }
 }

@@ -26,6 +26,10 @@ https://stealthix.itch.io/animated-fires
 
 https://sanctumpixel.itch.io/lightning-lines-pixel-art-effect
 
+#### Statue Beam Effect and Statue Unlock Effect
+
+https://ansimuz.itch.io/warped-shooting-fx
+
 <!---->
 <!-- ### Audio -->
 <!---->
@@ -33,9 +37,10 @@ https://sanctumpixel.itch.io/lightning-lines-pixel-art-effect
 <!---->
 <!-- #### Music -->
 <!---->
-<!-- ### Fonts -->
-<!---->
-<!-- https://fonts.google.com/specimen/Press+Start+2P -->
+
+### Fonts
+
+https://fonts.google.com/specimen/Press+Start+2P
 
 ---
 

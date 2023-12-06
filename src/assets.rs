@@ -35,6 +35,15 @@ pub struct GameAssets {
     #[asset(path = "health_background.png")]
     pub health_background: Handle<Image>,
 
+    #[asset(path = "statue.png")]
+    pub statue: Handle<Image>,
+    #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 32.0, columns = 5, rows = 1))]
+    #[asset(path = "statue_unlock.png")]
+    pub statue_unlock: Handle<TextureAtlas>,
+    #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 64.0, columns = 4, rows = 1))]
+    #[asset(path = "statue_beam.png")]
+    pub statue_beam: Handle<TextureAtlas>,
+
     #[asset(path = "fonts/PressStart2P.ttf")]
     pub font: Handle<Font>,
 }
