@@ -13,6 +13,7 @@ use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::world::camera::YSort;
 use crate::world::game_entity::SpawnGameEntity;
+use crate::world::CHUNK_SIZE;
 use crate::{GameAssets, GameState};
 
 use input::PlayerInput;
@@ -135,8 +136,8 @@ fn spawn_player(
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             SpriteSheetBundle {
                 transform: Transform::from_translation(Vec3::new(
-                    32.0 * 32.0,
-                    32.0 * 32.0 + 16.0,
+                    2.5 * CHUNK_SIZE,
+                    16.0 + 2.5 * CHUNK_SIZE,
                     0.0,
                 ))
                 .with_scale(Vec3::splat(2.0)),

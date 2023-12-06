@@ -1,20 +1,17 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::GridCoords;
+use bevy_rapier2d::prelude::*;
 
-use crate::{
-    utils::anim_sprite::{AnimSprite, AnimSpriteTimer},
-    world::camera::{YSort, TRANSLATION_TO_PIXEL},
-    GameAssets, GameState,
-};
+use crate::utils::anim_sprite::{AnimSprite, AnimSpriteTimer};
+use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
+use crate::{GameAssets, GameState};
 
 use super::Item;
 
 const OFFSET: Vec3 = Vec3::new(1.0, 45.0, 0.0);
 
-#[derive(Event)]
-pub struct StatueUnlocked {
-    pub pos: Vec3,
-}
+#[derive(Resource, Deref, DerefMut, Default)]
+pub struct ActiveStatues(Vec<Statue>);
 
 #[derive(PartialEq)]
 pub struct Statue {
@@ -31,13 +28,22 @@ impl Statue {
     }
 }
 
-fn spawn_statue_beam(
+#[derive(Event)]
+pub struct SpawnStatue {
+    pub pos: Vec3,
+}
+
+#[derive(Event)]
+pub struct StatueUnlocked {
+    pub pos: Vec3,
+}
+
+fn spawn_statue_beams(
     mut commands: Commands,
     assets: Res<GameAssets>,
     mut ev_statue_unlocked: EventReader<StatueUnlocked>,
 ) {
     for ev in ev_statue_unlocked.read() {
-        info!("{:?}", ev.pos);
         commands.spawn((
             AnimSprite::new(4, true),
             AnimSpriteTimer::new(0.05),
@@ -51,14 +57,44 @@ fn spawn_statue_beam(
     }
 }
 
+fn spawn_statues(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    mut ev_spawn_statue: EventReader<SpawnStatue>,
+) {
+    for ev in ev_spawn_statue.read() {
+        let collider = commands
+            .spawn((
+                Collider::cuboid(20.0, 10.0),
+                TransformBundle::from_transform(Transform::from_translation(Vec3::new(
+                    0.0, -20.0, 0.0,
+                ))),
+            ))
+            .id();
+
+        commands
+            .spawn((
+                YSort(0.0),
+                SpriteBundle {
+                    texture: assets.statue.clone(),
+                    transform: Transform::from_translation(ev.pos),
+                    ..default()
+                },
+            ))
+            .push_children(&[collider]);
+    }
+}
+
 pub struct StatuePlugin;
 
 impl Plugin for StatuePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawn_statue_beam).run_if(in_state(GameState::Gaming)),
+            (spawn_statues, spawn_statue_beams).run_if(in_state(GameState::Gaming)),
         )
+        .init_resource::<ActiveStatues>()
+        .add_event::<SpawnStatue>()
         .add_event::<StatueUnlocked>();
     }
 }

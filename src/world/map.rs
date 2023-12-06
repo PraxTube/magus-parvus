@@ -3,22 +3,41 @@ use std::collections::HashSet;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use super::CHUNK_SIZE;
 use crate::player::Player;
 use crate::{GameAssets, GameState};
 
 use super::BACKGROUND_ZINDEX_ABS;
 
-const CHUNK_SIZE: f32 = 32.0 * 32.0;
 const CAMERA_SIZE_X: f32 = 400.0;
 const CAMERA_SIZE_Y: f32 = 300.0;
-const CHUNK_ROWS: usize = 2;
-const IIDS: [&str; 6] = [
+const CHUNK_ROWS: usize = 5;
+const IIDS: [&str; 25] = [
     "4561cae1-8990-11ee-bdb7-27b92e7f0bd1",
     "4c5c13d0-8990-11ee-bb97-5335be5f091d",
+    "98936980-8990-11ee-bec7-fdf4bcea93a8",
+    "09315e40-8990-11ee-bec7-1d8ee619301e",
+    "0c0e6680-8990-11ee-bec7-c93ceae6c5ca",
     "30c12d00-8990-11ee-8c0e-1f466f38a0b0",
     "09bdb020-8990-11ee-8c0e-83df39a96f91",
+    "1111d130-8990-11ee-bec7-e700d2272088",
+    "124d1050-8990-11ee-bec7-6198e863d073",
+    "1827a120-8990-11ee-bec7-4f3cacef695d",
     "39c4ea40-8990-11ee-8c0e-f5477a2dc37e",
     "54eaef30-8990-11ee-bb97-69638b6a5187",
+    "1a354b70-8990-11ee-bec7-730615478666",
+    "1b511bb0-8990-11ee-bec7-19cc658e1943",
+    "1c70e390-8990-11ee-bec7-0502e0bb0762",
+    "1df2a190-8990-11ee-bec7-83d9deca7e3c",
+    "20749180-8990-11ee-bec7-23e99a0a4339",
+    "22139b80-8990-11ee-bec7-b10470991053",
+    "235961f0-8990-11ee-bec7-317e033999e9",
+    "24889320-8990-11ee-bec7-cf378b66fb63",
+    "25b134a0-8990-11ee-bec7-c55024c91577",
+    "276fd490-8990-11ee-bec7-29fb36a20f8d",
+    "28a2fd60-8990-11ee-bec7-0b57a23c555e",
+    "29b72c80-8990-11ee-bec7-f753d14a721b",
+    "2b786480-8990-11ee-bec7-97692d863dba",
 ];
 
 #[derive(Component)]
