@@ -6,6 +6,10 @@ use crate::player::input::PlayerInput;
 use crate::player::{Player, PlayerState};
 use crate::GameState;
 
+// How much `1.0` in bevy coordinates translates to the pixels of a sprite.
+// Only relevant for the ysorting.
+pub const TRANSLATION_TO_PIXEL: f32 = 0.0001;
+
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
@@ -25,9 +29,9 @@ pub struct MainCamera;
 #[derive(Component)]
 pub struct YSort(pub f32);
 
-pub fn apply_y_sort(mut q_transforms: Query<(&mut Transform, &YSort)>) {
-    for (mut transform, ysort) in &mut q_transforms {
-        transform.translation.z = ysort.0 - transform.translation.y * 0.0001;
+pub fn apply_y_sort(mut q_transforms: Query<(&mut Transform, &GlobalTransform, &YSort)>) {
+    for (mut transform, global_transform, ysort) in &mut q_transforms {
+        transform.translation.z = ysort.0 - global_transform.translation().y * TRANSLATION_TO_PIXEL;
     }
 }
 

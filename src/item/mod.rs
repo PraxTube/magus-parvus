@@ -1,14 +1,21 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::world::camera::YSort;
+use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
+use crate::world::BACKGROUND_ZINDEX_ABS;
+use crate::GameState;
+
+// The index of the layer the items reside in.
+// If the LDtk layers are changed (rearanged or added/removed),
+// then this will need to be changed accordingly.
+const ITEM_LAYER_ZINDEX_ABS: f32 = 3.0;
 
 pub struct ItemPlugin;
 
 impl Plugin for ItemPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<ItemBundle>("Item")
-            .add_systems(Update, (debug_items, add_item_ysort));
+            .add_systems(Update, add_item_ysort.run_if(in_state(GameState::Gaming)));
     }
 }
 
@@ -45,13 +52,9 @@ struct ItemBundle {
 
 fn add_item_ysort(mut commands: Commands, q_items: Query<Entity, (With<Item>, Without<YSort>)>) {
     for entity in &q_items {
-        commands.entity(entity).insert(YSort(0.0));
-    }
-}
-
-fn debug_items(mut q_items: Query<(&Item, &mut Transform)>) {
-    for (item, mut transform) in &mut q_items {
-        transform.translation += Vec3::new(0.1, 0.0, 0.0);
-        info!("{:?}, {:?}", transform, item);
+        let offset = -ITEM_LAYER_ZINDEX_ABS + BACKGROUND_ZINDEX_ABS;
+        commands
+            .entity(entity)
+            .insert(YSort(-10.0 * TRANSLATION_TO_PIXEL + offset));
     }
 }

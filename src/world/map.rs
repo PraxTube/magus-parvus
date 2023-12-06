@@ -6,6 +6,8 @@ use bevy_ecs_ldtk::prelude::*;
 use crate::player::Player;
 use crate::{GameAssets, GameState};
 
+use super::BACKGROUND_ZINDEX_ABS;
+
 const CHUNK_SIZE: f32 = 32.0 * 32.0;
 const CAMERA_SIZE_X: f32 = 400.0;
 const CAMERA_SIZE_Y: f32 = 300.0;
@@ -29,7 +31,7 @@ fn map_indices_to_world_coords(x_index: i32, y_index: i32) -> Vec3 {
     Vec3::new(
         x_index as f32 * CHUNK_SIZE,
         y_index as f32 * CHUNK_SIZE,
-        -1_000.0,
+        -BACKGROUND_ZINDEX_ABS,
     )
 }
 
