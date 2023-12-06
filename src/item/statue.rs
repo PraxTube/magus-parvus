@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_ecs_ldtk::GridCoords;
 
 use crate::{
     utils::anim_sprite::{AnimSprite, AnimSpriteTimer},
@@ -6,11 +7,28 @@ use crate::{
     GameAssets, GameState,
 };
 
+use super::Item;
+
 const OFFSET: Vec3 = Vec3::new(1.0, 45.0, 0.0);
 
 #[derive(Event)]
 pub struct StatueUnlocked {
     pub pos: Vec3,
+}
+
+#[derive(PartialEq)]
+pub struct Statue {
+    item: Item,
+    pos: Vec2,
+}
+
+impl Statue {
+    pub fn new(item: Item, grid_coords: &GridCoords) -> Self {
+        Self {
+            item,
+            pos: Vec2::new(grid_coords.x as f32 * 32.0, grid_coords.y as f32 * 32.0),
+        }
+    }
 }
 
 fn spawn_statue_beam(

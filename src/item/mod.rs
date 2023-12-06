@@ -8,7 +8,7 @@ use crate::world::camera::YSort;
 use crate::world::BACKGROUND_ZINDEX_ABS;
 use crate::{GameAssets, GameState};
 
-use self::statue::StatueUnlocked;
+use self::statue::{Statue, StatueUnlocked};
 
 pub struct ItemPlugin;
 
@@ -18,13 +18,20 @@ impl Plugin for ItemPlugin {
             Update,
             (add_item_ysort, add_item_sprite_bundle).run_if(in_state(GameState::Gaming)),
         )
+        .init_resource::<ActiveStatues>()
         .register_ldtk_entity::<ItemBundle>("Item")
         .add_plugins(statue::StatuePlugin);
     }
 }
 
-#[derive(Debug, Default, Component, Reflect)]
-enum Item {
+#[derive(Resource, Deref, DerefMut, Default)]
+pub struct ActiveStatues(Vec<Statue>);
+
+#[derive(Component)]
+pub struct VisitedItem;
+
+#[derive(Debug, Default, Component, Reflect, Clone, PartialEq)]
+pub enum Item {
     #[default]
     Test,
     Fulgur,
@@ -52,8 +59,6 @@ struct ItemBundle {
     item: Item,
     #[grid_coords]
     grid_coords: GridCoords,
-    #[worldly]
-    worldy: Worldly,
 }
 
 fn add_item_ysort(mut commands: Commands, q_items: Query<Entity, (With<Item>, Without<YSort>)>) {
@@ -67,10 +72,34 @@ fn add_item_ysort(mut commands: Commands, q_items: Query<Entity, (With<Item>, Wi
 fn add_item_sprite_bundle(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    q_items: Query<(Entity, &GridCoords), (With<Item>, Without<Sprite>)>,
+    q_items: Query<(Entity, &Parent, &Item, &GridCoords), Without<VisitedItem>>,
+    q_transforms: Query<(&Parent, &GlobalTransform), Without<Item>>,
+    mut statues: ResMut<ActiveStatues>,
     mut ev_statue_unlocked: EventWriter<StatueUnlocked>,
 ) {
-    for (entity, grid_coords) in &q_items {
+    for (entity, parent, item, grid_coords) in &q_items {
+        let statue = Statue::new(item.clone(), grid_coords);
+        if statues.contains(&statue) {
+            continue;
+        };
+
+        let parent_pos = match q_transforms.get(parent.get()) {
+            Ok(p) => match q_transforms.get(p.0.get()) {
+                Ok(p) => p.1.translation(),
+                Err(err) => {
+                    error!("no parent found, {}", err);
+                    continue;
+                }
+            },
+            Err(err) => {
+                error!("no parent found, {}", err);
+                continue;
+            }
+        };
+
+        statues.push(statue);
+        commands.entity(entity).insert(VisitedItem);
+
         let collider = commands
             .spawn((
                 Collider::cuboid(20.0, 10.0),
@@ -80,22 +109,28 @@ fn add_item_sprite_bundle(
             ))
             .id();
 
-        let transform = Transform::from_translation(Vec3::new(
-            grid_coords.x as f32 * 32.0,
-            grid_coords.y as f32 * 32.0,
-            0.0,
-        ));
+        info!("{:?}", parent_pos);
+
+        let transform = Transform::from_translation(
+            Vec3::new(
+                grid_coords.x as f32 * 32.0,
+                grid_coords.y as f32 * 32.0,
+                0.0,
+            ) + parent_pos,
+        );
         ev_statue_unlocked.send(StatueUnlocked {
             pos: transform.translation,
         });
 
         commands
-            .entity(entity)
-            .insert(SpriteBundle {
-                texture: assets.statue.clone(),
-                transform,
-                ..default()
-            })
+            .spawn((
+                YSort(0.0),
+                SpriteBundle {
+                    texture: assets.statue.clone(),
+                    transform,
+                    ..default()
+                },
+            ))
             .push_children(&[collider]);
     }
 }
