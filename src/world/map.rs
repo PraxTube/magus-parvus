@@ -40,20 +40,6 @@ const IIDS: [&str; 25] = [
     "2b786480-8990-11ee-bec7-97692d863dba",
 ];
 
-#[derive(Component)]
-pub struct Chunk {
-    x_index: i32,
-    y_index: i32,
-}
-
-fn map_indices_to_world_coords(x_index: i32, y_index: i32) -> Vec3 {
-    Vec3::new(
-        x_index as f32 * CHUNK_SIZE,
-        y_index as f32 * CHUNK_SIZE,
-        -BACKGROUND_ZINDEX_ABS,
-    )
-}
-
 fn world_coords_to_map_indices(position: Vec3) -> (i32, i32) {
     let x_index = (position.x / CHUNK_SIZE) as i32 + if position.x < 0.0 { -1 } else { 0 };
     let y_index = (position.y / CHUNK_SIZE) as i32 + if position.y < 0.0 { -1 } else { 0 };
@@ -67,22 +53,29 @@ fn map_indices_to_index(x_index: i32, y_index: i32) -> usize {
     m + n * CHUNK_ROWS
 }
 
-fn level_set_from_map_indices(x_index: i32, y_index: i32) -> LevelSet {
+fn iid_from_map_indices(x_index: i32, y_index: i32) -> String {
     let index = map_indices_to_index(x_index, y_index);
     if index >= IIDS.len() {
-        return LevelSet::from_iids([IIDS[0]]);
+        return IIDS[0].to_string();
     }
-    LevelSet::from_iids([IIDS[index]])
+    IIDS[index].to_string()
 }
 
-fn adjust_chunks(
-    mut commands: Commands,
-    assets: Res<GameAssets>,
-    q_player: Query<&Transform, With<Player>>,
-    q_chunks: Query<(Entity, &Chunk)>,
-) {
+fn spawn_ldtk_world(mut commands: Commands, assets: Res<GameAssets>) {
+    commands.spawn(LdtkWorldBundle {
+        transform: Transform::from_translation(Vec3::new(0.0, 0.0, -BACKGROUND_ZINDEX_ABS)),
+        ldtk_handle: assets.level.clone(),
+        ..Default::default()
+    });
+}
+
+fn adjust_chunks(mut level_set: Query<&mut LevelSet>, q_player: Query<&Transform, With<Player>>) {
     let player_pos = match q_player.get_single() {
         Ok(p) => p.translation,
+        Err(_) => return,
+    };
+    let mut level_set = match level_set.get_single_mut() {
+        Ok(l) => l,
         Err(_) => return,
     };
 
@@ -95,42 +88,24 @@ fn adjust_chunks(
     .into_iter()
     .collect();
     let indices: Vec<_> = unique_indices.into_iter().collect();
-    let mut chunk_exist_flags: Vec<bool> = vec![false; indices.len()];
+    let mut iids: Vec<String> = Vec::new();
 
-    for (entity, chunk) in &q_chunks {
-        let mut despawn = true;
-        for i in 0..indices.len() {
-            if indices[i].0 == chunk.x_index && indices[i].1 == chunk.y_index {
-                chunk_exist_flags[i] = true;
-                despawn = false;
-                break;
-            }
-        }
-        if despawn {
-            commands.entity(entity).despawn_recursive();
+    for k in 0..indices.len() {
+        let i = indices[k].0;
+        let j = indices[k].1;
+        let iid = iid_from_map_indices(i, j);
+        let level = LevelIid::new(&iid);
+        iids.push(iid);
+
+        if !level_set.iids.contains(&level) {
+            level_set.iids.insert(level);
         }
     }
 
-    for k in 0..indices.len() {
-        if chunk_exist_flags[k] {
-            continue;
+    for level_iid in &level_set.iids.clone() {
+        if !iids.contains(&level_iid.get()) {
+            level_set.iids.remove(level_iid);
         }
-
-        let i = indices[k].0;
-        let j = indices[k].1;
-
-        commands.spawn((
-            Chunk {
-                x_index: i,
-                y_index: j,
-            },
-            LdtkWorldBundle {
-                transform: Transform::from_translation(map_indices_to_world_coords(i, j)),
-                ldtk_handle: assets.level.clone(),
-                level_set: LevelSet::from_iids(level_set_from_map_indices(i, j)),
-                ..Default::default()
-            },
-        ));
     }
 }
 
@@ -140,9 +115,12 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(LdtkPlugin)
             .insert_resource(LdtkSettings {
-                level_spawn_behavior: LevelSpawnBehavior::UseZeroTranslation,
+                level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                    load_level_neighbors: false,
+                },
                 ..default()
             })
+            .add_systems(OnEnter(GameState::Gaming), spawn_ldtk_world)
             .add_systems(Update, (adjust_chunks).run_if(in_state(GameState::Gaming)));
     }
 }

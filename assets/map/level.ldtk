@@ -39,7 +39,7 @@
 	"levelNamePattern": "Level_%idx",
 	"tutorialDesc": null,
 	"customCommands": [],
-	"flags": [],
+	"flags": ["IgnoreBackupSuggest"],
 	"defs": { "layers": [
 		{
 			"__type": "Entities",
@@ -8372,7 +8372,24 @@
 					"seed": 4912828,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Item",
+							"__grid": [17,13],
+							"__pivot": [0,0],
+							"__tags": ["ItemSocket"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"__worldX": 2592,
+							"__worldY": -1632,
+							"iid": "d34f1320-8990-11ee-aa13-b95c4a269b6f",
+							"width": 32,
+							"height": 32,
+							"defUid": 42,
+							"px": [544,416],
+							"fieldInstances": [{ "__identifier": "item", "__type": "LocalEnum.Item", "__value": "Test", "__tile": null, "defUid": 44, "realEditorValues": [] }]
+						}
+					]
 				},
 				{
 					"__identifier": "Props_tileset",
@@ -12922,7 +12939,24 @@
 					"seed": 3770943,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Item",
+							"__grid": [16,16],
+							"__pivot": [0,0],
+							"__tags": ["ItemSocket"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"__worldX": 1536,
+							"__worldY": -2560,
+							"iid": "d175bf40-8990-11ee-aa13-5d228f787057",
+							"width": 32,
+							"height": 32,
+							"defUid": 42,
+							"px": [512,512],
+							"fieldInstances": [{ "__identifier": "item", "__type": "LocalEnum.Item", "__value": "Test", "__tile": null, "defUid": 44, "realEditorValues": [] }]
+						}
+					]
 				},
 				{
 					"__identifier": "Props_tileset",
@@ -15224,7 +15258,24 @@
 					"seed": 3770943,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Item",
+							"__grid": [14,17],
+							"__pivot": [0,0],
+							"__tags": ["ItemSocket"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"__worldX": 3520,
+							"__worldY": -2528,
+							"iid": "d45f71b0-8990-11ee-aa13-55e2d1e5a4e4",
+							"width": 32,
+							"height": 32,
+							"defUid": 42,
+							"px": [448,544],
+							"fieldInstances": [{ "__identifier": "item", "__type": "LocalEnum.Item", "__value": "Test", "__tile": null, "defUid": 44, "realEditorValues": [] }]
+						}
+					]
 				},
 				{
 					"__identifier": "Props_tileset",

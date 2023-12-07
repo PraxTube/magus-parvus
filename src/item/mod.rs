@@ -51,6 +51,8 @@ struct ItemBundle {
     item: Item,
     #[grid_coords]
     grid_coords: GridCoords,
+    #[worldly]
+    worldly: Worldly,
 }
 
 fn check_spawn_statues(
@@ -61,11 +63,6 @@ fn check_spawn_statues(
     mut ev_spawn_statue: EventWriter<SpawnStatue>,
 ) {
     for (entity, parent, item, grid_coords) in &q_items {
-        let statue = Statue::new(item.clone(), grid_coords);
-        if statues.contains(&statue) {
-            continue;
-        };
-
         let parent_pos = match q_transforms.get(parent.get()) {
             Ok(p) => match q_transforms.get(p.0.get()) {
                 Ok(p) => p.1.translation(),
@@ -80,6 +77,7 @@ fn check_spawn_statues(
             }
         };
 
+        let statue = Statue::new(item.clone(), grid_coords);
         statues.push(statue);
         commands.entity(entity).insert(VisitedItem);
 
