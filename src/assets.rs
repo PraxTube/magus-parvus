@@ -38,8 +38,8 @@ pub struct GameAssets {
     #[asset(path = "statue.png")]
     pub statue: Handle<Image>,
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 32.0, columns = 5, rows = 1))]
-    #[asset(path = "statue_unlock.png")]
-    pub statue_unlock: Handle<TextureAtlas>,
+    #[asset(path = "statue_blink.png")]
+    pub statue_blink: Handle<TextureAtlas>,
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 64.0, columns = 4, rows = 1))]
     #[asset(path = "statue_beam.png")]
     pub statue_beam: Handle<TextureAtlas>,
