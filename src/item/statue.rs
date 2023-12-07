@@ -1,9 +1,10 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::GridCoords;
+use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::utils::anim_sprite::{AnimSprite, AnimSpriteTimer};
 use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
+use crate::world::BACKGROUND_ZINDEX_ABS;
 use crate::{GameAssets, GameState};
 
 use super::Item;
@@ -13,18 +14,14 @@ const OFFSET: Vec3 = Vec3::new(1.0, 45.0, 0.0);
 #[derive(Resource, Deref, DerefMut, Default)]
 pub struct ActiveStatues(Vec<Statue>);
 
-#[derive(PartialEq)]
+#[derive(Component)]
 pub struct Statue {
     item: Item,
-    pos: Vec2,
 }
 
 impl Statue {
-    pub fn new(item: Item, grid_coords: &GridCoords) -> Self {
-        Self {
-            item,
-            pos: Vec2::new(grid_coords.x as f32 * 32.0, grid_coords.y as f32 * 32.0),
-        }
+    pub fn new(item: Item) -> Self {
+        Self { item }
     }
 }
 
@@ -60,9 +57,15 @@ fn spawn_statue_beams(
 fn spawn_statues(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut ev_spawn_statue: EventReader<SpawnStatue>,
+    q_items: Query<(Entity, &Item, &GridCoords), Without<Statue>>,
 ) {
-    for ev in ev_spawn_statue.read() {
+    for (entity, item, grid_coords) in &q_items {
+        let pos = Vec3::new(
+            grid_coords.x as f32 * 32.0,
+            grid_coords.y as f32 * 32.0,
+            0.0,
+        );
+
         let collider = commands
             .spawn((
                 Collider::cuboid(20.0, 10.0),
@@ -73,14 +76,14 @@ fn spawn_statues(
             .id();
 
         commands
-            .spawn((
-                YSort(0.0),
-                SpriteBundle {
-                    texture: assets.statue.clone(),
-                    transform: Transform::from_translation(ev.pos),
-                    ..default()
-                },
-            ))
+            .entity(entity)
+            .insert(YSort(0.0 + BACKGROUND_ZINDEX_ABS))
+            .insert(Statue::new(item.clone()))
+            .insert(SpriteBundle {
+                texture: assets.statue.clone(),
+                transform: Transform::from_translation(pos),
+                ..default()
+            })
             .push_children(&[collider]);
     }
 }
