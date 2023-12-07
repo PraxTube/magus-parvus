@@ -1,4 +1,4 @@
-mod statue;
+pub mod statue;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;

@@ -15,8 +15,8 @@ const BEAM_OFFSET: Vec3 = Vec3::new(1.0, 45.0, -10.0);
 const TRIGGER_DISTANCE_SQRT: f32 = 64.0 * 64.0;
 
 #[derive(Component, Clone)]
-struct Statue {
-    item: Item,
+pub struct Statue {
+    pub item: Item,
     unlocked: bool,
 }
 
@@ -47,8 +47,8 @@ impl BeamTimer {
 }
 
 #[derive(Event, Clone)]
-struct StatueUnlocked {
-    statue: Statue,
+pub struct StatueUnlocked {
+    pub statue: Statue,
     pos: Vec3,
 }
 

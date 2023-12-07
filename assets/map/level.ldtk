@@ -14095,7 +14095,10 @@
 							"height": 32,
 							"defUid": 42,
 							"px": [608,288],
-							"fieldInstances": [{ "__identifier": "item", "__type": "LocalEnum.Item", "__value": "Test", "__tile": null, "defUid": 44, "realEditorValues": [] }]
+							"fieldInstances": [{ "__identifier": "item", "__type": "LocalEnum.Item", "__value": "Fulgur", "__tile": null, "defUid": 44, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Fulgur"]
+							}] }]
 						}
 					]
 				},
