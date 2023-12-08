@@ -30,13 +30,13 @@ impl Statue {
 }
 
 #[derive(Component)]
-struct BeamTimer {
+struct UnlockTimer {
     timer: Timer,
     ev: StatueUnlocked,
     disabled: bool,
 }
 
-impl BeamTimer {
+impl UnlockTimer {
     fn new(ev: StatueUnlocked) -> Self {
         Self {
             timer: Timer::from_seconds(1.0, TimerMode::Once),
@@ -51,6 +51,9 @@ pub struct StatueUnlocked {
     pub statue: Statue,
     pos: Vec3,
 }
+
+#[derive(Event, Clone, Deref, DerefMut)]
+pub struct StatueUnlockedDelayed(pub StatueUnlocked);
 
 fn spawn_statues(
     mut commands: Commands,
@@ -108,37 +111,50 @@ fn spawn_statue_blinks(
 fn spawn_statue_beams(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    time: Res<Time>,
-    mut q_beam_timers: Query<&mut BeamTimer>,
+    mut ev_statue_unlocked_delayed: EventReader<StatueUnlockedDelayed>,
+) {
+    for ev in ev_statue_unlocked_delayed.read() {
+        commands.spawn((
+            AnimSprite::new(4, true),
+            AnimSpriteTimer::new(0.05),
+            YSort((BEAM_OFFSET.y - 1.0) * TRANSLATION_TO_PIXEL),
+            SpriteSheetBundle {
+                texture_atlas: assets.statue_beam.clone(),
+                transform: Transform::from_translation(ev.pos + BEAM_OFFSET),
+                ..default()
+            },
+        ));
+    }
+}
+
+fn spawn_unlock_timers(
+    mut commands: Commands,
     mut ev_statue_unlocked: EventReader<StatueUnlocked>,
 ) {
     for ev in ev_statue_unlocked.read() {
-        commands.spawn(BeamTimer::new(ev.clone()));
+        commands.spawn(UnlockTimer::new(ev.clone()));
     }
+}
 
-    for mut beam_timer in &mut q_beam_timers {
-        beam_timer.timer.tick(time.delta());
-
-        if beam_timer.timer.just_finished() {
-            beam_timer.disabled = true;
-            commands.spawn((
-                AnimSprite::new(4, true),
-                AnimSpriteTimer::new(0.05),
-                YSort((BEAM_OFFSET.y - 1.0) * TRANSLATION_TO_PIXEL),
-                SpriteSheetBundle {
-                    texture_atlas: assets.statue_beam.clone(),
-                    transform: Transform::from_translation(beam_timer.ev.pos + BEAM_OFFSET),
-                    ..default()
-                },
-            ));
+fn despawn_unlock_timers(
+    mut commands: Commands,
+    q_unlock_timers: Query<(Entity, &UnlockTimer)>,
+    mut ev_statue_unlocked_delayed: EventWriter<StatueUnlockedDelayed>,
+) {
+    for (entity, unlock_timer) in &q_unlock_timers {
+        if unlock_timer.disabled {
+            ev_statue_unlocked_delayed.send(StatueUnlockedDelayed(unlock_timer.ev.clone()));
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
 
-fn despawn_beam_timers(mut commands: Commands, q_beam_timers: Query<(Entity, &BeamTimer)>) {
-    for (entity, beam_timer) in &q_beam_timers {
-        if beam_timer.disabled {
-            commands.entity(entity).despawn_recursive();
+fn tick_unlock_timers(time: Res<Time>, mut q_unlock_timers: Query<&mut UnlockTimer>) {
+    for mut unlock_timer in &mut q_unlock_timers {
+        unlock_timer.timer.tick(time.delta());
+
+        if unlock_timer.timer.just_finished() {
+            unlock_timer.disabled = true;
         }
     }
 }
@@ -179,11 +195,14 @@ impl Plugin for StatuePlugin {
                 spawn_statues,
                 spawn_statue_blinks,
                 spawn_statue_beams,
-                despawn_beam_timers,
+                spawn_unlock_timers,
+                tick_unlock_timers,
+                despawn_unlock_timers,
                 unlock_statues,
             )
                 .run_if(in_state(GameState::Gaming)),
         )
-        .add_event::<StatueUnlocked>();
+        .add_event::<StatueUnlocked>()
+        .add_event::<StatueUnlockedDelayed>();
     }
 }

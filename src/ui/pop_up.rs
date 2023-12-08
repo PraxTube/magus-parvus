@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::item::statue::StatueUnlocked;
+use crate::item::statue::StatueUnlockedDelayed;
 use crate::item::Item;
 use crate::{GameAssets, GameState};
 
@@ -17,7 +17,11 @@ impl PopUp {
     }
 }
 
-fn spawn_title_text(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlocked) -> Entity {
+fn spawn_title_text(
+    commands: &mut Commands,
+    font: Handle<Font>,
+    ev: &StatueUnlockedDelayed,
+) -> Entity {
     let text = match ev.statue.item {
         Item::Test => "TEST, you should not see this, please report",
         Item::Fulgur => "UNLOCKED: Fulgur",
@@ -39,7 +43,7 @@ fn spawn_title_text(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlo
     commands.spawn(text_bundle).id()
 }
 
-fn spawn_pop_up(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlocked) {
+fn spawn_pop_up(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlockedDelayed) {
     let title_text = spawn_title_text(commands, font.clone(), ev);
 
     commands
@@ -65,7 +69,7 @@ fn spawn_pop_up(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlocked
 fn spawn_pop_ups(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut ev_statue_unlocked: EventReader<StatueUnlocked>,
+    mut ev_statue_unlocked: EventReader<StatueUnlockedDelayed>,
 ) {
     for ev in ev_statue_unlocked.read() {
         spawn_pop_up(&mut commands, assets.font.clone(), ev);
