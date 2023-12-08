@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::world::game_entity::SpawnGameEntity;
 use crate::{GameAssets, GameState};
 
-use super::damage_number::SpawnDamageText;
+use super::world_text::{SpawnWorldText, WorldText};
 
 #[derive(Component, Clone)]
 pub struct Health {
@@ -205,14 +205,15 @@ fn despawn_health_bars(
 
 fn check_health_reduction(
     mut q_healths: Query<(&Transform, &mut Health)>,
-    mut ev_spawn_damage_text: EventWriter<SpawnDamageText>,
+    mut ev_spawn_damage_text: EventWriter<SpawnWorldText>,
 ) {
     for (transform, mut health) in &mut q_healths {
         if health.health != health.old_health {
             let damage = (health.health - health.old_health).abs() as u32;
-            ev_spawn_damage_text.send(SpawnDamageText {
+            ev_spawn_damage_text.send(SpawnWorldText {
+                world_text: WorldText::default(),
                 pos: transform.translation,
-                damage,
+                content: damage.to_string(),
             });
             health.old_health = health.health;
         }

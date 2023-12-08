@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use crate::{
     enemy::Enemy,
     player::Player,
+    ui::health::Health,
     utils::anim_sprite::{AnimSprite, AnimSpriteTimer},
     world::camera::YSort,
     GameAssets, GameState,
@@ -14,13 +15,14 @@ use crate::{
 
 use super::{Spell, SpellCasted};
 
+const DAMAGE: f32 = 999.0;
 const SCALE: f32 = 2.0;
 const DISTANCE: f32 = 100.0;
 const SPRITES: usize = 17;
 const SPRITE_TIME: f32 = 0.075;
 
-const START_ALBEDO: f32 = 0.75;
-const SCREEN_COLOR: Color = Color::rgba(0.8, 0.2, 0.1, START_ALBEDO);
+const START_ALBEDO: f32 = 0.5;
+const SCREEN_COLOR: Color = Color::rgba(0.4, 0.2, 0.3, START_ALBEDO);
 
 #[derive(Component)]
 struct Death {
@@ -172,13 +174,12 @@ fn despawn_screen_effects(
 }
 
 fn kill_all_enemies(
-    mut commands: Commands,
-    q_enemies: Query<Entity, With<Enemy>>,
+    mut q_enemies: Query<&mut Health, With<Enemy>>,
     mut ev_kill_all: EventReader<KillAll>,
 ) {
     for _ in ev_kill_all.read() {
-        for entity in &q_enemies {
-            commands.entity(entity).despawn_recursive();
+        for mut health in &mut q_enemies {
+            health.health -= DAMAGE;
         }
     }
 }

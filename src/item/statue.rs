@@ -4,6 +4,7 @@ use bevy_rapier2d::prelude::*;
 
 use crate::enemy::Enemy;
 use crate::player::Player;
+use crate::ui::world_text::{SpawnWorldText, WorldText};
 use crate::utils::anim_sprite::{AnimSprite, AnimSpriteTimer};
 use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
 use crate::world::BACKGROUND_ZINDEX_ABS;
@@ -97,6 +98,25 @@ fn spawn_statues(
                 ..default()
             })
             .push_children(&[collider]);
+    }
+}
+
+fn spawn_statue_trigger_marks(
+    mut ev_statue_triggered: EventReader<StatueTriggered>,
+    mut ev_spawn_world_text: EventWriter<SpawnWorldText>,
+) {
+    for ev in ev_statue_triggered.read() {
+        let world_text = WorldText {
+            font_scale: 20.0,
+            font_color: Color::rgba(0.6, 0.2, 0.4, 0.0),
+            offset: Vec3::new(0.0, 35.0, 10.0),
+            ..default()
+        };
+        ev_spawn_world_text.send(SpawnWorldText {
+            world_text,
+            pos: ev.statue.pos,
+            content: "!".to_string(),
+        });
     }
 }
 
@@ -230,6 +250,7 @@ impl Plugin for StatuePlugin {
             Update,
             (
                 spawn_statues,
+                spawn_statue_trigger_marks,
                 spawn_statue_blinks,
                 spawn_statue_beams,
                 spawn_unlock_timers,
