@@ -1,3 +1,4 @@
+mod enemy_spawner;
 pub mod statue;
 
 use bevy::prelude::*;
@@ -7,12 +8,12 @@ pub struct ItemPlugin;
 
 impl Plugin for ItemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(statue::StatuePlugin)
+        app.add_plugins((statue::StatuePlugin, enemy_spawner::EnemySpawnerPlugin))
             .register_ldtk_entity::<ItemBundle>("Item");
     }
 }
 
-#[derive(Debug, Default, Component, Reflect, Clone)]
+#[derive(Debug, Default, Component, Reflect, Clone, PartialEq)]
 pub enum Item {
     #[default]
     Test,

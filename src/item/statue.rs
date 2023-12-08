@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use crate::enemy::Enemy;
 use crate::player::Player;
 use crate::utils::anim_sprite::{AnimSprite, AnimSpriteTimer};
 use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
@@ -17,6 +18,9 @@ const TRIGGER_DISTANCE_SQRT: f32 = 64.0 * 64.0;
 #[derive(Component, Clone)]
 pub struct Statue {
     pub item: Item,
+    pub pos: Vec3,
+    triggered: bool,
+    pub all_enemies_spawned: bool,
     unlocked: bool,
 }
 
@@ -24,6 +28,9 @@ impl Statue {
     pub fn new(item: Item) -> Self {
         Self {
             item,
+            pos: Vec3::ZERO,
+            triggered: false,
+            all_enemies_spawned: false,
             unlocked: false,
         }
     }
@@ -47,9 +54,13 @@ impl UnlockTimer {
 }
 
 #[derive(Event, Clone)]
+pub struct StatueTriggered {
+    pub statue: Statue,
+}
+
+#[derive(Event, Clone)]
 pub struct StatueUnlocked {
     pub statue: Statue,
-    pos: Vec3,
 }
 
 #[derive(Event, Clone, Deref, DerefMut)]
@@ -101,7 +112,7 @@ fn spawn_statue_blinks(
             YSort(10.0),
             SpriteSheetBundle {
                 texture_atlas: assets.statue_blink.clone(),
-                transform: Transform::from_translation(ev.pos + BLINK_OFFSET),
+                transform: Transform::from_translation(ev.statue.pos + BLINK_OFFSET),
                 ..default()
             },
         ));
@@ -120,7 +131,7 @@ fn spawn_statue_beams(
             YSort((BEAM_OFFSET.y - 1.0) * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {
                 texture_atlas: assets.statue_beam.clone(),
-                transform: Transform::from_translation(ev.pos + BEAM_OFFSET),
+                transform: Transform::from_translation(ev.statue.pos + BEAM_OFFSET),
                 ..default()
             },
         ));
@@ -159,10 +170,10 @@ fn tick_unlock_timers(time: Res<Time>, mut q_unlock_timers: Query<&mut UnlockTim
     }
 }
 
-fn unlock_statues(
+fn trigger_statues(
     q_player: Query<&Transform, (With<Player>, Without<Statue>)>,
     mut q_statues: Query<(&GlobalTransform, &mut Statue)>,
-    mut ev_statue_unlocked: EventWriter<StatueUnlocked>,
+    mut ev_statue_triggered: EventWriter<StatueTriggered>,
 ) {
     let player_pos = match q_player.get_single() {
         Ok(p) => p.translation,
@@ -170,18 +181,44 @@ fn unlock_statues(
     };
 
     for (statue_transform, mut statue) in &mut q_statues {
-        if statue.unlocked {
+        if statue.triggered {
             continue;
         }
 
         let dis = player_pos.distance_squared(statue_transform.translation());
-        if dis <= TRIGGER_DISTANCE_SQRT {
-            statue.unlocked = true;
-            ev_statue_unlocked.send(StatueUnlocked {
-                statue: statue.clone(),
-                pos: statue_transform.translation(),
-            })
+        if dis > TRIGGER_DISTANCE_SQRT {
+            continue;
         }
+
+        statue.triggered = true;
+        statue.pos = statue_transform.translation();
+        ev_statue_triggered.send(StatueTriggered {
+            statue: statue.clone(),
+        })
+    }
+}
+
+fn unlock_statues(
+    q_enemies: Query<&Enemy>,
+    mut q_statues: Query<&mut Statue>,
+    mut ev_statue_unlocked: EventWriter<StatueUnlocked>,
+) {
+    for mut statue in &mut q_statues {
+        if statue.unlocked {
+            continue;
+        }
+        if !statue.all_enemies_spawned {
+            continue;
+        }
+
+        if q_enemies.iter().count() > 0 {
+            continue;
+        }
+
+        statue.unlocked = true;
+        ev_statue_unlocked.send(StatueUnlocked {
+            statue: statue.clone(),
+        })
     }
 }
 
@@ -198,10 +235,12 @@ impl Plugin for StatuePlugin {
                 spawn_unlock_timers,
                 tick_unlock_timers,
                 despawn_unlock_timers,
+                trigger_statues,
                 unlock_statues,
             )
                 .run_if(in_state(GameState::Gaming)),
         )
+        .add_event::<StatueTriggered>()
         .add_event::<StatueUnlocked>()
         .add_event::<StatueUnlockedDelayed>();
     }

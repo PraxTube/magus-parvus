@@ -1,20 +1,16 @@
-use std::f32::consts::TAU;
-
 use rand::{self, Rng};
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use super::Enemy;
 use crate::spell::fireball::Fireball;
 use crate::spell::icicle::Icicle;
 use crate::spell::lightning::Lightning;
 use crate::ui::health::Health;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::world::camera::YSort;
-use crate::world::game_entity::SpawnGameEntity;
 use crate::{player::Player, GameAssets, GameState};
-
-use super::Enemy;
 
 const MAX_JUMP_SPEED: f32 = 200.0;
 const RANDOM_OFFSET_INTENSITY: f32 = 0.25;
@@ -22,8 +18,6 @@ const JUMP_TIME: f32 = 0.5;
 
 const STAGGERING_TIME: f32 = 0.2;
 const STAGGERING_INTENSITY: f32 = 100.0;
-
-const ENEMY_COUNT: usize = 200;
 
 #[derive(Default, PartialEq, Clone, Copy)]
 pub enum SlimeState {
@@ -61,6 +55,11 @@ impl Default for SlimeEnemy {
     }
 }
 
+#[derive(Event)]
+pub struct SpawnSlimeEnemy {
+    pub pos: Vec3,
+}
+
 fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
     match state {
         SlimeState::Idling => (0, 5),
@@ -84,12 +83,7 @@ fn update_indicies(
     }
 }
 
-fn spawn_slime(
-    commands: &mut Commands,
-    assets: &Res<GameAssets>,
-    _ev_spawn_game_entity: &mut EventWriter<SpawnGameEntity>,
-    spawn_pos: Vec3,
-) {
+fn spawn_slime(commands: &mut Commands, assets: &Res<GameAssets>, spawn_pos: Vec3) {
     let entity = commands
         .spawn((
             RigidBody::Dynamic,
@@ -131,12 +125,10 @@ fn spawn_slime(
 fn spawn_slimes(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut ev_spawn_game_entity: EventWriter<SpawnGameEntity>,
+    mut ev_spawn_slime_enemy: EventReader<SpawnSlimeEnemy>,
 ) {
-    for i in 0..ENEMY_COUNT {
-        let pos = Vec3::new(1024.0, 1024.0, 0.0)
-            + Quat::from_rotation_z(TAU * i as f32 / ENEMY_COUNT as f32).mul_vec3(Vec3::X) * 600.0;
-        spawn_slime(&mut commands, &assets, &mut ev_spawn_game_entity, pos);
+    for ev in ev_spawn_slime_enemy.read() {
+        spawn_slime(&mut commands, &assets, ev.pos);
     }
 }
 
@@ -449,6 +441,7 @@ impl Plugin for SlimeEnemyPlugin {
                 tick_slime_timers,
                 move_slimes,
                 update_jump_position,
+                spawn_slimes,
                 despawn_slimes,
                 check_player_collision,
                 check_fireball_collisions,
@@ -457,6 +450,6 @@ impl Plugin for SlimeEnemyPlugin {
             )
                 .run_if(in_state(GameState::Gaming)),
         )
-        .add_systems(OnEnter(GameState::Gaming), spawn_slimes);
+        .add_event::<SpawnSlimeEnemy>();
     }
 }

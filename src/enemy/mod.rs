@@ -1,4 +1,4 @@
-mod slime;
+pub mod slime;
 
 use bevy::prelude::*;
 
