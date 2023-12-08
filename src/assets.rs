@@ -27,6 +27,10 @@ pub struct GameAssets {
     #[asset(path = "icicle_shatter.png")]
     pub icicle_shatter: Handle<TextureAtlas>,
 
+    #[asset(texture_atlas(tile_size_x = 80.0, tile_size_y = 96.0, columns = 17, rows = 1))]
+    #[asset(path = "death.png")]
+    pub death: Handle<TextureAtlas>,
+
     #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,
 
@@ -43,6 +47,9 @@ pub struct GameAssets {
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 64.0, columns = 4, rows = 1))]
     #[asset(path = "statue_beam.png")]
     pub statue_beam: Handle<TextureAtlas>,
+
+    #[asset(path = "white_pixel.png")]
+    pub white_pixel: Handle<Image>,
 
     #[asset(path = "fonts/PressStart2P.ttf")]
     pub font: Handle<Font>,

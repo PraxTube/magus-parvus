@@ -1,3 +1,4 @@
+mod death;
 pub mod fireball;
 pub mod icicle;
 pub mod lightning;
@@ -25,6 +26,7 @@ impl Plugin for SpellPlugin {
                 icicle::IciclePlugin,
                 speed_boost::SpeedBoostPlugin,
                 phantasma::PhantasmaPlugin,
+                death::DeathPlugin,
             ));
     }
 }
@@ -38,6 +40,7 @@ enum Spell {
     ScutumGlaciei,
     SpeedBoost,
     Phantasma,
+    Death,
 }
 
 #[derive(Event)]
@@ -143,6 +146,10 @@ fn submit_spell(
         } else if spell_str == "phantasma" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Phantasma,
+            });
+        } else if spell_str == "now you" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::Death,
             });
         }
     }

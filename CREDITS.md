@@ -30,6 +30,10 @@ https://sanctumpixel.itch.io/lightning-lines-pixel-art-effect
 
 https://ansimuz.itch.io/warped-shooting-fx
 
+#### Death
+
+https://creativekind.itch.io/necromancer-free
+
 <!---->
 <!-- ### Audio -->
 <!---->
