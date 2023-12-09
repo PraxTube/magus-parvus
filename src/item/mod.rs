@@ -19,6 +19,8 @@ pub enum Item {
     #[default]
     NotImplemented,
     Tutorial,
+    IgnisPila,
+    InfernoPila,
     Fulgur,
 }
 
@@ -26,6 +28,8 @@ impl Item {
     fn from_str(s: &str) -> Item {
         match s {
             "Tutorial" => Item::Tutorial,
+            "IgnisPila" => Item::IgnisPila,
+            "InfernoPila" => Item::InfernoPila,
             "Fulgur" => Item::Fulgur,
             _ => Item::NotImplemented,
         }

@@ -42,6 +42,24 @@ fn statue_sub_spawners(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
     match statue.item {
         Item::NotImplemented => Vec::new(),
         Item::Tutorial => Vec::new(),
+        Item::IgnisPila => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 1,
+                ..default()
+            },
+        )],
+        Item::InfernoPila => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 8,
+                timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+                spawn_formation: SpawnFormation::Circle,
+                ..default()
+            },
+        )],
         Item::Fulgur => vec![
             (
                 5.0,
