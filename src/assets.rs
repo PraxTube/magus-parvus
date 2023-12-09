@@ -27,7 +27,7 @@ pub struct GameAssets {
     #[asset(path = "icicle_shatter.png")]
     pub icicle_shatter: Handle<TextureAtlas>,
 
-    #[asset(texture_atlas(tile_size_x = 80.0, tile_size_y = 96.0, columns = 17, rows = 1))]
+    #[asset(texture_atlas(tile_size_x = 80.0, tile_size_y = 96.0, columns = 18, rows = 1))]
     #[asset(path = "death.png")]
     pub death: Handle<TextureAtlas>,
 

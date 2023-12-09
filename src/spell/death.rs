@@ -18,7 +18,7 @@ use super::{Spell, SpellCasted};
 const DAMAGE: f32 = 999.0;
 const SCALE: f32 = 2.0;
 const DISTANCE: f32 = 100.0;
-const SPRITES: usize = 17;
+const SPRITES: usize = 18;
 const SPRITE_TIME: f32 = 0.075;
 
 const START_ALBEDO: f32 = 0.5;
