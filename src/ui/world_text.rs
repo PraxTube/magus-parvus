@@ -8,7 +8,7 @@ use crate::{GameAssets, GameState};
 // The higher it is, the sharper the text.
 const FONT_SCALE_RATIO: f32 = 100.0;
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct WorldText {
     pub font_scale: f32,
     pub font_color: Color,
@@ -34,14 +34,14 @@ impl Default for WorldText {
             vec2(0.533, 0.507),
             vec2(1.0, 1.0),
         ]];
-        let color_points = [[
+        let alpha_points = [[
             vec2(0.0, 0.5),
             vec2(0.14, 3.035),
             vec2(0.533, 0.507),
             vec2(1.0, 0.0),
         ]];
         let scale_curve = CubicBezier::new(scale_points).to_curve();
-        let color_curve = CubicBezier::new(color_points).to_curve();
+        let alpha_curve = CubicBezier::new(alpha_points).to_curve();
         Self {
             font_scale: 10.0,
             font_color: Color::rgba(1.0, 1.0, 1.0, 0.0),
@@ -49,7 +49,7 @@ impl Default for WorldText {
             random_spray_intensity: 5.0,
             timer: Timer::from_seconds(1.0, TimerMode::Once),
             scale_curve,
-            alpha_curve: color_curve,
+            alpha_curve,
         }
     }
 }
@@ -66,7 +66,7 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
         * ev.world_text.random_spray_intensity;
 
     commands.spawn((
-        WorldText::default(),
+        ev.world_text.clone(),
         Text2dBundle {
             text: Text::from_section(ev.content.to_string(), text_style.clone())
                 .with_alignment(TextAlignment::Center),

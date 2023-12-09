@@ -1,5 +1,6 @@
 mod death;
 pub mod fireball;
+mod flub;
 pub mod icicle;
 pub mod lightning;
 mod phantasma;
@@ -27,6 +28,7 @@ impl Plugin for SpellPlugin {
                 speed_boost::SpeedBoostPlugin,
                 phantasma::PhantasmaPlugin,
                 death::DeathPlugin,
+                flub::FlubPlugin,
             ));
     }
 }
@@ -41,6 +43,7 @@ enum Spell {
     SpeedBoost,
     Phantasma,
     Death,
+    Flub,
 }
 
 #[derive(Event)]
@@ -117,7 +120,7 @@ fn submit_spell(
 
     for ev in ev_typing_submit_event.read() {
         player.state = PlayerState::Idling;
-        let spell_str = ev.value.trim_end().to_lowercase();
+        let spell_str = ev.value.trim_start().trim_end().to_lowercase();
 
         if spell_str == "fireball" {
             ev_spell_casted.send(SpellCasted {
@@ -151,6 +154,8 @@ fn submit_spell(
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Death,
             });
+        } else if !spell_str.is_empty() {
+            ev_spell_casted.send(SpellCasted { spell: Spell::Flub })
         }
     }
 }

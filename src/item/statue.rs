@@ -107,8 +107,7 @@ fn spawn_statue_trigger_marks(
 ) {
     for ev in ev_statue_triggered.read() {
         let world_text = WorldText {
-            font_scale: 20.0,
-            font_color: Color::rgba(0.6, 0.2, 0.4, 0.0),
+            font_scale: 15.0,
             offset: Vec3::new(0.0, 35.0, 10.0),
             ..default()
         };
