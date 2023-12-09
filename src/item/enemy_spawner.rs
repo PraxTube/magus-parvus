@@ -40,8 +40,8 @@ struct EnemySubSpawner {
 
 fn statue_sub_spawners(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
     match statue.item {
-        Item::Test => Vec::new(),
-        Item::Fulgur => vec![
+        Item::Fulgur => Vec::new(),
+        Item::Test => vec![
             (
                 5.0,
                 EnemySubSpawner {

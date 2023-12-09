@@ -1,4 +1,5 @@
 mod enemy_spawner;
+pub mod item_value;
 pub mod statue;
 
 use bevy::prelude::*;
