@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_rapier2d::geometry::Collider;
 
 use super::CHUNK_SIZE;
 use crate::player::Player;
@@ -59,6 +60,29 @@ fn iid_from_map_indices(x_index: i32, y_index: i32) -> String {
         return IIDS[0].to_string();
     }
     IIDS[index].to_string()
+}
+
+fn spawn_world_borders(mut commands: Commands) {
+    commands.spawn((
+        Collider::cuboid(10.0, 2600.0),
+        TransformBundle::from_transform(Transform::from_translation(Vec3::new(0.0, 2600.0, 0.0))),
+    ));
+    commands.spawn((
+        Collider::cuboid(10.0, 2600.0),
+        TransformBundle::from_transform(Transform::from_translation(Vec3::new(
+            5120.0, 2600.0, 0.0,
+        ))),
+    ));
+    commands.spawn((
+        Collider::cuboid(2600.0, 10.0),
+        TransformBundle::from_transform(Transform::from_translation(Vec3::new(2610.0, 55.0, 0.0))),
+    ));
+    commands.spawn((
+        Collider::cuboid(2600.0, 10.0),
+        TransformBundle::from_transform(Transform::from_translation(Vec3::new(
+            2610.0, 5120.0, 0.0,
+        ))),
+    ));
 }
 
 fn spawn_ldtk_world(mut commands: Commands, assets: Res<GameAssets>) {
@@ -120,7 +144,10 @@ impl Plugin for MapPlugin {
                 },
                 ..default()
             })
-            .add_systems(OnEnter(GameState::Gaming), spawn_ldtk_world)
+            .add_systems(
+                OnEnter(GameState::Gaming),
+                (spawn_world_borders, spawn_ldtk_world),
+            )
             .add_systems(Update, (adjust_chunks).run_if(in_state(GameState::Gaming)));
     }
 }

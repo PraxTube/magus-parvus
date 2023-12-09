@@ -19,6 +19,8 @@ use bevy_screen_diagnostics::{
     ScreenDiagnosticsPlugin, ScreenEntityDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin,
 };
 
+const BACKGROUND_COLOR: Color = Color::rgb(0.95, 0.90, 0.75);
+
 #[derive(States, Clone, Eq, PartialEq, Debug, Hash, Default)]
 pub enum GameState {
     #[default]
@@ -71,5 +73,6 @@ fn main() {
             player::PlayerPlugin,
             audio::GameAudioPlugin,
         ))
+        .insert_resource(ClearColor(BACKGROUND_COLOR))
         .run();
 }
