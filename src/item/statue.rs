@@ -16,7 +16,7 @@ const BLINK_OFFSET: Vec3 = Vec3::new(0.0, 32.0, 0.0);
 const BEAM_OFFSET: Vec3 = Vec3::new(1.0, 45.0, -10.0);
 const TRIGGER_DISTANCE_SQRT: f32 = 64.0 * 64.0;
 
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Default)]
 pub struct Statue {
     pub item: Item,
     pub pos: Vec3,
@@ -25,33 +25,11 @@ pub struct Statue {
     unlocked: bool,
 }
 
-impl Statue {
-    pub fn new(item: Item) -> Self {
-        Self {
-            item,
-            pos: Vec3::ZERO,
-            triggered: false,
-            all_enemies_spawned: false,
-            unlocked: false,
-        }
-    }
-}
-
 #[derive(Component)]
 struct UnlockTimer {
     timer: Timer,
     ev: StatueUnlocked,
     disabled: bool,
-}
-
-impl UnlockTimer {
-    fn new(ev: StatueUnlocked) -> Self {
-        Self {
-            timer: Timer::from_seconds(1.0, TimerMode::Once),
-            ev,
-            disabled: false,
-        }
-    }
 }
 
 #[derive(Event, Clone)]
@@ -66,6 +44,28 @@ pub struct StatueUnlocked {
 
 #[derive(Event, Clone, Deref, DerefMut)]
 pub struct StatueUnlockedDelayed(pub StatueUnlocked);
+
+impl Statue {
+    pub fn new(item: Item) -> Self {
+        Self {
+            item,
+            pos: Vec3::ZERO,
+            triggered: false,
+            all_enemies_spawned: false,
+            unlocked: false,
+        }
+    }
+}
+
+impl UnlockTimer {
+    fn new(ev: StatueUnlocked) -> Self {
+        Self {
+            timer: Timer::from_seconds(1.0, TimerMode::Once),
+            ev,
+            disabled: false,
+        }
+    }
+}
 
 fn spawn_statues(
     mut commands: Commands,
