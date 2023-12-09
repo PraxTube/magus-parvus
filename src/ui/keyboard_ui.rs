@@ -12,6 +12,7 @@ enum Icon {
     K,
     A,
     D,
+    I,
     LEFT,
     RIGHT,
     UP,
@@ -28,6 +29,7 @@ fn icon_index(icon: Icon) -> usize {
         Icon::LEFT => 8,
         Icon::D => 9,
         Icon::RIGHT => 11,
+        Icon::I => 12,
     }
 }
 
@@ -127,6 +129,13 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
         Icon::RIGHT,
         Vec2::new(arrow_dis, 0.0),
         false,
+    );
+    spawn_icon(
+        &mut commands,
+        texture_atlas.clone(),
+        Icon::I,
+        Vec2::new(400.0, 150.0),
+        true,
     );
 }
 
