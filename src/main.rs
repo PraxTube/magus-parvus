@@ -1,4 +1,5 @@
 mod assets;
+mod audio;
 mod enemy;
 mod item;
 mod player;
@@ -68,6 +69,7 @@ fn main() {
             item::ItemPlugin,
             enemy::EnemyPlugin,
             player::PlayerPlugin,
+            audio::GameAudioPlugin,
         ))
         .run();
 }

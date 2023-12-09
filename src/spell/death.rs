@@ -21,8 +21,8 @@ const DISTANCE: f32 = 100.0;
 const SPRITES: usize = 18;
 const SPRITE_TIME: f32 = 0.075;
 
-const START_ALBEDO: f32 = 0.5;
-const SCREEN_COLOR: Color = Color::rgba(0.4, 0.2, 0.3, START_ALBEDO);
+const START_ALBEDO: f32 = 1.0;
+const SCREEN_COLOR: Color = Color::rgba(0.0, 0.0, 0.0, START_ALBEDO);
 
 #[derive(Component)]
 struct Death {

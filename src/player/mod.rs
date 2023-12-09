@@ -1,3 +1,4 @@
+mod audio;
 pub mod input;
 pub mod state;
 pub mod stats;
@@ -19,6 +20,8 @@ use crate::{GameAssets, GameState};
 use input::PlayerInput;
 use stats::Stats;
 
+use self::audio::StepsTimer;
+
 pub const PLAYER_SPAWN_POS: Vec3 = Vec3::new(2.5 * CHUNK_SIZE, 16.0 + 2.5 * CHUNK_SIZE, 0.0);
 const STAGGERING_TIME: f32 = 0.25;
 const STAGGERING_INTENSITY: f32 = 200.0;
@@ -37,7 +40,11 @@ impl Plugin for PlayerPlugin {
             )
                 .run_if(in_state(GameState::Gaming)),
         )
-        .add_plugins((input::InputPlugin, state::PlayerStatePlugin))
+        .add_plugins((
+            input::InputPlugin,
+            state::PlayerStatePlugin,
+            audio::PlayerAudioPlugin,
+        ))
         .add_systems(OnEnter(GameState::Gaming), spawn_player);
     }
 }
@@ -141,6 +148,7 @@ fn spawn_player(
                 texture_atlas: assets.player.clone(),
                 ..default()
             },
+            StepsTimer::default(),
         ))
         .id();
 

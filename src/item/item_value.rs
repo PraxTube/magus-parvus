@@ -17,8 +17,8 @@ pub fn item_description(item: &Item) -> String {
         Item::Tutorial => {
             "Press 'i' to open your spell console.\nThen type your spell, try 'fireball'."
         }
-        Item::IgnisPila => "Cast 8 fireballs omni directionaly.",
-        Item::InfernoPila => "Cast MANY fireballs omni directionaly",
+        Item::IgnisPila => "Cast 8 fireballs omni directionally.",
+        Item::InfernoPila => "Cast MANY fireballs omni directionally",
         Item::Fulgur => {
             "Call down lightning strikes on random enemies.\nOnly works when there are enemies."
         }

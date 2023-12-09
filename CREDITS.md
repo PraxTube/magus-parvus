@@ -1,57 +1,55 @@
 # Credits
 
-## Assets
+## Pixel Art
 
-### Pixel Art
-
-#### Background
+### Background
 
 https://cainos.itch.io/pixel-art-top-down-basic
 
 https://cazwolf.itch.io/caz-pixel-free
 
-#### Mage (Player Character)
+### Mage (Player Character)
 
 https://greenpixels.itch.io/pixel-art-assets-5
 
-#### Slime (Enemy)
+### Slime (Enemy)
 
 https://free-game-assets.itch.io/free-field-enemies-pixel-art-for-tower-defense
 
 NOTE: Only the slime was used. It was modified slightly.
 
-#### Fireball
+### Fireball
 
 https://stealthix.itch.io/animated-fires
 
-#### Lightning
+### Lightning
 
 https://sanctumpixel.itch.io/lightning-lines-pixel-art-effect
 
-#### Statue Beam Effect and Statue Unlock Effect
+### Statue Beam Effect and Statue Unlock Effect
 
 https://ansimuz.itch.io/warped-shooting-fx
 
-#### Death
+### Death
 
 https://creativekind.itch.io/necromancer-free
 
-<!---->
-<!-- ### Audio -->
-<!---->
-<!-- #### Sounds -->
-<!---->
-<!-- #### Music -->
-<!---->
+---
 
-### Fonts
+## Audio
 
-https://fonts.google.com/specimen/Press+Start+2P
+### Sounds
+
+#### Player Footsteps
+
+https://dryoma.itch.io/footsteps-sounds
+
+### Music
+
+https://shononoki.itch.io/rpg-music-pack-svl
 
 ---
 
-## Backends
+## Fonts
 
-### Game Engine
-
-https://bevyengine.org/
+https://fonts.google.com/specimen/Press+Start+2P
