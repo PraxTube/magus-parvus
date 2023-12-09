@@ -17,15 +17,17 @@ impl Plugin for ItemPlugin {
 #[derive(Debug, Default, Component, Reflect, Clone, PartialEq)]
 pub enum Item {
     #[default]
-    Test,
+    NotImplemented,
+    Tutorial,
     Fulgur,
 }
 
 impl Item {
     fn from_str(s: &str) -> Item {
         match s {
+            "Tutorial" => Item::Tutorial,
             "Fulgur" => Item::Fulgur,
-            _ => Item::Test,
+            _ => Item::NotImplemented,
         }
     }
 
