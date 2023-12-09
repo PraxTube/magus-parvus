@@ -19,6 +19,7 @@ use crate::{GameAssets, GameState};
 use input::PlayerInput;
 use stats::Stats;
 
+pub const PLAYER_SPAWN_POS: Vec3 = Vec3::new(2.5 * CHUNK_SIZE, 16.0 + 2.5 * CHUNK_SIZE, 0.0);
 const STAGGERING_TIME: f32 = 0.25;
 const STAGGERING_INTENSITY: f32 = 200.0;
 
@@ -135,12 +136,8 @@ fn spawn_player(
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             SpriteSheetBundle {
-                transform: Transform::from_translation(Vec3::new(
-                    2.5 * CHUNK_SIZE,
-                    16.0 + 2.5 * CHUNK_SIZE,
-                    0.0,
-                ))
-                .with_scale(Vec3::splat(2.0)),
+                transform: Transform::from_translation(PLAYER_SPAWN_POS)
+                    .with_scale(Vec3::splat(2.0)),
                 texture_atlas: assets.player.clone(),
                 ..default()
             },

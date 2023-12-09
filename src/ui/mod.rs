@@ -1,4 +1,5 @@
 pub mod health;
+mod keyboard_ui;
 mod pop_up;
 pub mod text_field;
 pub mod world_text;
@@ -14,6 +15,7 @@ impl Plugin for UiPlugin {
             world_text::WorldTextPlugin,
             text_field::TextFieldPlugin,
             pop_up::PopUpPlugin,
+            keyboard_ui::KeyboardUiPlugin,
         ));
     }
 }

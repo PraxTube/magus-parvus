@@ -8,6 +8,8 @@
 
 https://cainos.itch.io/pixel-art-top-down-basic
 
+https://cazwolf.itch.io/caz-pixel-free
+
 #### Mage (Player Character)
 
 https://greenpixels.itch.io/pixel-art-assets-5
