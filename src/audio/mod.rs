@@ -1,4 +1,5 @@
 mod bgm;
+mod spacial;
 
 use rand::{thread_rng, Rng};
 
@@ -14,7 +15,7 @@ pub struct GameAudioPlugin;
 impl Plugin for GameAudioPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(AudioPlugin)
-            .add_plugins(bgm::BgmPlugin)
+            .add_plugins((bgm::BgmPlugin, spacial::SpacialAudioPlugin))
             .add_event::<PlaySound>()
             .add_systems(Update, (play_sounds,).run_if(in_state(GameState::Gaming)));
     }
@@ -27,6 +28,7 @@ pub struct PlaySound {
     pub playback_rate: f64,
     pub rand_speed_intensity: f64,
     pub repeat: bool,
+    pub parent: Option<Entity>,
 }
 
 impl Default for PlaySound {
@@ -37,11 +39,16 @@ impl Default for PlaySound {
             playback_rate: 1.0,
             rand_speed_intensity: 0.0,
             repeat: false,
+            parent: None,
         }
     }
 }
 
-fn play_sounds(audio: Res<Audio>, mut ev_play_sound: EventReader<PlaySound>) {
+fn play_sounds(
+    mut commands: Commands,
+    audio: Res<Audio>,
+    mut ev_play_sound: EventReader<PlaySound>,
+) {
     let mut rng = thread_rng();
     let mut added_sounds: HashSet<Handle<AudioSource>> = HashSet::new();
 
@@ -56,20 +63,33 @@ fn play_sounds(audio: Res<Audio>, mut ev_play_sound: EventReader<PlaySound>) {
         } else {
             rng.gen_range(-1.0..1.0) * ev.rand_speed_intensity
         };
+        let volume_offset = if ev.parent.is_some() { 0.0 } else { 1.0 };
 
-        let _audio_instance = if ev.repeat {
+        let audio_instance = if ev.repeat {
             audio
                 .play(ev.clip.clone())
-                .with_volume(ev.volume * MAIN_VOLUME)
+                .with_volume(ev.volume * volume_offset * MAIN_VOLUME)
                 .with_playback_rate(ev.playback_rate + speed_offset)
                 .looped()
                 .handle()
         } else {
             audio
                 .play(ev.clip.clone())
-                .with_volume(ev.volume * MAIN_VOLUME)
+                .with_volume(ev.volume * volume_offset * MAIN_VOLUME)
                 .with_playback_rate(ev.playback_rate + speed_offset)
                 .handle()
+        };
+
+        if let Some(parent) = ev.parent {
+            let audio_emitter = commands
+                .spawn((
+                    TransformBundle::default(),
+                    AudioEmitter {
+                        instances: vec![audio_instance],
+                    },
+                ))
+                .id();
+            commands.entity(parent).push_children(&[audio_emitter]);
         };
     }
 }

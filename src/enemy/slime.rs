@@ -130,6 +130,7 @@ fn spawn_slime(
     ev_play_sound.send(PlaySound {
         clip: assets.slime_land_sound.clone(),
         rand_speed_intensity: 0.2,
+        parent: Some(entity),
         ..default()
     });
 }
@@ -148,10 +149,10 @@ fn spawn_slimes(
 fn tick_slime_timers(
     assets: Res<GameAssets>,
     time: Res<Time>,
-    mut q_slimes: Query<&mut SlimeEnemy, With<Enemy>>,
+    mut q_slimes: Query<(Entity, &mut SlimeEnemy), With<Enemy>>,
     mut ev_play_sound: EventWriter<PlaySound>,
 ) {
-    for mut slime in &mut q_slimes {
+    for (entity, mut slime) in &mut q_slimes {
         match slime.state {
             SlimeState::Idling => {
                 slime.jump_cooldown_timer.tick(time.delta());
@@ -160,6 +161,7 @@ fn tick_slime_timers(
                         clip: assets.slime_jump_sound.clone(),
                         volume: 0.75,
                         rand_speed_intensity: 0.2,
+                        parent: Some(entity),
                         ..default()
                     });
                     slime.state = SlimeState::Jumping;
@@ -171,6 +173,7 @@ fn tick_slime_timers(
                     ev_play_sound.send(PlaySound {
                         clip: assets.slime_land_sound.clone(),
                         rand_speed_intensity: 0.2,
+                        parent: Some(entity),
                         ..default()
                     });
                     slime.state = SlimeState::Idling;
@@ -181,6 +184,7 @@ fn tick_slime_timers(
                 if slime.staggering_timer.just_finished() {
                     ev_play_sound.send(PlaySound {
                         clip: assets.slime_hit_sound.clone(),
+                        parent: Some(entity),
                         ..default()
                     });
                     slime.state = SlimeState::Idling;
@@ -250,6 +254,7 @@ fn despawn_slimes(
         if health.health <= 0.0 && slime.state != SlimeState::Dying {
             ev_play_sound.send(PlaySound {
                 clip: assets.slime_death_sound.clone(),
+                parent: Some(entity),
                 ..default()
             });
             slime.state = SlimeState::Dying;

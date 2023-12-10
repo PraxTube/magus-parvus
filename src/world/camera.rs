@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::{PrimaryWindow, WindowMode};
+use bevy_kira_audio::prelude::AudioReceiver;
 
 use crate::player::input::PlayerInput;
 use crate::player::{Player, PlayerState};
@@ -38,7 +39,7 @@ pub fn apply_y_sort(mut q_transforms: Query<(&mut Transform, &GlobalTransform, &
 fn spawn_camera(mut commands: Commands) {
     let mut camera = Camera2dBundle::default();
     camera.projection.scaling_mode = ScalingMode::FixedVertical(400.0);
-    commands.spawn((MainCamera, camera));
+    commands.spawn((MainCamera, AudioReceiver, camera));
 }
 
 fn move_camera(
