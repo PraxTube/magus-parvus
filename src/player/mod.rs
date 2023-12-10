@@ -152,7 +152,7 @@ fn spawn_player(
         ))
         .id();
 
-    let health = Health::new(entity, 10.0, 0.60);
+    let health = Health::new(entity, 10.0, 2.00);
     ev_spawn_game_entity.send(SpawnGameEntity { entity, health });
 
     let collider = commands

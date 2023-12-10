@@ -26,7 +26,7 @@ impl Health {
     }
 
     pub fn health_bar_offset(&self) -> Vec3 {
-        Vec3::new(0.0, -45.0, 0.0) * self.size
+        Vec3::new(0.0, -15.0, 0.0) * self.size
     }
 
     pub fn health_bar_scale(&self) -> Vec3 {
@@ -124,10 +124,6 @@ fn spawn_background(commands: &mut Commands, assets: &Res<GameAssets>, health: &
     ));
     commands
         .spawn((SpriteBundle {
-            sprite: Sprite {
-                color: Color::rgb(0.2, 0.2, 0.2),
-                ..default()
-            },
             texture: assets.health_background.clone(),
             transform,
             ..default()
@@ -149,10 +145,6 @@ fn spawn_fill(commands: &mut Commands, assets: &Res<GameAssets>, health: &Health
     ));
     commands
         .spawn((SpriteBundle {
-            sprite: Sprite {
-                color: Color::rgb(0.8, 0.0, 0.0),
-                ..default()
-            },
             texture: assets.health_fill.clone(),
             transform,
             ..default()
