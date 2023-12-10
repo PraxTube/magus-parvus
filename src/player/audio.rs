@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use rand::{thread_rng, Rng};
 
 use crate::{audio::PlaySound, GameAssets, GameState};
 
@@ -49,12 +48,10 @@ fn play_step_sounds(
         return;
     }
 
-    let mut rng = thread_rng();
-
     ev_play_sound.send(PlaySound {
         clip: assets.player_footstep.clone(),
-        playback_rate: 1.0 + rng.gen_range(-1.0..1.0) as f64 * RAND_SPEED_INTENSITY,
         volume: 1.5,
+        rand_speed_intensity: RAND_SPEED_INTENSITY,
         ..default()
     });
 }

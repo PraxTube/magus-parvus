@@ -1,11 +1,13 @@
 mod bgm;
 
-use bevy::prelude::*;
+use rand::{thread_rng, Rng};
+
+use bevy::{prelude::*, utils::HashSet};
 use bevy_kira_audio::prelude::{AudioPlugin, AudioSource, *};
 
 use crate::GameState;
 
-const MAIN_VOLUME: f64 = 0.35;
+const MAIN_VOLUME: f64 = 0.5;
 
 pub struct GameAudioPlugin;
 
@@ -23,6 +25,7 @@ pub struct PlaySound {
     pub clip: Handle<AudioSource>,
     pub volume: f64,
     pub playback_rate: f64,
+    pub rand_speed_intensity: f64,
     pub repeat: bool,
 }
 
@@ -32,25 +35,40 @@ impl Default for PlaySound {
             clip: Handle::default(),
             volume: 1.0,
             playback_rate: 1.0,
+            rand_speed_intensity: 0.0,
             repeat: false,
         }
     }
 }
 
 fn play_sounds(audio: Res<Audio>, mut ev_play_sound: EventReader<PlaySound>) {
+    let mut rng = thread_rng();
+    let mut added_sounds: HashSet<Handle<AudioSource>> = HashSet::new();
+
     for ev in ev_play_sound.read() {
+        if added_sounds.contains(&ev.clip) {
+            continue;
+        }
+        added_sounds.insert(ev.clip.clone());
+
+        let speed_offset = if ev.rand_speed_intensity == 0.0 {
+            0.0
+        } else {
+            rng.gen_range(-1.0..1.0) * ev.rand_speed_intensity
+        };
+
         let _audio_instance = if ev.repeat {
             audio
                 .play(ev.clip.clone())
                 .with_volume(ev.volume * MAIN_VOLUME)
-                .with_playback_rate(ev.playback_rate)
+                .with_playback_rate(ev.playback_rate + speed_offset)
                 .looped()
                 .handle()
         } else {
             audio
                 .play(ev.clip.clone())
                 .with_volume(ev.volume * MAIN_VOLUME)
-                .with_playback_rate(ev.playback_rate)
+                .with_playback_rate(ev.playback_rate + speed_offset)
                 .handle()
         };
     }

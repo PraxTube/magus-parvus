@@ -8,6 +8,7 @@ fn play_bgm(assets: Res<GameAssets>, mut ev_play_sound: EventWriter<PlaySound>) 
     ev_play_sound.send(PlaySound {
         clip: assets.bgm.clone(),
         repeat: true,
+        volume: 0.5,
         ..default()
     });
 }

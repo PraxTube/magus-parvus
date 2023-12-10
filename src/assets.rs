@@ -62,4 +62,13 @@ pub struct GameAssets {
     pub player_footstep: Handle<AudioSource>,
     #[asset(path = "music/bgm.ogg")]
     pub bgm: Handle<AudioSource>,
+
+    #[asset(path = "sounds/slime_jump.ogg")]
+    pub slime_jump_sound: Handle<AudioSource>,
+    #[asset(path = "sounds/slime_land.ogg")]
+    pub slime_land_sound: Handle<AudioSource>,
+    #[asset(path = "sounds/slime_hit.ogg")]
+    pub slime_hit_sound: Handle<AudioSource>,
+    #[asset(path = "sounds/slime_death.ogg")]
+    pub slime_death_sound: Handle<AudioSource>,
 }

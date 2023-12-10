@@ -4,6 +4,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use super::Enemy;
+use crate::audio::PlaySound;
 use crate::spell::fireball::Fireball;
 use crate::spell::icicle::Icicle;
 use crate::spell::lightning::Lightning;
@@ -40,6 +41,11 @@ struct SlimeEnemy {
     disabled: bool,
 }
 
+#[derive(Event)]
+pub struct SpawnSlimeEnemy {
+    pub pos: Vec3,
+}
+
 impl Default for SlimeEnemy {
     fn default() -> Self {
         Self {
@@ -53,11 +59,6 @@ impl Default for SlimeEnemy {
             disabled: false,
         }
     }
-}
-
-#[derive(Event)]
-pub struct SpawnSlimeEnemy {
-    pub pos: Vec3,
 }
 
 fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
@@ -83,7 +84,12 @@ fn update_indicies(
     }
 }
 
-fn spawn_slime(commands: &mut Commands, assets: &Res<GameAssets>, spawn_pos: Vec3) {
+fn spawn_slime(
+    commands: &mut Commands,
+    assets: &Res<GameAssets>,
+    spawn_pos: Vec3,
+    ev_play_sound: &mut EventWriter<PlaySound>,
+) {
     let entity = commands
         .spawn((
             RigidBody::Dynamic,
@@ -120,36 +126,63 @@ fn spawn_slime(commands: &mut Commands, assets: &Res<GameAssets>, spawn_pos: Vec
         .entity(entity)
         .insert(Health::new(entity, 10.0, 0.60))
         .push_children(&[collider]);
+
+    ev_play_sound.send(PlaySound {
+        clip: assets.slime_land_sound.clone(),
+        rand_speed_intensity: 0.2,
+        ..default()
+    });
 }
 
 fn spawn_slimes(
     mut commands: Commands,
     assets: Res<GameAssets>,
     mut ev_spawn_slime_enemy: EventReader<SpawnSlimeEnemy>,
+    mut ev_play_sound: EventWriter<PlaySound>,
 ) {
     for ev in ev_spawn_slime_enemy.read() {
-        spawn_slime(&mut commands, &assets, ev.pos);
+        spawn_slime(&mut commands, &assets, ev.pos, &mut ev_play_sound);
     }
 }
 
-fn tick_slime_timers(time: Res<Time>, mut q_slimes: Query<&mut SlimeEnemy, With<Enemy>>) {
+fn tick_slime_timers(
+    assets: Res<GameAssets>,
+    time: Res<Time>,
+    mut q_slimes: Query<&mut SlimeEnemy, With<Enemy>>,
+    mut ev_play_sound: EventWriter<PlaySound>,
+) {
     for mut slime in &mut q_slimes {
         match slime.state {
             SlimeState::Idling => {
                 slime.jump_cooldown_timer.tick(time.delta());
                 if slime.jump_cooldown_timer.just_finished() {
+                    ev_play_sound.send(PlaySound {
+                        clip: assets.slime_jump_sound.clone(),
+                        volume: 0.75,
+                        rand_speed_intensity: 0.2,
+                        ..default()
+                    });
                     slime.state = SlimeState::Jumping;
                 }
             }
             SlimeState::Jumping => {
                 slime.jumping_timer.tick(time.delta());
                 if slime.jumping_timer.just_finished() {
+                    ev_play_sound.send(PlaySound {
+                        clip: assets.slime_land_sound.clone(),
+                        rand_speed_intensity: 0.2,
+                        ..default()
+                    });
                     slime.state = SlimeState::Idling;
                 }
             }
             SlimeState::Staggering => {
                 slime.staggering_timer.tick(time.delta());
                 if slime.staggering_timer.just_finished() {
+                    ev_play_sound.send(PlaySound {
+                        clip: assets.slime_hit_sound.clone(),
+                        ..default()
+                    });
                     slime.state = SlimeState::Idling;
                 }
             }
@@ -207,9 +240,18 @@ fn move_slimes(mut q_slimes: Query<(&mut Velocity, &SlimeEnemy)>) {
     }
 }
 
-fn despawn_slimes(mut commands: Commands, mut q_slimes: Query<(Entity, &Health, &mut SlimeEnemy)>) {
+fn despawn_slimes(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    mut q_slimes: Query<(Entity, &Health, &mut SlimeEnemy)>,
+    mut ev_play_sound: EventWriter<PlaySound>,
+) {
     for (entity, health, mut slime) in &mut q_slimes {
-        if health.health <= 0.0 {
+        if health.health <= 0.0 && slime.state != SlimeState::Dying {
+            ev_play_sound.send(PlaySound {
+                clip: assets.slime_death_sound.clone(),
+                ..default()
+            });
             slime.state = SlimeState::Dying;
         }
         if slime.disabled {
