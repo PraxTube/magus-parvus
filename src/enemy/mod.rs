@@ -6,7 +6,7 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((slime::SlimeEnemyPlugin,));
+        app.add_plugins((slime::EnemySlimePlugin,));
     }
 }
 

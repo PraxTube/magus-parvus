@@ -54,9 +54,9 @@ fn apply_contact_damage(
     }
 }
 
-pub struct PlayerDamagePlugin;
+pub struct PlayerCollisionPlugin;
 
-impl Plugin for PlayerDamagePlugin {
+impl Plugin for PlayerCollisionPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,

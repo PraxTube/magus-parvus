@@ -3,7 +3,7 @@ pub mod state;
 pub mod stats;
 
 mod audio;
-mod damage;
+mod collision;
 mod movement;
 mod spawn;
 mod sprite;
@@ -16,8 +16,8 @@ use bevy::prelude::*;
 use crate::world::CHUNK_SIZE;
 
 pub const PLAYER_SPAWN_POS: Vec3 = Vec3::new(2.5 * CHUNK_SIZE, 16.0 + 2.5 * CHUNK_SIZE, 0.0);
-pub const STAGGERING_TIME: f32 = 0.25;
-pub const STAGGERING_INTENSITY: f32 = 200.0;
+const STAGGERING_TIME: f32 = 0.25;
+const STAGGERING_INTENSITY: f32 = 200.0;
 
 pub struct PlayerPlugin;
 
@@ -28,7 +28,7 @@ impl Plugin for PlayerPlugin {
             state::PlayerStatePlugin,
             audio::PlayerAudioPlugin,
             sprite::PlayerSpritePlugin,
-            damage::PlayerDamagePlugin,
+            collision::PlayerCollisionPlugin,
             movement::PlayerMovementPlugin,
             spawn::PlayerSpawnPlugin,
         ));
