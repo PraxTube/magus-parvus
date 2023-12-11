@@ -20,6 +20,7 @@ fn spawn_slime(
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
             Enemy { damage: 1.0 },
+            Health::new(10.0),
             SlimeEnemy::default(),
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
@@ -46,10 +47,7 @@ fn spawn_slime(
         ))
         .id();
 
-    commands
-        .entity(entity)
-        .insert(Health::new(entity, 10.0, 0.60))
-        .push_children(&[collider]);
+    commands.entity(entity).push_children(&[collider]);
 
     ev_play_sound.send(PlaySound {
         clip: assets.slime_land_sound.clone(),

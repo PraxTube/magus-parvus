@@ -1,20 +1,19 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::ui::health::Health;
+use crate::ui::health::{Health, SpawnPlayerHearts};
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::world::camera::YSort;
-use crate::world::game_entity::SpawnGameEntity;
 use crate::{GameAssets, GameState};
 
 use super::audio::StepsTimer;
 use super::stats::Stats;
-use super::{Player, PLAYER_SPAWN_POS};
+use super::{Player, PLAYER_HEALTH, PLAYER_SPAWN_POS};
 
 fn spawn_player(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut ev_spawn_game_entity: EventWriter<SpawnGameEntity>,
+    mut ev_spawn_player_hears: EventWriter<SpawnPlayerHearts>,
 ) {
     let entity = commands
         .spawn((
@@ -22,6 +21,7 @@ fn spawn_player(
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
             Stats::default(),
+            Health::new(PLAYER_HEALTH),
             YSort(0.0),
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
@@ -35,8 +35,9 @@ fn spawn_player(
         ))
         .id();
 
-    let health = Health::new(entity, 10.0, 2.00);
-    ev_spawn_game_entity.send(SpawnGameEntity { entity, health });
+    ev_spawn_player_hears.send(SpawnPlayerHearts {
+        count: PLAYER_HEALTH as usize,
+    });
 
     let collider = commands
         .spawn((

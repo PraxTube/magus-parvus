@@ -35,11 +35,6 @@ pub struct GameAssets {
     #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,
 
-    #[asset(path = "health_fill.png")]
-    pub health_fill: Handle<Image>,
-    #[asset(path = "health_background.png")]
-    pub health_background: Handle<Image>,
-
     #[asset(path = "statue.png")]
     pub statue: Handle<Image>,
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 32.0, columns = 5, rows = 1))]
@@ -51,6 +46,10 @@ pub struct GameAssets {
 
     #[asset(path = "white_pixel.png")]
     pub white_pixel: Handle<Image>,
+    #[asset(path = "heart_full.png")]
+    pub heart_full: Handle<Image>,
+    #[asset(path = "heart_empty.png")]
+    pub heart_empty: Handle<Image>,
     #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 3, rows = 5))]
     #[asset(path = "keyboard_ui.png")]
     pub keyboard_ui: Handle<TextureAtlas>,
