@@ -114,9 +114,7 @@ fn adjust_chunks(mut level_set: Query<&mut LevelSet>, q_player: Query<&Transform
     let indices: Vec<_> = unique_indices.into_iter().collect();
     let mut iids: Vec<String> = Vec::new();
 
-    for k in 0..indices.len() {
-        let i = indices[k].0;
-        let j = indices[k].1;
+    for (i, j) in indices {
         let iid = iid_from_map_indices(i, j);
         let level = LevelIid::new(&iid);
         iids.push(iid);
@@ -127,7 +125,7 @@ fn adjust_chunks(mut level_set: Query<&mut LevelSet>, q_player: Query<&Transform
     }
 
     for level_iid in &level_set.iids.clone() {
-        if !iids.contains(&level_iid.get()) {
+        if !iids.contains(level_iid.get()) {
             level_set.iids.remove(level_iid);
         }
     }

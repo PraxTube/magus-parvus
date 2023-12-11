@@ -167,7 +167,7 @@ fn steer_fireballs(
                     .translation
                     .distance_squared(transform.translation)
             {
-                closest_enemy = enemey_transform.clone();
+                closest_enemy = *enemey_transform;
             }
         }
 

@@ -13,22 +13,22 @@ enum Icon {
     A,
     D,
     I,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN,
+    Left,
+    Right,
+    Up,
+    Down,
 }
 
 fn icon_index(icon: Icon) -> usize {
     match icon {
         Icon::J => 0,
-        Icon::DOWN => 2,
+        Icon::Down => 2,
         Icon::K => 3,
-        Icon::UP => 5,
+        Icon::Up => 5,
         Icon::A => 6,
-        Icon::LEFT => 8,
+        Icon::Left => 8,
         Icon::D => 9,
-        Icon::RIGHT => 11,
+        Icon::Right => 11,
         Icon::I => 12,
     }
 }
@@ -84,7 +84,7 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
     spawn_icon(
         &mut commands,
         texture_atlas.clone(),
-        Icon::DOWN,
+        Icon::Down,
         Vec2::new(0.0, -arrow_dis),
         false,
     );
@@ -98,7 +98,7 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
     spawn_icon(
         &mut commands,
         texture_atlas.clone(),
-        Icon::UP,
+        Icon::Up,
         Vec2::new(0.0, arrow_dis),
         false,
     );
@@ -112,7 +112,7 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
     spawn_icon(
         &mut commands,
         texture_atlas.clone(),
-        Icon::LEFT,
+        Icon::Left,
         Vec2::new(-arrow_dis, 0.0),
         false,
     );
@@ -126,7 +126,7 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
     spawn_icon(
         &mut commands,
         texture_atlas.clone(),
-        Icon::RIGHT,
+        Icon::Right,
         Vec2::new(arrow_dis, 0.0),
         false,
     );
