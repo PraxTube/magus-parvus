@@ -134,11 +134,8 @@ impl Default for EnemySubSpawner {
     }
 }
 
-fn spawn_spawners(
-    mut commands: Commands,
-    mut ev_initiate_enemy_spawning: EventReader<StatueTriggered>,
-) {
-    for ev in ev_initiate_enemy_spawning.read() {
+fn spawn_spawners(mut commands: Commands, mut ev_statue_triggered: EventReader<StatueTriggered>) {
+    for ev in ev_statue_triggered.read() {
         commands.spawn(EnemySpawner::new(
             statue_sub_spawners(&ev.statue),
             ev.statue.clone(),
@@ -173,11 +170,10 @@ fn disable_enemy_spawners(
         if enemy_spawner.sub_spawner_index < enemy_spawner.sub_spawners.len() {
             continue;
         }
-        if !enemy_spawner.timer.finished() {
-            continue;
-        }
 
-        enemy_spawner.disabled = true;
+        if enemy_spawner.timer.finished() {
+            enemy_spawner.disabled = true;
+        }
     }
 }
 

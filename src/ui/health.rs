@@ -15,6 +15,9 @@ struct Heart {
     index: usize,
 }
 
+#[derive(Component)]
+struct HeartsContainer;
+
 #[derive(Event)]
 pub struct SpawnPlayerHearts {
     pub count: usize,
@@ -97,21 +100,33 @@ fn spawn_hearts(
 ) {
     for ev in ev_spawn_player_hearts.read() {
         let root = commands
-            .spawn(NodeBundle {
-                style: Style {
-                    width: Val::Percent(90.0),
-                    top: Val::Percent(5.0),
-                    left: Val::Percent(5.0),
+            .spawn((
+                HeartsContainer,
+                NodeBundle {
+                    style: Style {
+                        width: Val::Percent(90.0),
+                        top: Val::Percent(5.0),
+                        left: Val::Percent(5.0),
+                        ..default()
+                    },
                     ..default()
                 },
-                ..default()
-            })
+            ))
             .id();
 
         for i in 0..ev.count {
             let heart_entity = spawn_heart(&mut commands, &assets, i);
             commands.entity(root).push_children(&[heart_entity]);
         }
+    }
+}
+
+fn despawn_hearts(
+    mut commands: Commands,
+    q_hearts_containers: Query<Entity, With<HeartsContainer>>,
+) {
+    for entity in &q_hearts_containers {
+        commands.entity(entity).despawn_recursive();
     }
 }
 
@@ -152,6 +167,7 @@ impl Plugin for HealthPlugin {
                 .run_if(in_state(GameState::Gaming)),
         )
         .add_event::<SpawnPlayerHearts>()
-        .add_event::<HealthChanged>();
+        .add_event::<HealthChanged>()
+        .add_systems(OnEnter(GameState::GameOver), despawn_hearts);
     }
 }

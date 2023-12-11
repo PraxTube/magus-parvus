@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use super::{Enemy, SlimeEnemy, SlimeState, JUMP_TIME, MAX_JUMP_SPEED, RANDOM_OFFSET_INTENSITY};
-use crate::{player::Player, GameState};
+use crate::player::Player;
 
 fn update_jump_position(
     mut q_slimes: Query<(&Transform, &mut SlimeEnemy), (With<Enemy>, Without<Player>)>,
@@ -54,9 +54,6 @@ pub struct SlimeMovementPlugin;
 
 impl Plugin for SlimeMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (update_jump_position, move_slimes).run_if(in_state(GameState::Gaming)),
-        );
+        app.add_systems(Update, (update_jump_position, move_slimes));
     }
 }

@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 use super::{SlimeEnemy, SlimeState};
 use crate::utils::anim_sprite::AnimationIndices;
-use crate::GameState;
 
 fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
     match state {
@@ -31,9 +30,6 @@ pub struct SlimeSpritePlugin;
 
 impl Plugin for SlimeSpritePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (update_indicies).run_if(in_state(GameState::Gaming)),
-        );
+        app.add_systems(Update, (update_indicies,));
     }
 }

@@ -58,10 +58,27 @@ fn spawn_player(
         .push_children(&[collider]);
 }
 
+fn despawn_player(
+    mut commands: Commands,
+    mut next_state: ResMut<NextState<GameState>>,
+    q_player: Query<(Entity, &Health), With<Player>>,
+) {
+    let (entity, health) = match q_player.get_single() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+
+    if health.health <= 0.0 {
+        commands.entity(entity).despawn_recursive();
+        next_state.set(GameState::GameOver);
+    }
+}
+
 pub struct PlayerSpawnPlugin;
 
 impl Plugin for PlayerSpawnPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Gaming), spawn_player);
+        app.add_systems(OnEnter(GameState::Gaming), spawn_player)
+            .add_systems(Update, despawn_player.run_if(in_state(GameState::Gaming)));
     }
 }

@@ -316,10 +316,9 @@ impl Plugin for TextFieldPlugin {
                 update_cursor_text,
                 update_buffer_container.after(push_chars),
                 update_buffer_text.after(push_chars),
-                spawn_casting_text,
                 despawn_casting_text,
-            )
-                .run_if(in_state(GameState::Gaming)),
+                spawn_casting_text.run_if(in_state(GameState::Gaming)),
+            ),
         );
     }
 }

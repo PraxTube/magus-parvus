@@ -1,13 +1,25 @@
 use bevy::prelude::*;
 
-use crate::GameState;
-
 #[derive(Component, Default)]
 pub struct AnimSprite {
     sprites: usize,
     repeating: bool,
     disabled: bool,
 }
+
+#[derive(Component)]
+pub struct AnimSpriteTimer {
+    timer: Timer,
+}
+
+#[derive(Component)]
+pub struct AnimationIndices {
+    pub first: usize,
+    pub last: usize,
+}
+
+#[derive(Component, Deref, DerefMut)]
+pub struct FrameTimer(pub Timer);
 
 impl AnimSprite {
     /// The number of sprites starts at 1, so if there are 4 sprites in the sheet
@@ -21,11 +33,6 @@ impl AnimSprite {
     }
 }
 
-#[derive(Component)]
-pub struct AnimSpriteTimer {
-    timer: Timer,
-}
-
 impl Default for AnimSpriteTimer {
     fn default() -> Self {
         Self {
@@ -34,7 +41,6 @@ impl Default for AnimSpriteTimer {
     }
 }
 
-#[allow(dead_code)]
 impl AnimSpriteTimer {
     pub fn new(seconds: f32) -> Self {
         Self {
@@ -42,15 +48,6 @@ impl AnimSpriteTimer {
         }
     }
 }
-
-#[derive(Component)]
-pub struct AnimationIndices {
-    pub first: usize,
-    pub last: usize,
-}
-
-#[derive(Component, Deref, DerefMut)]
-pub struct FrameTimer(pub Timer);
 
 fn animate_sprites(
     time: Res<Time>,
@@ -115,8 +112,7 @@ impl Plugin for AnimSpritePlugin {
                 animate_sprites,
                 animate_complex_sprites,
                 despawn_anim_sprites,
-            )
-                .run_if(in_state(GameState::Gaming)),
+            ),
         );
     }
 }

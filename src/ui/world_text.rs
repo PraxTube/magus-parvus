@@ -120,10 +120,11 @@ pub struct WorldTextPlugin;
 
 impl Plugin for WorldTextPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<SpawnWorldText>().add_systems(
+        app.add_systems(
             Update,
-            (spawn_world_texts, despawn_world_texts, animate_world_texts)
-                .run_if(in_state(GameState::Gaming)),
-        );
+            (spawn_world_texts).run_if(in_state(GameState::Gaming)),
+        )
+        .add_systems(Update, (despawn_world_texts, animate_world_texts))
+        .add_event::<SpawnWorldText>();
     }
 }

@@ -17,10 +17,10 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (move_camera, zoom_camera, apply_y_sort).run_if(in_state(GameState::Gaming)),
+            (move_camera, zoom_camera).run_if(in_state(GameState::Gaming)),
         )
         .add_systems(OnEnter(GameState::Gaming), spawn_camera)
-        .add_systems(Update, toggle_full_screen);
+        .add_systems(Update, (toggle_full_screen, apply_y_sort));
     }
 }
 

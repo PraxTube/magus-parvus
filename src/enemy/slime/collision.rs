@@ -7,7 +7,6 @@ use crate::spell::fireball::Fireball;
 use crate::spell::icicle::Icicle;
 use crate::spell::lightning::Lightning;
 use crate::ui::health::Health;
-use crate::GameState;
 
 fn player_collisions(
     q_player: Query<(&Transform, &Player), With<Player>>,
@@ -232,8 +231,7 @@ impl Plugin for SlimeCollisionPlugin {
                 fireball_collisions,
                 lightning_collisions,
                 icicle_collisions,
-            )
-                .run_if(in_state(GameState::Gaming)),
+            ),
         );
     }
 }

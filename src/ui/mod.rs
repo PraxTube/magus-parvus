@@ -1,3 +1,4 @@
+mod game_over_ui;
 pub mod health;
 mod keyboard_ui;
 mod pop_up;
@@ -16,6 +17,7 @@ impl Plugin for UiPlugin {
             text_field::TextFieldPlugin,
             pop_up::PopUpPlugin,
             keyboard_ui::KeyboardUiPlugin,
+            game_over_ui::GameOverUiPlugin,
         ));
     }
 }

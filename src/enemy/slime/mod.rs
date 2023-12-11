@@ -29,7 +29,8 @@ impl Plugin for EnemySlimePlugin {
         .add_event::<SpawnSlimeEnemy>()
         .add_systems(
             Update,
-            (change_slime_states).run_if(in_state(GameState::Gaming)),
+            (change_slime_states)
+                .run_if(in_state(GameState::Gaming).or_else(in_state(GameState::GameOver))),
         );
     }
 }

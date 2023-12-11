@@ -36,6 +36,14 @@ https://creativekind.itch.io/necromancer-free
 
 ---
 
+## UI
+
+### Heart
+
+https://fliflifly.itch.io/hearts-and-health-bar
+
+---
+
 ## Audio
 
 ### Sounds

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
-const MAX_DISTANCE: f64 = 1000.0;
+const MAX_DISTANCE: f64 = 500.0;
 
 fn update(
     receiver_transform: &GlobalTransform,

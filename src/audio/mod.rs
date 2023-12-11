@@ -6,8 +6,6 @@ use rand::{thread_rng, Rng};
 use bevy::{prelude::*, utils::HashSet};
 use bevy_kira_audio::prelude::{AudioPlugin, AudioSource, *};
 
-use crate::GameState;
-
 const MAIN_VOLUME: f64 = 0.5;
 
 pub struct GameAudioPlugin;
@@ -17,7 +15,7 @@ impl Plugin for GameAudioPlugin {
         app.add_plugins(AudioPlugin)
             .add_plugins((bgm::BgmPlugin, spacial::SpacialAudioPlugin))
             .add_event::<PlaySound>()
-            .add_systems(Update, (play_sounds,).run_if(in_state(GameState::Gaming)));
+            .add_systems(Update, (play_sounds,));
     }
 }
 
