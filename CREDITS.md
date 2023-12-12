@@ -25,6 +25,8 @@ https://stealthix.itch.io/animated-fires
 ### Lightning
 
 https://sanctumpixel.itch.io/lightning-lines-pixel-art-effect
+https://pimen.itch.io/thunder-spell-effect-01
+https://pimen.itch.io/thunder-spell-effect-02
 
 ### Statue Beam Effect and Statue Unlock Effect
 
@@ -33,6 +35,10 @@ https://ansimuz.itch.io/warped-shooting-fx
 ### Death
 
 https://creativekind.itch.io/necromancer-free
+
+### Air spells (aer tracto, aer pello)
+
+https://pimen.itch.io/wind-spell-effect
 
 ---
 

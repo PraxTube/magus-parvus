@@ -7,6 +7,7 @@ use crate::spell::aer_tracto::AerTracto;
 use crate::spell::fireball::Fireball;
 use crate::spell::icicle::Icicle;
 use crate::spell::lightning::Lightning;
+use crate::spell::lightning_bird::LightningStrike;
 use crate::ui::health::Health;
 
 fn player_collisions(
@@ -119,6 +120,7 @@ fn fireball_collisions(
 fn lightning_collisions(
     mut q_enemies: Query<(&mut SlimeEnemy, &mut Health, &mut Velocity)>,
     q_lightnings: Query<&Lightning>,
+    q_lightning_strikes: Query<&LightningStrike>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
@@ -150,16 +152,20 @@ fn lightning_collisions(
             continue;
         }
 
-        let lightning = if let Ok(l) = q_lightnings.get(source_parent) {
-            l
+        let damage = if let Ok(l) = q_lightnings.get(source_parent) {
+            l.damage
         } else if let Ok(l) = q_lightnings.get(target_parent) {
-            l
+            l.damage
+        } else if let Ok(l) = q_lightning_strikes.get(source_parent) {
+            l.damage
+        } else if let Ok(l) = q_lightning_strikes.get(target_parent) {
+            l.damage
         } else {
             continue;
         };
 
+        slime_health.health -= damage;
         velocity.linvel = Vec2::ZERO;
-        slime_health.health -= lightning.damage;
         slime.state = SlimeState::Staggering;
     }
 }

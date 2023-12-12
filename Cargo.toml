@@ -22,3 +22,4 @@ bevy_asset_loader = { version = "0.18.0", features = ["2d"] }
 bevy_ecs_ldtk = { git = "https://github.com/PraxTube/bevy_ecs_ldtk.git", branch = "feat/bevy-0.12", features = ["atlas"]}
 bevy_rapier2d = "0.23.0"
 bevy_kira_audio = "0.18.0"
+bevy_trickfilm = { version = "0.5.0"}

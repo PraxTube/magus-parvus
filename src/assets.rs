@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_ecs_ldtk::prelude::LdtkProject;
 use bevy_kira_audio::AudioSource;
+use bevy_trickfilm::prelude::*;
 
 #[derive(AssetCollection, Resource)]
 pub struct GameAssets {
@@ -20,6 +21,23 @@ pub struct GameAssets {
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 112.0, columns = 12, rows = 1))]
     #[asset(path = "lightning.png")]
     pub lightning: Handle<TextureAtlas>,
+
+    #[asset(texture_atlas(tile_size_x = 66.0, tile_size_y = 66.0, columns = 13, rows = 1))]
+    #[asset(path = "lightning_strike.png")]
+    pub lightning_strike: Handle<TextureAtlas>,
+    #[asset(paths("lightning_strike.trickfilm#main"), collection(typed))]
+    pub lightning_strike_animations: Vec<Handle<AnimationClip2D>>,
+
+    #[asset(texture_atlas(tile_size_x = 50.0, tile_size_y = 50.0, columns = 16, rows = 1))]
+    #[asset(path = "lightning_bird.png")]
+    pub lightning_bird: Handle<TextureAtlas>,
+    #[asset(
+        paths("lightning_bird.trickfilm#spawn", "lightning_bird.trickfilm#fly"),
+        collection(typed)
+    )]
+    pub lightning_bird_animations: Vec<Handle<AnimationClip2D>>,
+    #[asset(path = "sounds/lightning_bird_flap.ogg")]
+    pub lightning_bird_flap_sound: Handle<AudioSource>,
 
     #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 7, rows = 1))]
     #[asset(path = "aer_tracto.png")]

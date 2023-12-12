@@ -20,6 +20,7 @@ use bevy_rapier2d::prelude::*;
 use bevy_screen_diagnostics::{
     ScreenDiagnosticsPlugin, ScreenEntityDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin,
 };
+use bevy_trickfilm::Animation2DPlugin;
 
 const BACKGROUND_COLOR: Color = Color::rgb(0.95, 0.90, 0.75);
 
@@ -58,7 +59,8 @@ fn main() {
             ScreenFrameDiagnosticsPlugin,
             ScreenEntityDiagnosticsPlugin,
             RapierPhysicsPlugin::<NoUserData>::default(),
-            // RapierDebugRenderPlugin::default(),
+            RapierDebugRenderPlugin::default(),
+            Animation2DPlugin,
         ))
         .insert_resource(Msaa::Off)
         .add_state::<GameState>()

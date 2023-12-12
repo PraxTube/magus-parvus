@@ -2,6 +2,7 @@ pub mod aer_tracto;
 pub mod fireball;
 pub mod icicle;
 pub mod lightning;
+pub mod lightning_bird;
 
 mod death;
 mod flub;
@@ -26,6 +27,7 @@ impl Plugin for SpellPlugin {
             .add_plugins((
                 fireball::FireballPlugin,
                 lightning::LightningPlugin,
+                lightning_bird::LightningBirdPlugin,
                 icicle::IciclePlugin,
                 aer_tracto::AerTractoPlugin,
                 speed_boost::SpeedBoostPlugin,
@@ -42,6 +44,7 @@ enum Spell {
     IgnisPila,
     InfernoPila,
     Fulgur,
+    FulgurAvis,
     ScutumGlaciei,
     AerTracto,
     AerPello,
@@ -142,6 +145,10 @@ fn submit_spell(
         } else if spell_str == "fulgur" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Fulgur,
+            });
+        } else if spell_str == "fulgur avis" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::FulgurAvis,
             });
         } else if spell_str == "scutum glaciei" {
             ev_spell_casted.send(SpellCasted {

@@ -1080,6 +1080,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_trickfilm"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93d15fa264a2b890deca32e0419470fa54fc149b2992adb37ab80de2fae6a0e4"
+dependencies = [
+ "bevy",
+ "ron",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "bevy_ui"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2435,6 +2447,7 @@ dependencies = [
  "bevy_kira_audio",
  "bevy_rapier2d",
  "bevy_screen_diagnostics",
+ "bevy_trickfilm",
  "rand",
 ]
 
