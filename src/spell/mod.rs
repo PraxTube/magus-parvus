@@ -44,6 +44,7 @@ enum Spell {
     Fulgur,
     ScutumGlaciei,
     AerTracto,
+    AerPello,
     SpeedBoost,
     Phantasma,
     Death,
@@ -149,6 +150,10 @@ fn submit_spell(
         } else if spell_str == "aer tracto" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::AerTracto,
+            });
+        } else if spell_str == "aer pello" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::AerPello,
             });
         } else if spell_str == "cito" {
             ev_spell_casted.send(SpellCasted {
