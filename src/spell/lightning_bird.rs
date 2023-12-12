@@ -1,4 +1,5 @@
 use std::f32::consts::PI;
+use std::time::Duration;
 
 use rand::{thread_rng, Rng};
 
@@ -16,9 +17,13 @@ use super::{Spell, SpellCasted};
 const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.5;
 const MAX_PLAYER_DISTANCE: f32 = 500.0;
+
 const ATTACK_TIME: f32 = 1.0;
 const STRIKE_INTERVALS: [f32; 10] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.85, 0.9, 1.0, 1.1, 1.2];
 const RAND_STRIKE_RADIUS: f32 = 25.0;
+
+const FLAP_TIME: f32 = 0.8;
+const FLAP_TIME_OFFSET: f32 = 0.4;
 
 #[derive(Component)]
 struct LightningBird {
@@ -44,7 +49,7 @@ impl Default for LightningBird {
         Self {
             disabled: false,
             attack_timer: Timer::from_seconds(ATTACK_TIME, TimerMode::Once),
-            flap_timer: Timer::from_seconds(0.8, TimerMode::Repeating),
+            flap_timer: Timer::from_seconds(FLAP_TIME_OFFSET, TimerMode::Once),
         }
     }
 }
@@ -179,6 +184,15 @@ fn tick_timers(time: Res<Time>, mut q_lightning_birds: Query<&mut LightningBird>
     for mut lightning_bird in &mut q_lightning_birds {
         lightning_bird.flap_timer.tick(time.delta());
         lightning_bird.attack_timer.tick(time.delta());
+
+        if lightning_bird.flap_timer.mode() == TimerMode::Once
+            && lightning_bird.flap_timer.just_finished()
+        {
+            lightning_bird
+                .flap_timer
+                .set_duration(Duration::from_secs_f32(FLAP_TIME));
+            lightning_bird.flap_timer.set_mode(TimerMode::Repeating);
+        }
     }
 }
 
