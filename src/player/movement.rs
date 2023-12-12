@@ -15,6 +15,10 @@ fn player_movement(
         Ok(p) => (p.0, p.1, p.2),
         Err(_) => return,
     };
+
+    if player.state == PlayerState::Casting {
+        velocity.linvel = Vec2::ZERO;
+    }
     if player.state != PlayerState::Moving && player.state != PlayerState::Idling {
         return;
     }

@@ -21,7 +21,7 @@ impl Default for Fireball {
     fn default() -> Self {
         Self {
             disabled: false,
-            damage: 1.0,
+            damage: 5.0,
         }
     }
 }
@@ -29,7 +29,7 @@ impl Default for Fireball {
 const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.5;
 const SCALE_TIME: f32 = 0.35;
-const DELTA_STEERING: f32 = 2.0;
+const DELTA_STEERING: f32 = 2.5;
 const INFERNO_COUNT: usize = 50;
 
 fn spawn_fireball(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {

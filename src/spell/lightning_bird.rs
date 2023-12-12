@@ -93,9 +93,11 @@ fn spawn_lightning_birds(
 
     for ev in ev_spell_casted.read() {
         if ev.spell == Spell::FulgurAvis {
-            let transform = Transform::from_translation(player_transform.translation)
-                .with_scale(Vec3::splat(SCALE))
-                .with_rotation(quat_from_vec2(player.current_direction));
+            let transform = Transform::from_translation(
+                player_transform.translation + Vec3::new(0.0, 0.0, 10.0),
+            )
+            .with_scale(Vec3::splat(SCALE))
+            .with_rotation(quat_from_vec2(Vec2::new(player.current_direction.x, 0.0)));
             spawn_lightning_bird(&mut commands, &assets, transform);
         }
     }

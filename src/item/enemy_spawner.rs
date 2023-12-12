@@ -60,45 +60,34 @@ fn statue_sub_spawners(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
                 ..default()
             },
         )],
-        Item::Fulgur => vec![
-            (
-                5.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 8,
-                    spawn_formation: SpawnFormation::Random,
-                    timer: Timer::from_seconds(0.1, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-            (
-                0.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 15,
-                    spawn_formation: SpawnFormation::Circle,
-                    ..default()
-                },
-            ),
-            (
-                5.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 8,
-                    spawn_formation: SpawnFormation::Random,
-                    offset: 300.0,
-                    timer: Timer::from_seconds(0.2, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
+        Item::Fulgur => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 2,
+                spawn_formation: SpawnFormation::Random,
+                timer: Timer::from_seconds(0.5, TimerMode::Repeating),
+                ..default()
+            },
+        )],
+        Item::ScutumGlaciei => vec![
             (
                 0.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
                     count: 10,
+                    spawn_formation: SpawnFormation::Circle,
+                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                10.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 5,
                     spawn_formation: SpawnFormation::Group,
-                    offset: 300.0,
-                    angle: -TAU / 3.0,
+                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
                     ..default()
                 },
             ),
