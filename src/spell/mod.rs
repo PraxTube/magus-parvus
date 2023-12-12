@@ -1,8 +1,10 @@
-mod death;
+pub mod aer_tracto;
 pub mod fireball;
-mod flub;
 pub mod icicle;
 pub mod lightning;
+
+mod death;
+mod flub;
 mod phantasma;
 mod speed_boost;
 
@@ -25,6 +27,7 @@ impl Plugin for SpellPlugin {
                 fireball::FireballPlugin,
                 lightning::LightningPlugin,
                 icicle::IciclePlugin,
+                aer_tracto::AerTractoPlugin,
                 speed_boost::SpeedBoostPlugin,
                 phantasma::PhantasmaPlugin,
                 death::DeathPlugin,
@@ -40,6 +43,7 @@ enum Spell {
     InfernoPila,
     Fulgur,
     ScutumGlaciei,
+    AerTracto,
     SpeedBoost,
     Phantasma,
     Death,
@@ -141,6 +145,10 @@ fn submit_spell(
         } else if spell_str == "scutum glaciei" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::ScutumGlaciei,
+            });
+        } else if spell_str == "aer tracto" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::AerTracto,
             });
         } else if spell_str == "cito" {
             ev_spell_casted.send(SpellCasted {

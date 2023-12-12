@@ -3,6 +3,7 @@ use bevy_rapier2d::prelude::*;
 
 use super::{Enemy, SlimeEnemy, SlimeState, STAGGERING_INTENSITY};
 use crate::player::Player;
+use crate::spell::aer_tracto::AerTracto;
 use crate::spell::fireball::Fireball;
 use crate::spell::icicle::Icicle;
 use crate::spell::lightning::Lightning;
@@ -220,6 +221,49 @@ fn icicle_collisions(
     }
 }
 
+fn aer_tracto_collisions(
+    mut q_enemies: Query<(&mut SlimeEnemy, &mut Velocity)>,
+    q_aer_tractos: Query<(&Transform, &AerTracto)>,
+    q_colliders: Query<&Parent, With<Collider>>,
+    mut ev_collision_events: EventReader<CollisionEvent>,
+) {
+    for ev in ev_collision_events.read() {
+        let (source, target) = match ev {
+            CollisionEvent::Started(source, target, _) => (source, target),
+            CollisionEvent::Stopped(_, _, _) => continue,
+        };
+
+        let source_parent = match q_colliders.get(*source) {
+            Ok(p) => p.get(),
+            Err(_) => continue,
+        };
+        let target_parent = match q_colliders.get(*target) {
+            Ok(p) => p.get(),
+            Err(_) => continue,
+        };
+
+        let (mut slime, mut velocity) = if let Ok(s) = q_enemies.get_mut(source_parent) {
+            s
+        } else if let Ok(s) = q_enemies.get_mut(target_parent) {
+            s
+        } else {
+            continue;
+        };
+
+        let (aer_tracto_transform, aer_tracto) = if let Ok(a) = q_aer_tractos.get(source_parent) {
+            a
+        } else if let Ok(a) = q_aer_tractos.get(target_parent) {
+            a
+        } else {
+            continue;
+        };
+
+        let dir = -aer_tracto_transform.rotation.mul_vec3(Vec3::X).truncate();
+        velocity.linvel = dir * aer_tracto.pull_intensity;
+        slime.state = SlimeState::Staggering;
+    }
+}
+
 pub struct SlimeCollisionPlugin;
 
 impl Plugin for SlimeCollisionPlugin {
@@ -231,6 +275,7 @@ impl Plugin for SlimeCollisionPlugin {
                 fireball_collisions,
                 lightning_collisions,
                 icicle_collisions,
+                aer_tracto_collisions,
             ),
         );
     }
