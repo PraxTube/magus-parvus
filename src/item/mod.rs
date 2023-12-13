@@ -23,6 +23,9 @@ pub enum Item {
     InfernoPila,
     Fulgur,
     ScutumGlaciei,
+    AerTracto,
+    AerPello,
+    FulgurAvis,
 }
 
 impl Item {
@@ -33,6 +36,9 @@ impl Item {
             "InfernoPila" => Item::InfernoPila,
             "Fulgur" => Item::Fulgur,
             "ScutumGlaciei" => Item::ScutumGlaciei,
+            "AerTracto" => Item::AerTracto,
+            "AerPello" => Item::AerPello,
+            "FulgurAvis" => Item::FulgurAvis,
             _ => Item::NotImplemented,
         }
     }

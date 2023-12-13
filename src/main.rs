@@ -42,6 +42,7 @@ fn main() {
                     primary_window: Some(Window {
                         present_mode: PresentMode::Fifo,
                         mode: WindowMode::Windowed,
+                        fit_canvas_to_parent: true,
                         ..default()
                     }),
                     ..default()

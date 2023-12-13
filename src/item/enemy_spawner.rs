@@ -72,22 +72,66 @@ fn statue_sub_spawners(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
         )],
         Item::ScutumGlaciei => vec![
             (
-                0.0,
+                10.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
-                    count: 10,
+                    count: 5,
                     spawn_formation: SpawnFormation::Circle,
                     timer: Timer::from_seconds(0.25, TimerMode::Repeating),
                     ..default()
                 },
             ),
             (
-                10.0,
+                0.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
                     count: 5,
                     spawn_formation: SpawnFormation::Group,
                     timer: Timer::from_seconds(0.25, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+        ],
+        Item::AerTracto => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 10,
+                spawn_formation: SpawnFormation::Random,
+                timer: Timer::from_seconds(0.3, TimerMode::Repeating),
+                ..default()
+            },
+        )],
+        Item::AerPello => vec![(
+            1.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 15,
+                spawn_formation: SpawnFormation::Group,
+                timer: Timer::from_seconds(0.0, TimerMode::Repeating),
+                ..default()
+            },
+        )],
+        Item::FulgurAvis => vec![
+            (
+                5.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 10,
+                    spawn_formation: SpawnFormation::Circle,
+                    offset: 100.0,
+                    timer: Timer::from_seconds(0.0, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 20,
+                    spawn_formation: SpawnFormation::Random,
+                    offset: 300.0,
+                    timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                     ..default()
                 },
             ),
