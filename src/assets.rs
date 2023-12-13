@@ -36,6 +36,11 @@ pub struct GameAssets {
         collection(typed)
     )]
     pub lightning_bird_animations: Vec<Handle<AnimationClip2D>>,
+    #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 6, rows = 1))]
+    #[asset(path = "lightning_bird_death.png")]
+    pub lightning_bird_death: Handle<TextureAtlas>,
+    #[asset(paths("lightning_bird_death.trickfilm#main"), collection(typed))]
+    pub lightning_bird_death_animations: Vec<Handle<AnimationClip2D>>,
     #[asset(path = "sounds/lightning_bird_flap.ogg")]
     pub lightning_bird_flap_sound: Handle<AudioSource>,
 

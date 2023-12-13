@@ -17,6 +17,7 @@ use super::{Spell, SpellCasted};
 const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.5;
 const MAX_PLAYER_DISTANCE: f32 = 500.0;
+const DESPAWN_TIME: f32 = 20.0;
 
 const ATTACK_TIME: f32 = 1.0;
 const STRIKE_INTERVALS: [f32; 10] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.85, 0.9, 1.0, 1.1, 1.2];
@@ -27,9 +28,10 @@ const FLAP_TIME_OFFSET: f32 = 0.4;
 
 #[derive(Component)]
 struct LightningBird {
-    disabled: bool,
     attack_timer: Timer,
     flap_timer: Timer,
+    despawn_timer: Timer,
+    disabled: bool,
 }
 
 #[derive(Component)]
@@ -44,12 +46,16 @@ struct LightningStrikeSpawnTimer {
     timer: Timer,
 }
 
+#[derive(Component, Deref, DerefMut)]
+struct LightningBirdDeathTimer(Timer);
+
 impl Default for LightningBird {
     fn default() -> Self {
         Self {
-            disabled: false,
             attack_timer: Timer::from_seconds(ATTACK_TIME, TimerMode::Once),
             flap_timer: Timer::from_seconds(FLAP_TIME_OFFSET, TimerMode::Once),
+            despawn_timer: Timer::from_seconds(DESPAWN_TIME, TimerMode::Once),
+            disabled: false,
         }
     }
 }
@@ -186,6 +192,11 @@ fn tick_timers(time: Res<Time>, mut q_lightning_birds: Query<&mut LightningBird>
     for mut lightning_bird in &mut q_lightning_birds {
         lightning_bird.flap_timer.tick(time.delta());
         lightning_bird.attack_timer.tick(time.delta());
+        lightning_bird.despawn_timer.tick(time.delta());
+
+        if lightning_bird.despawn_timer.just_finished() {
+            lightning_bird.disabled = true;
+        }
 
         if lightning_bird.flap_timer.mode() == TimerMode::Once
             && lightning_bird.flap_timer.just_finished()
@@ -236,10 +247,23 @@ fn adjust_sprite_flip(
 
 fn despawn_lightning_birds(
     mut commands: Commands,
-    q_lightning_birds: Query<(Entity, &LightningBird)>,
+    assets: Res<GameAssets>,
+    q_lightning_birds: Query<(Entity, &Transform, &LightningBird)>,
 ) {
-    for (entity, fireball) in &q_lightning_birds {
-        if fireball.disabled {
+    for (entity, transform, lightning_bird) in &q_lightning_birds {
+        if lightning_bird.disabled {
+            let mut animator = AnimationPlayer2D::default();
+            animator.play(assets.lightning_bird_death_animations[0].clone());
+            commands.spawn((
+                animator,
+                LightningBirdDeathTimer(Timer::from_seconds(0.3, TimerMode::Once)),
+                SpriteSheetBundle {
+                    transform: Transform::from_translation(transform.translation)
+                        .with_scale(Vec3::splat(3.0)),
+                    texture_atlas: assets.lightning_bird_death.clone(),
+                    ..default()
+                },
+            ));
             commands.entity(entity).despawn_recursive();
         }
     }
@@ -253,6 +277,19 @@ fn despawn_lightning_strikes(
     for (entity, mut lightning_strike) in &mut q_lightning_strikes {
         lightning_strike.timer.tick(time.delta());
         if lightning_strike.timer.just_finished() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
+fn despawn_lightning_bird_deaths(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut q_lightning_bird_deaths: Query<(Entity, &mut LightningBirdDeathTimer)>,
+) {
+    for (entity, mut timer) in &mut q_lightning_bird_deaths {
+        timer.tick(time.delta());
+        if timer.just_finished() {
             commands.entity(entity).despawn_recursive();
         }
     }
@@ -275,6 +312,7 @@ impl Plugin for LightningBirdPlugin {
                 adjust_sprite_flip,
                 despawn_lightning_birds,
                 despawn_lightning_strikes,
+                despawn_lightning_bird_deaths,
             )
                 .run_if(in_state(GameState::Gaming)),
         );

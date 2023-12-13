@@ -84,13 +84,13 @@ fn zoom_camera(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>)
 fn player_movement(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
     let mut direction = Vec2::default();
 
-    if keys.pressed(KeyCode::J) {
+    if keys.pressed(KeyCode::J) || keys.pressed(KeyCode::S) {
         direction += Vec2::new(0.0, -1.0);
     }
-    if keys.pressed(KeyCode::K) {
+    if keys.pressed(KeyCode::K) || keys.pressed(KeyCode::W) {
         direction += Vec2::new(0.0, 1.0);
     }
-    if keys.pressed(KeyCode::F) {
+    if keys.pressed(KeyCode::F) || keys.pressed(KeyCode::D) {
         direction += Vec2::new(1.0, 0.0);
     }
     if keys.pressed(KeyCode::A) {
