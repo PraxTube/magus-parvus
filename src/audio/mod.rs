@@ -6,8 +6,6 @@ use rand::{thread_rng, Rng};
 use bevy::{prelude::*, utils::HashSet};
 use bevy_kira_audio::prelude::{AudioPlugin, AudioSource, *};
 
-const MAIN_VOLUME: f64 = 0.5;
-
 pub struct GameAudioPlugin;
 
 impl Plugin for GameAudioPlugin {
@@ -15,7 +13,19 @@ impl Plugin for GameAudioPlugin {
         app.add_plugins(AudioPlugin)
             .add_plugins((bgm::BgmPlugin, spacial::SpacialAudioPlugin))
             .add_event::<PlaySound>()
+            .init_resource::<GameAudio>()
             .add_systems(Update, (play_sounds,));
+    }
+}
+
+#[derive(Resource)]
+pub struct GameAudio {
+    pub main_volume: f64,
+}
+
+impl Default for GameAudio {
+    fn default() -> Self {
+        Self { main_volume: 0.5 }
     }
 }
 
@@ -45,6 +55,7 @@ impl Default for PlaySound {
 fn play_sounds(
     mut commands: Commands,
     audio: Res<Audio>,
+    game_audio: Res<GameAudio>,
     mut ev_play_sound: EventReader<PlaySound>,
 ) {
     let mut rng = thread_rng();
@@ -66,14 +77,14 @@ fn play_sounds(
         let audio_instance = if ev.repeat {
             audio
                 .play(ev.clip.clone())
-                .with_volume(ev.volume * volume_offset * MAIN_VOLUME)
+                .with_volume(ev.volume * volume_offset * game_audio.main_volume)
                 .with_playback_rate(ev.playback_rate + speed_offset)
                 .looped()
                 .handle()
         } else {
             audio
                 .play(ev.clip.clone())
-                .with_volume(ev.volume * volume_offset * MAIN_VOLUME)
+                .with_volume(ev.volume * volume_offset * game_audio.main_volume)
                 .with_playback_rate(ev.playback_rate + speed_offset)
                 .handle()
         };
