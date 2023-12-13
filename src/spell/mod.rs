@@ -6,6 +6,7 @@ pub mod lightning_bird;
 
 mod death;
 mod flub;
+mod kill_player;
 mod phantasma;
 mod speed_boost;
 
@@ -34,6 +35,7 @@ impl Plugin for SpellPlugin {
                 phantasma::PhantasmaPlugin,
                 death::DeathPlugin,
                 flub::FlubPlugin,
+                kill_player::KillPlayerPlugin,
             ));
     }
 }
@@ -52,6 +54,7 @@ enum Spell {
     Phantasma,
     Death,
     Flub,
+    KillPlayer,
 }
 
 #[derive(Event)]
@@ -170,9 +173,13 @@ fn submit_spell(
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Phantasma,
             });
-        } else if spell_str == "now you" {
+        } else if spell_str == "now you" || spell_str == "jetzt du" {
             ev_spell_casted.send(SpellCasted {
                 spell: Spell::Death,
+            });
+        } else if spell_str == "kill player" {
+            ev_spell_casted.send(SpellCasted {
+                spell: Spell::KillPlayer,
             });
         } else if !spell_str.is_empty() {
             ev_spell_casted.send(SpellCasted { spell: Spell::Flub })
