@@ -197,13 +197,17 @@ fn push_chars(
         Ok(p) => p.state,
         Err(_) => return,
     };
-    if player_state != PlayerState::Casting {
-        return;
-    }
 
     let control_active = keys.pressed(KeyCode::ControlLeft);
 
     for ev in keyboard_input_events.read() {
+        // We run this in the loop so that the events get consumed.
+        // Otherwise we might run into the issue of added it to the buffer
+        // when spawning the text field.
+        if player_state != PlayerState::Casting {
+            continue;
+        }
+
         if ev.state.is_pressed() {
             let maybe_char = match ev.key_code {
                 Some(KeyCode::A) => Some('a'),
