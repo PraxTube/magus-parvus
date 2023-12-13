@@ -194,7 +194,7 @@ fn disable_enemy_spawners(
     mut q_enemy_spawners: Query<&mut EnemySpawner>,
     q_enemy_sub_spawners: Query<&EnemySubSpawner>,
 ) {
-    if q_enemy_sub_spawners.iter().count() > 0 {
+    if !q_enemy_sub_spawners.is_empty() {
         return;
     }
 

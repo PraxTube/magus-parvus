@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::{PrimaryWindow, WindowMode};
 use bevy_kira_audio::prelude::AudioReceiver;
+use bevy_rapier2d::dynamics::Velocity;
 
 use crate::player::input::PlayerInput;
 use crate::player::{Player, PlayerState};
@@ -10,6 +11,9 @@ use crate::GameState;
 // How much `1.0` in bevy coordinates translates to the pixels of a sprite.
 // Only relevant for the ysorting.
 pub const TRANSLATION_TO_PIXEL: f32 = 0.0001;
+// This is not changing the actual timestep,
+// it's just a way to reduce magic numbers in code.
+const RAPIER_TIMESTEP: f32 = 60.0;
 
 pub struct CameraPlugin;
 
@@ -17,17 +21,15 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (move_camera, zoom_camera).run_if(in_state(GameState::Gaming)),
-        )
-        .add_systems(OnEnter(GameState::Gaming), spawn_camera)
-        .add_systems(
-            Update,
             (
                 #[cfg(not(target_arch = "wasm32"))]
                 toggle_full_screen,
                 apply_y_sort,
+                zoom_camera,
             ),
-        );
+        )
+        .add_systems(OnEnter(GameState::Gaming), spawn_camera)
+        .add_systems(PostUpdate, move_camera.run_if(in_state(GameState::Gaming)));
     }
 }
 
@@ -51,10 +53,10 @@ fn spawn_camera(mut commands: Commands) {
 
 fn move_camera(
     mut q_camera: Query<&mut Transform, (With<MainCamera>, Without<Player>)>,
-    q_player: Query<&Transform, With<Player>>,
+    q_player: Query<(&Transform, &Velocity), With<Player>>,
 ) {
-    let player_pos = match q_player.get_single() {
-        Ok(player) => player.translation,
+    let (player_pos, player_vel) = match q_player.get_single() {
+        Ok(p) => (p.0.translation, p.1),
         Err(err) => {
             error!("no player! cannot move camera, {}", err);
             return;
@@ -68,8 +70,11 @@ fn move_camera(
             return;
         }
     };
-    camera_transform.translation =
-        Vec3::new(player_pos.x, player_pos.y, camera_transform.translation.z);
+    camera_transform.translation = Vec3::new(
+        player_pos.x + player_vel.linvel.x / RAPIER_TIMESTEP,
+        player_pos.y + player_vel.linvel.y / RAPIER_TIMESTEP,
+        camera_transform.translation.z,
+    );
 }
 
 fn zoom_camera(

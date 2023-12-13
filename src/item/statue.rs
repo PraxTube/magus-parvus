@@ -230,7 +230,7 @@ fn unlock_statues(
             continue;
         }
 
-        if q_enemies.iter().count() > 0 {
+        if !q_enemies.is_empty() {
             continue;
         }
 
