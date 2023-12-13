@@ -12,6 +12,7 @@ mod world;
 
 pub use assets::GameAssets;
 
+use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowMode};
 
@@ -34,6 +35,7 @@ pub enum GameState {
 
 fn main() {
     App::new()
+        .insert_resource(AssetMetaCheck::Never)
         .add_plugins((
             DefaultPlugins
                 .set(WindowPlugin {
