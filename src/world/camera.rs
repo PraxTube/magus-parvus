@@ -20,7 +20,14 @@ impl Plugin for CameraPlugin {
             (move_camera, zoom_camera).run_if(in_state(GameState::Gaming)),
         )
         .add_systems(OnEnter(GameState::Gaming), spawn_camera)
-        .add_systems(Update, (toggle_full_screen, apply_y_sort));
+        .add_systems(
+            Update,
+            (
+                #[cfg(not(target_arch = "wasm32"))]
+                toggle_full_screen,
+                apply_y_sort,
+            ),
+        );
     }
 }
 
@@ -77,6 +84,7 @@ fn zoom_camera(
     projection.scale = (projection.scale + player_input.zoom).clamp(1.0, 10.0);
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn toggle_full_screen(
     mut main_window: Query<&mut Window, With<PrimaryWindow>>,
     q_player: Query<&Player>,
