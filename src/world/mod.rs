@@ -1,7 +1,10 @@
 pub mod camera;
+pub mod camera_shake;
+
 mod map;
 
 pub use camera::MainCamera;
+pub use camera_shake::CameraShake;
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -13,8 +16,12 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((camera::CameraPlugin, map::MapPlugin))
-            .add_systems(Startup, configure_physics);
+        app.add_plugins((
+            camera::CameraPlugin,
+            camera_shake::CameraShakePlugin,
+            map::MapPlugin,
+        ))
+        .add_systems(Startup, configure_physics);
     }
 }
 

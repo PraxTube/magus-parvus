@@ -15,6 +15,7 @@ opt-level = 3
 
 [dependencies]
 rand = "0.8.5"
+chrono = "0.4.31"
 
 bevy = "0.12.1"
 bevy_screen_diagnostics = "0.4.0"
@@ -23,3 +24,4 @@ bevy_ecs_ldtk = { git = "https://github.com/PraxTube/bevy_ecs_ldtk.git", branch 
 bevy_rapier2d = "0.23.0"
 bevy_kira_audio = "0.18.0"
 bevy_trickfilm = { version = "0.5.0"}
+noisy_bevy = "0.5.0"

@@ -4,6 +4,7 @@ use bevy::window::{PrimaryWindow, WindowMode};
 use bevy_kira_audio::prelude::AudioReceiver;
 use bevy_rapier2d::dynamics::Velocity;
 
+use super::camera_shake::{update_camera, CameraShake};
 use crate::player::input::PlayerInput;
 use crate::player::{Player, PlayerState};
 use crate::GameState;
@@ -14,24 +15,6 @@ pub const TRANSLATION_TO_PIXEL: f32 = 0.0001;
 // This is not changing the actual timestep,
 // it's just a way to reduce magic numbers in code.
 const RAPIER_TIMESTEP: f32 = 60.0;
-
-pub struct CameraPlugin;
-
-impl Plugin for CameraPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (
-                #[cfg(not(target_arch = "wasm32"))]
-                toggle_full_screen,
-                apply_y_sort,
-                zoom_camera,
-            ),
-        )
-        .add_systems(OnEnter(GameState::Gaming), spawn_camera)
-        .add_systems(PostUpdate, move_camera.run_if(in_state(GameState::Gaming)));
-    }
-}
 
 #[derive(Component)]
 pub struct MainCamera;
@@ -51,30 +34,19 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn((MainCamera, AudioReceiver, camera));
 }
 
-fn move_camera(
-    mut q_camera: Query<&mut Transform, (With<MainCamera>, Without<Player>)>,
+fn update_camera_target(
+    mut shake: ResMut<CameraShake>,
     q_player: Query<(&Transform, &Velocity), With<Player>>,
 ) {
     let (player_pos, player_vel) = match q_player.get_single() {
         Ok(p) => (p.0.translation, p.1),
-        Err(err) => {
-            error!("no player! cannot move camera, {}", err);
-            return;
-        }
+        Err(_) => return,
     };
 
-    let mut camera_transform = match q_camera.get_single_mut() {
-        Ok(c) => c,
-        Err(err) => {
-            error!("there is not exactly one main camera, {}", err);
-            return;
-        }
-    };
-    camera_transform.translation = Vec3::new(
+    shake.update_target(Vec2::new(
         player_pos.x + player_vel.linvel.x / RAPIER_TIMESTEP,
         player_pos.y + player_vel.linvel.y / RAPIER_TIMESTEP,
-        camera_transform.translation.z,
-    );
+    ));
 }
 
 fn zoom_camera(
@@ -119,5 +91,23 @@ fn toggle_full_screen(
         WindowMode::Fullscreen
     } else {
         WindowMode::Windowed
+    }
+}
+
+pub struct CameraPlugin;
+
+impl Plugin for CameraPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            (
+                #[cfg(not(target_arch = "wasm32"))]
+                toggle_full_screen,
+                apply_y_sort,
+                zoom_camera,
+            ),
+        )
+        .add_systems(OnEnter(GameState::Gaming), spawn_camera)
+        .add_systems(PostUpdate, update_camera_target.before(update_camera));
     }
 }

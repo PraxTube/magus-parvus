@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{player::Player, GameAssets, GameState};
+use crate::{player::Player, world::CameraShake, GameAssets, GameState};
 
 use super::world_text::{SpawnWorldText, WorldText};
 
@@ -132,6 +132,7 @@ fn despawn_hearts(
 
 fn update_player_hearts(
     assets: Res<GameAssets>,
+    mut shake: ResMut<CameraShake>,
     q_player: Query<&Health, With<Player>>,
     mut q_hearts: Query<(&mut UiImage, &Heart)>,
     mut ev_health_changed: EventReader<HealthChanged>,
@@ -142,8 +143,9 @@ fn update_player_hearts(
             Err(_) => continue,
         };
 
-        let threshold_index = player_health.health as usize;
+        shake.add_trauma(0.5);
 
+        let threshold_index = player_health.health as usize;
         for (mut ui_image, heart) in &mut q_hearts {
             if heart.index >= threshold_index {
                 ui_image.texture = assets.heart_empty.clone();
