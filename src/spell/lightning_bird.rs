@@ -37,7 +37,6 @@ struct LightningBird {
 #[derive(Component)]
 pub struct LightningStrike {
     pub damage: f32,
-    timer: Timer,
 }
 
 #[derive(Component)]
@@ -46,8 +45,8 @@ struct LightningStrikeSpawnTimer {
     timer: Timer,
 }
 
-#[derive(Component, Deref, DerefMut)]
-struct LightningBirdDeathTimer(Timer);
+#[derive(Component)]
+struct LightningBirdDeath;
 
 impl Default for LightningBird {
     fn default() -> Self {
@@ -62,10 +61,7 @@ impl Default for LightningBird {
 
 impl Default for LightningStrike {
     fn default() -> Self {
-        Self {
-            damage: 5.0,
-            timer: Timer::from_seconds(0.6, TimerMode::Repeating),
-        }
+        Self { damage: 5.0 }
     }
 }
 
@@ -256,7 +252,7 @@ fn despawn_lightning_birds(
             animator.play(assets.lightning_bird_death_animations[0].clone());
             commands.spawn((
                 animator,
-                LightningBirdDeathTimer(Timer::from_seconds(0.3, TimerMode::Once)),
+                LightningBirdDeath,
                 SpriteSheetBundle {
                     transform: Transform::from_translation(transform.translation)
                         .with_scale(Vec3::splat(3.0)),
@@ -271,12 +267,10 @@ fn despawn_lightning_birds(
 
 fn despawn_lightning_strikes(
     mut commands: Commands,
-    time: Res<Time>,
-    mut q_lightning_strikes: Query<(Entity, &mut LightningStrike)>,
+    q_lightning_strikes: Query<(Entity, &AnimationPlayer2D), With<LightningStrike>>,
 ) {
-    for (entity, mut lightning_strike) in &mut q_lightning_strikes {
-        lightning_strike.timer.tick(time.delta());
-        if lightning_strike.timer.just_finished() {
+    for (entity, animation_player) in &q_lightning_strikes {
+        if animation_player.is_finished() {
             commands.entity(entity).despawn_recursive();
         }
     }
@@ -284,12 +278,10 @@ fn despawn_lightning_strikes(
 
 fn despawn_lightning_bird_deaths(
     mut commands: Commands,
-    time: Res<Time>,
-    mut q_lightning_bird_deaths: Query<(Entity, &mut LightningBirdDeathTimer)>,
+    q_lightning_bird_deaths: Query<(Entity, &AnimationPlayer2D), With<LightningBirdDeath>>,
 ) {
-    for (entity, mut timer) in &mut q_lightning_bird_deaths {
-        timer.tick(time.delta());
-        if timer.just_finished() {
+    for (entity, animation_player) in &q_lightning_bird_deaths {
+        if animation_player.is_finished() {
             commands.entity(entity).despawn_recursive();
         }
     }
