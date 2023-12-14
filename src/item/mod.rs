@@ -1,6 +1,8 @@
-mod enemy_spawner;
 pub mod item_value;
 pub mod statue;
+
+mod enemy_spawner;
+mod enemy_sub_spawner;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
@@ -9,8 +11,12 @@ pub struct ItemPlugin;
 
 impl Plugin for ItemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((statue::StatuePlugin, enemy_spawner::EnemySpawnerPlugin))
-            .register_ldtk_entity::<ItemBundle>("Item");
+        app.add_plugins((
+            statue::StatuePlugin,
+            enemy_spawner::EnemySpawnerPlugin,
+            enemy_sub_spawner::EnemySubSpawnerPlugin,
+        ))
+        .register_ldtk_entity::<ItemBundle>("Item");
     }
 }
 

@@ -23,20 +23,20 @@ pub struct SpellPlugin;
 
 impl Plugin for SpellPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (write_spell, double_j_escape, submit_spell))
-            .add_event::<SpellCasted>()
-            .add_plugins((
-                fireball::FireballPlugin,
-                lightning::LightningPlugin,
-                lightning_bird::LightningBirdPlugin,
-                icicle::IciclePlugin,
-                aer_tracto::AerTractoPlugin,
-                speed_boost::SpeedBoostPlugin,
-                phantasma::PhantasmaPlugin,
-                death::DeathPlugin,
-                flub::FlubPlugin,
-                kill_player::KillPlayerPlugin,
-            ));
+        app.add_plugins((
+            fireball::FireballPlugin,
+            lightning::LightningPlugin,
+            lightning_bird::LightningBirdPlugin,
+            icicle::IciclePlugin,
+            aer_tracto::AerTractoPlugin,
+            speed_boost::SpeedBoostPlugin,
+            phantasma::PhantasmaPlugin,
+            death::DeathPlugin,
+            flub::FlubPlugin,
+            kill_player::KillPlayerPlugin,
+        ))
+        .add_event::<SpellCasted>()
+        .add_systems(Update, (double_j_escape, submit_spell));
     }
 }
 
@@ -60,34 +60,6 @@ enum Spell {
 #[derive(Event)]
 pub struct SpellCasted {
     spell: Spell,
-}
-
-fn write_spell(
-    keys: Res<Input<KeyCode>>,
-    q_player: Query<&Player>,
-    mut string: Local<String>,
-    mut ev_received_char: EventReader<ReceivedCharacter>,
-) {
-    let player_state = match q_player.get_single() {
-        Ok(p) => p.state,
-        Err(_) => return,
-    };
-    if player_state != PlayerState::Casting {
-        return;
-    }
-
-    if keys.just_pressed(KeyCode::Return) {
-        string.clear();
-    }
-    if keys.just_pressed(KeyCode::Back) {
-        string.pop();
-    }
-    for ev in ev_received_char.read() {
-        // ignore control (special) characters
-        if !ev.char.is_control() {
-            string.push(ev.char);
-        }
-    }
 }
 
 fn double_j_escape(

@@ -1,4 +1,10 @@
-use super::Item;
+use bevy::prelude::*;
+
+use super::{
+    enemy_sub_spawner::{EnemySubSpawner, SpawnFormation},
+    statue::Statue,
+    Item,
+};
 
 pub fn item_title(item: &Item) -> String {
     let text = match item {
@@ -32,4 +38,105 @@ pub fn item_description(item: &Item) -> String {
         Item::FulgurAvis => "Summon a powerful lightning bird.",
     };
     text.to_string()
+}
+
+pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
+    match statue.item {
+        Item::NotImplemented => Vec::new(),
+        Item::Tutorial => Vec::new(),
+        Item::IgnisPila => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 1,
+                ..default()
+            },
+        )],
+        Item::InfernoPila => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 8,
+                timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+                spawn_formation: SpawnFormation::Circle,
+                ..default()
+            },
+        )],
+        Item::Fulgur => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 2,
+                spawn_formation: SpawnFormation::Random,
+                timer: Timer::from_seconds(0.5, TimerMode::Repeating),
+                ..default()
+            },
+        )],
+        Item::ScutumGlaciei => vec![
+            (
+                10.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 5,
+                    spawn_formation: SpawnFormation::Circle,
+                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 5,
+                    spawn_formation: SpawnFormation::Group,
+                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+        ],
+        Item::AerTracto => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 10,
+                spawn_formation: SpawnFormation::Random,
+                timer: Timer::from_seconds(0.3, TimerMode::Repeating),
+                ..default()
+            },
+        )],
+        Item::AerPello => vec![(
+            1.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 15,
+                spawn_formation: SpawnFormation::Group,
+                timer: Timer::from_seconds(0.0, TimerMode::Repeating),
+                ..default()
+            },
+        )],
+        Item::FulgurAvis => vec![
+            (
+                5.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 10,
+                    spawn_formation: SpawnFormation::Circle,
+                    offset: 100.0,
+                    timer: Timer::from_seconds(0.0, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 20,
+                    spawn_formation: SpawnFormation::Random,
+                    offset: 300.0,
+                    timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+        ],
+    }
 }

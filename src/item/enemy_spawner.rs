@@ -1,142 +1,21 @@
-use std::{f32::consts::TAU, time::Duration};
-
-use rand::{rngs::ThreadRng, thread_rng, Rng};
+use std::time::Duration;
 
 use bevy::prelude::*;
 
+use super::enemy_sub_spawner::EnemySubSpawner;
+use super::item_value::statue_sub_spawner;
 use super::statue::{Statue, StatueTriggered};
-use super::Item;
-use crate::{enemy::slime::SpawnSlimeEnemy, GameState};
+use crate::GameState;
 
 const PADDED_TIME: f32 = 0.5;
 
-#[derive(Clone)]
-pub enum SpawnFormation {
-    Circle,
-    Group,
-    Random,
-}
-
 #[derive(Component)]
-struct EnemySpawner {
+pub struct EnemySpawner {
     statue: Statue,
     sub_spawners: Vec<(f32, EnemySubSpawner)>,
     sub_spawner_index: usize,
     timer: Timer,
     disabled: bool,
-}
-
-#[derive(Component, Clone)]
-struct EnemySubSpawner {
-    statue: Statue,
-    count: usize,
-    current_index: usize,
-    offset: f32,
-    angle: f32,
-    spawn_formation: SpawnFormation,
-    timer: Timer,
-    disabled: bool,
-}
-
-fn statue_sub_spawners(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
-    match statue.item {
-        Item::NotImplemented => Vec::new(),
-        Item::Tutorial => Vec::new(),
-        Item::IgnisPila => vec![(
-            0.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 1,
-                ..default()
-            },
-        )],
-        Item::InfernoPila => vec![(
-            0.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 8,
-                timer: Timer::from_seconds(1.0, TimerMode::Repeating),
-                spawn_formation: SpawnFormation::Circle,
-                ..default()
-            },
-        )],
-        Item::Fulgur => vec![(
-            0.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 2,
-                spawn_formation: SpawnFormation::Random,
-                timer: Timer::from_seconds(0.5, TimerMode::Repeating),
-                ..default()
-            },
-        )],
-        Item::ScutumGlaciei => vec![
-            (
-                10.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 5,
-                    spawn_formation: SpawnFormation::Circle,
-                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-            (
-                0.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 5,
-                    spawn_formation: SpawnFormation::Group,
-                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-        ],
-        Item::AerTracto => vec![(
-            0.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 10,
-                spawn_formation: SpawnFormation::Random,
-                timer: Timer::from_seconds(0.3, TimerMode::Repeating),
-                ..default()
-            },
-        )],
-        Item::AerPello => vec![(
-            1.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 15,
-                spawn_formation: SpawnFormation::Group,
-                timer: Timer::from_seconds(0.0, TimerMode::Repeating),
-                ..default()
-            },
-        )],
-        Item::FulgurAvis => vec![
-            (
-                5.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 10,
-                    spawn_formation: SpawnFormation::Circle,
-                    offset: 100.0,
-                    timer: Timer::from_seconds(0.0, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-            (
-                0.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 20,
-                    spawn_formation: SpawnFormation::Random,
-                    offset: 300.0,
-                    timer: Timer::from_seconds(0.1, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-        ],
-    }
 }
 
 impl EnemySpawner {
@@ -152,41 +31,39 @@ impl EnemySpawner {
     }
 }
 
-impl Default for EnemySubSpawner {
-    fn default() -> Self {
-        Self {
-            statue: Statue::default(),
-            count: 0,
-            current_index: 0,
-            offset: 200.0,
-            angle: 0.0,
-            spawn_formation: SpawnFormation::Circle,
-            timer: Timer::from_seconds(0.0, TimerMode::Once),
-            disabled: false,
-        }
-    }
-}
-
 fn spawn_spawners(mut commands: Commands, mut ev_statue_triggered: EventReader<StatueTriggered>) {
     for ev in ev_statue_triggered.read() {
         commands.spawn(EnemySpawner::new(
-            statue_sub_spawners(&ev.statue),
+            statue_sub_spawner(&ev.statue),
             ev.statue.clone(),
         ));
     }
 }
 
-fn tick_enemy_spawner_timers(
-    time: Res<Time>,
-    mut q_enemy_spawners: Query<&mut EnemySpawner>,
-    mut q_enemey_sub_spawners: Query<&mut EnemySubSpawner>,
-) {
+fn spawn_sub_spawners(mut commands: Commands, mut q_enemy_spawners: Query<&mut EnemySpawner>) {
+    for mut enemy_spawner in &mut q_enemy_spawners {
+        if !enemy_spawner.timer.just_finished() {
+            continue;
+        }
+        if enemy_spawner.sub_spawner_index >= enemy_spawner.sub_spawners.len() {
+            continue;
+        }
+
+        let (time, sub_spawner) =
+            enemy_spawner.sub_spawners[enemy_spawner.sub_spawner_index].clone();
+
+        enemy_spawner.sub_spawner_index += 1;
+        enemy_spawner
+            .timer
+            .set_duration(Duration::from_secs_f32(time + PADDED_TIME));
+        enemy_spawner.timer.reset();
+        commands.spawn(sub_spawner);
+    }
+}
+
+fn tick_timers(time: Res<Time>, mut q_enemy_spawners: Query<&mut EnemySpawner>) {
     for mut enemy_spawner in &mut q_enemy_spawners {
         enemy_spawner.timer.tick(time.delta());
-    }
-
-    for mut enemy_sub_spawner in &mut q_enemey_sub_spawners {
-        enemy_sub_spawner.timer.tick(time.delta());
     }
 }
 
@@ -206,14 +83,6 @@ fn disable_enemy_spawners(
 
         if enemy_spawner.timer.finished() {
             enemy_spawner.disabled = true;
-        }
-    }
-}
-
-fn disable_enemy_sub_spawners(mut q_enemey_sub_spawners: Query<&mut EnemySubSpawner>) {
-    for mut enemy_sub_spawner in &mut q_enemey_sub_spawners {
-        if enemy_sub_spawner.current_index == enemy_sub_spawner.count {
-            enemy_sub_spawner.disabled = true;
         }
     }
 }
@@ -246,93 +115,6 @@ fn despawn_spawners(
     }
 }
 
-fn spawn_sub_spawners(mut commands: Commands, mut q_enemy_spawners: Query<&mut EnemySpawner>) {
-    for mut enemy_spawner in &mut q_enemy_spawners {
-        if !enemy_spawner.timer.just_finished() {
-            continue;
-        }
-        if enemy_spawner.sub_spawner_index >= enemy_spawner.sub_spawners.len() {
-            continue;
-        }
-
-        let (time, sub_spawner) =
-            enemy_spawner.sub_spawners[enemy_spawner.sub_spawner_index].clone();
-
-        enemy_spawner.sub_spawner_index += 1;
-        enemy_spawner
-            .timer
-            .set_duration(Duration::from_secs_f32(time + PADDED_TIME));
-        enemy_spawner.timer.reset();
-        commands.spawn(sub_spawner);
-    }
-}
-
-fn despawn_sub_spawners(
-    mut commands: Commands,
-    q_enemy_sub_spawners: Query<(Entity, &EnemySubSpawner)>,
-) {
-    for (entity, enemy_spawner) in &q_enemy_sub_spawners {
-        if enemy_spawner.disabled {
-            commands.entity(entity).despawn_recursive();
-        }
-    }
-}
-
-fn spawn_enemy(
-    sub_spawner: &mut EnemySubSpawner,
-    ev_spawn_slime_enemy: &mut EventWriter<SpawnSlimeEnemy>,
-    rng: &mut ThreadRng,
-) {
-    let pos = match sub_spawner.spawn_formation {
-        SpawnFormation::Circle => {
-            sub_spawner.statue.pos
-                + Quat::from_rotation_z(
-                    sub_spawner.current_index as f32 / sub_spawner.count as f32 * TAU,
-                )
-                .mul_vec3(Vec3::X)
-                    * sub_spawner.offset
-        }
-        SpawnFormation::Group => {
-            sub_spawner.statue.pos
-                + Quat::from_rotation_z(sub_spawner.angle).mul_vec3(Vec3::X) * sub_spawner.offset
-        }
-        SpawnFormation::Random => {
-            sub_spawner.statue.pos
-                + Quat::from_rotation_z(rng.gen_range(0.0..TAU)).mul_vec3(Vec3::X)
-                    * sub_spawner.offset
-        }
-    };
-
-    sub_spawner.current_index += 1;
-    ev_spawn_slime_enemy.send(SpawnSlimeEnemy { pos });
-}
-
-fn spawn_enemies(
-    mut q_sub_spawners: Query<&mut EnemySubSpawner>,
-    mut ev_spawn_slime_enemy: EventWriter<SpawnSlimeEnemy>,
-) {
-    let mut rng = thread_rng();
-
-    for mut sub_spawner in &mut q_sub_spawners {
-        if sub_spawner.disabled {
-            continue;
-        }
-
-        // Spawn all enemies at once.
-        if sub_spawner.timer.duration().as_secs_f32() == 0.0 {
-            for _ in 0..sub_spawner.count {
-                spawn_enemy(&mut sub_spawner, &mut ev_spawn_slime_enemy, &mut rng);
-            }
-            continue;
-        }
-
-        // Spawn single enemy based on timer.
-        if sub_spawner.timer.just_finished() {
-            spawn_enemy(&mut sub_spawner, &mut ev_spawn_slime_enemy, &mut rng);
-        }
-    }
-}
-
 pub struct EnemySpawnerPlugin;
 
 impl Plugin for EnemySpawnerPlugin {
@@ -341,13 +123,10 @@ impl Plugin for EnemySpawnerPlugin {
             Update,
             (
                 spawn_spawners,
-                tick_enemy_spawner_timers,
-                disable_enemy_spawners,
-                disable_enemy_sub_spawners,
-                despawn_spawners,
                 spawn_sub_spawners,
-                despawn_sub_spawners,
-                spawn_enemies.before(disable_enemy_sub_spawners),
+                tick_timers,
+                disable_enemy_spawners,
+                despawn_spawners,
             )
                 .run_if(in_state(GameState::Gaming)),
         );
