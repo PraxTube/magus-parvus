@@ -14,80 +14,79 @@ pub struct GameAssets {
     #[asset(path = "enemy.png")]
     pub enemy: Handle<TextureAtlas>,
 
+    // --- SPELL ---
     #[asset(texture_atlas(tile_size_x = 70.0, tile_size_y = 11.0, columns = 10, rows = 6))]
-    #[asset(path = "fireball.png")]
+    #[asset(path = "spell/fireball.png")]
     pub fireball: Handle<TextureAtlas>,
 
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 112.0, columns = 12, rows = 1))]
-    #[asset(path = "lightning.png")]
+    #[asset(path = "spell/lightning.png")]
     pub lightning: Handle<TextureAtlas>,
 
     #[asset(texture_atlas(tile_size_x = 66.0, tile_size_y = 66.0, columns = 13, rows = 1))]
-    #[asset(path = "lightning_strike.png")]
+    #[asset(path = "spell/lightning_strike.png")]
     pub lightning_strike: Handle<TextureAtlas>,
-    #[asset(paths("lightning_strike.trickfilm#main"), collection(typed))]
+    #[asset(paths("spell/lightning_strike.trickfilm#main"), collection(typed))]
     pub lightning_strike_animations: Vec<Handle<AnimationClip2D>>,
 
     #[asset(texture_atlas(tile_size_x = 50.0, tile_size_y = 50.0, columns = 16, rows = 1))]
-    #[asset(path = "lightning_bird.png")]
+    #[asset(path = "spell/lightning_bird.png")]
     pub lightning_bird: Handle<TextureAtlas>,
     #[asset(
-        paths("lightning_bird.trickfilm#spawn", "lightning_bird.trickfilm#fly"),
+        paths(
+            "spell/lightning_bird.trickfilm#spawn",
+            "spell/lightning_bird.trickfilm#fly"
+        ),
         collection(typed)
     )]
     pub lightning_bird_animations: Vec<Handle<AnimationClip2D>>,
     #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 6, rows = 1))]
-    #[asset(path = "lightning_bird_death.png")]
+    #[asset(path = "spell/lightning_bird_death.png")]
     pub lightning_bird_death: Handle<TextureAtlas>,
-    #[asset(paths("lightning_bird_death.trickfilm#main"), collection(typed))]
+    #[asset(paths("spell/lightning_bird_death.trickfilm#main"), collection(typed))]
     pub lightning_bird_death_animations: Vec<Handle<AnimationClip2D>>,
-    #[asset(path = "sounds/lightning_bird_flap.ogg")]
-    pub lightning_bird_flap_sound: Handle<AudioSource>,
 
     #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 7, rows = 1))]
-    #[asset(path = "aer_tracto.png")]
+    #[asset(path = "spell/aer_tracto.png")]
     pub aer_tracto: Handle<TextureAtlas>,
 
     #[asset(texture_atlas(tile_size_x = 64.0, tile_size_y = 64.0, columns = 30, rows = 1))]
-    #[asset(path = "icicle.png")]
+    #[asset(path = "spell/icicle.png")]
     pub icicle: Handle<TextureAtlas>,
     #[asset(texture_atlas(tile_size_x = 96.0, tile_size_y = 96.0, columns = 49, rows = 1))]
-    #[asset(path = "icicle_shatter.png")]
+    #[asset(path = "spell/icicle_shatter.png")]
     pub icicle_shatter: Handle<TextureAtlas>,
 
     #[asset(texture_atlas(tile_size_x = 80.0, tile_size_y = 96.0, columns = 18, rows = 1))]
-    #[asset(path = "death.png")]
+    #[asset(path = "spell/death.png")]
     pub death: Handle<TextureAtlas>,
 
+    // --- MAP ---
     #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,
-
-    #[asset(path = "statue.png")]
+    #[asset(path = "map/statue.png")]
     pub statue: Handle<Image>,
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 32.0, columns = 5, rows = 1))]
-    #[asset(path = "statue_blink.png")]
+    #[asset(path = "map/statue_blink.png")]
     pub statue_blink: Handle<TextureAtlas>,
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 64.0, columns = 4, rows = 1))]
-    #[asset(path = "statue_beam.png")]
+    #[asset(path = "map/statue_beam.png")]
     pub statue_beam: Handle<TextureAtlas>,
 
-    #[asset(path = "white_pixel.png")]
+    // --- UI ---
+    #[asset(path = "ui/white_pixel.png")]
     pub white_pixel: Handle<Image>,
-    #[asset(path = "heart_full.png")]
+    #[asset(path = "ui/heart_full.png")]
     pub heart_full: Handle<Image>,
-    #[asset(path = "heart_empty.png")]
+    #[asset(path = "ui/heart_empty.png")]
     pub heart_empty: Handle<Image>,
     #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 3, rows = 5))]
-    #[asset(path = "keyboard_ui.png")]
+    #[asset(path = "ui/keys.png")]
     pub keyboard_ui: Handle<TextureAtlas>,
 
-    #[asset(path = "fonts/PressStart2P.ttf")]
-    pub font: Handle<Font>,
-
+    // --- SOUND ---
     #[asset(path = "sounds/player_footstep.ogg")]
     pub player_footstep: Handle<AudioSource>,
-    #[asset(path = "music/bgm.ogg")]
-    pub bgm: Handle<AudioSource>,
 
     #[asset(path = "sounds/slime_jump.ogg")]
     pub slime_jump_sound: Handle<AudioSource>,
@@ -97,4 +96,15 @@ pub struct GameAssets {
     pub slime_hit_sound: Handle<AudioSource>,
     #[asset(path = "sounds/slime_death.ogg")]
     pub slime_death_sound: Handle<AudioSource>,
+
+    #[asset(path = "sounds/lightning_bird_flap.ogg")]
+    pub lightning_bird_flap_sound: Handle<AudioSource>,
+
+    // --- MUSIC ---
+    #[asset(path = "music/bgm.ogg")]
+    pub bgm: Handle<AudioSource>,
+
+    // --- FONT ---
+    #[asset(path = "fonts/PressStart2P.ttf")]
+    pub font: Handle<Font>,
 }
