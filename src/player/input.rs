@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, Window};
 
 use crate::world::MainCamera;
-use crate::GameState;
 
 #[derive(Resource, Default)]
 pub struct MouseWorldCoords(pub Vec2);
@@ -13,6 +12,7 @@ pub struct PlayerInput {
     pub move_direction: Vec2,
     pub zoom: f32,
     pub toggle_fullscreen: bool,
+    pub toggle_spell_book: bool,
 }
 
 fn reset_player_input(mut player_input: ResMut<PlayerInput>) {
@@ -116,6 +116,11 @@ fn toggle_fullscreen(
     player_input.toggle_fullscreen = pressed;
 }
 
+fn toggle_spell_book(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+    let pressed = keys.just_pressed(KeyCode::H);
+    player_input.toggle_spell_book = pressed;
+}
+
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
@@ -128,8 +133,8 @@ impl Plugin for InputPlugin {
                 zoom_camera,
                 player_movement,
                 toggle_fullscreen,
-            )
-                .run_if(in_state(GameState::Gaming)),
+                toggle_spell_book,
+            ),
         )
         .init_resource::<PlayerInput>()
         .init_resource::<MouseWorldCoords>()

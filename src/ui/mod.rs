@@ -1,9 +1,12 @@
-mod game_over_ui;
 pub mod health;
-mod keyboard_ui;
-mod pop_up;
 pub mod text_field;
 pub mod world_text;
+
+mod game_over_ui;
+mod keyboard_ui;
+mod pop_up;
+mod scrollable_list;
+mod spell_book;
 
 use bevy::prelude::*;
 
@@ -18,6 +21,8 @@ impl Plugin for UiPlugin {
             pop_up::PopUpPlugin,
             keyboard_ui::KeyboardUiPlugin,
             game_over_ui::GameOverUiPlugin,
+            spell_book::SpellBookPlugin,
+            scrollable_list::ScrollableListPlugin,
         ));
     }
 }
