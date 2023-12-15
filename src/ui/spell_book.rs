@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{player::input::PlayerInput, GameAssets, GameState};
+use crate::{item::Item, player::input::PlayerInput, GameAssets, GameState};
 
 use super::scrollable_list::spawn_scrollable_list;
 
@@ -26,13 +26,24 @@ fn spawn_background(commands: &mut Commands, texture: Handle<Image>) -> Entity {
         .id()
 }
 
-fn spawn_scrollable_spell_list(commands: &mut Commands) -> Entity {
-    spawn_scrollable_list(commands)
+fn spawn_scrollable_spell_list(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
+    spawn_scrollable_list(
+        commands,
+        assets,
+        vec![
+            Item::Fulgur,
+            Item::InfernoPila,
+            Item::ScutumGlaciei,
+            Item::Fulgur,
+            Item::InfernoPila,
+            Item::ScutumGlaciei,
+        ],
+    )
 }
 
 fn spawn_spell_book(commands: &mut Commands, assets: &Res<GameAssets>) {
     let background = spawn_background(commands, assets.spell_book_container.clone());
-    let scrollable_list = spawn_scrollable_spell_list(commands);
+    let scrollable_list = spawn_scrollable_spell_list(commands, &assets);
 
     commands
         .spawn((

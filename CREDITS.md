@@ -52,6 +52,17 @@ https://fliflifly.itch.io/hearts-and-health-bar
 
 https://cazwolf.itch.io/caz-pixel-free
 
+### Spell Book UI
+
+https://paperhatlizard.itch.io/cryos-mini-gui
+
+### Item Icons
+
+https://clockworkraven.itch.io/rpg-icon-pack-400-skills-and-spells-clockwork-raven-studios
+Note: I do NOT own these assets, if you want to use them follow the link and get them from there.
+
+Placeholder Icon: https://cazwolf.itch.io/caz-pixel-free
+
 ---
 
 ## Audio

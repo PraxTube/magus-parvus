@@ -86,6 +86,19 @@ pub struct GameAssets {
 
     #[asset(path = "ui/spell_book_container.png")]
     pub spell_book_container: Handle<Image>,
+    #[asset(path = "ui/spell_field.png")]
+    pub spell_field: Handle<Image>,
+    #[asset(path = "ui/spell_field_selector.png")]
+    pub spell_field_selector: Handle<Image>,
+
+    #[asset(path = "ui/fulgur_icon.png")]
+    pub fulgur_icon: Handle<Image>,
+    #[asset(path = "ui/inferno_pila_icon.png")]
+    pub inferno_pila_icon: Handle<Image>,
+    #[asset(path = "ui/scutum_glaciei_icon.png")]
+    pub scutum_glaciei_icon: Handle<Image>,
+    #[asset(path = "ui/placeholder_icon.png")]
+    pub placeholder_icon: Handle<Image>,
 
     // --- SOUND ---
     #[asset(path = "sounds/player_footstep.ogg")]

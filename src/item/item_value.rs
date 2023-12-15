@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::GameAssets;
+
 use super::{
     enemy_sub_spawner::{EnemySubSpawner, SpawnFormation},
     statue::Statue,
@@ -38,6 +40,21 @@ pub fn item_description(item: &Item) -> String {
         Item::FulgurAvis => "Summon a powerful lightning bird.",
     };
     text.to_string()
+}
+
+pub fn item_icon(assets: &Res<GameAssets>, item: &Item) -> Handle<Image> {
+    let handle = match item {
+        Item::NotImplemented => assets.placeholder_icon.clone(),
+        Item::Tutorial => assets.placeholder_icon.clone(),
+        Item::IgnisPila => assets.placeholder_icon.clone(),
+        Item::InfernoPila => assets.placeholder_icon.clone(),
+        Item::Fulgur => assets.fulgur_icon.clone(),
+        Item::ScutumGlaciei => assets.scutum_glaciei_icon.clone(),
+        Item::AerTracto => assets.placeholder_icon.clone(),
+        Item::AerPello => assets.placeholder_icon.clone(),
+        Item::FulgurAvis => assets.placeholder_icon.clone(),
+    };
+    handle
 }
 
 pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
