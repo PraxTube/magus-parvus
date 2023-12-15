@@ -9,7 +9,7 @@ use super::{
 };
 
 pub fn item_title(item: &Item) -> String {
-    let text = match item {
+    match item {
         Item::NotImplemented => "NOT IMPLEMENTED, you should not see this, please report",
         Item::Tutorial => "TUTORIAL: Spell Console",
         Item::IgnisPila => "UNLOCKED SPELL: Ignis Pila",
@@ -19,12 +19,12 @@ pub fn item_title(item: &Item) -> String {
         Item::AerTracto => "UNLOCKED SPELL: Aer Tracto",
         Item::AerPello => "UNLOCKED SPELL: Aer Pello",
         Item::FulgurAvis => "UNLOCKED SPELL: Fulgur Avis",
-    };
-    text.to_string()
+    }
+    .to_string()
 }
 
 pub fn item_description(item: &Item) -> String {
-    let text = match item {
+    match item {
         Item::NotImplemented => "CONTENT DESCRIPTION",
         Item::Tutorial => {
             "Press 'i' to open your spell console.\nThen type your spell, try 'fireball'."
@@ -38,12 +38,12 @@ pub fn item_description(item: &Item) -> String {
         Item::AerTracto => "Pull enemies towards you.",
         Item::AerPello => "Push enemies away from you.",
         Item::FulgurAvis => "Summon a powerful lightning bird.",
-    };
-    text.to_string()
+    }
+    .to_string()
 }
 
 pub fn item_icon(assets: &Res<GameAssets>, item: &Item) -> Handle<Image> {
-    let handle = match item {
+    match item {
         Item::NotImplemented => assets.placeholder_icon.clone(),
         Item::Tutorial => assets.placeholder_icon.clone(),
         Item::IgnisPila => assets.placeholder_icon.clone(),
@@ -53,8 +53,7 @@ pub fn item_icon(assets: &Res<GameAssets>, item: &Item) -> Handle<Image> {
         Item::AerTracto => assets.placeholder_icon.clone(),
         Item::AerPello => assets.placeholder_icon.clone(),
         Item::FulgurAvis => assets.placeholder_icon.clone(),
-    };
-    handle
+    }
 }
 
 pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {

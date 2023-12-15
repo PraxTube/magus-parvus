@@ -19,6 +19,9 @@ fn player_movement(
     if player.state == PlayerState::Casting {
         velocity.linvel = Vec2::ZERO;
     }
+    if player.state == PlayerState::SpellBook {
+        velocity.linvel = Vec2::ZERO;
+    }
     if player.state != PlayerState::Moving && player.state != PlayerState::Idling {
         return;
     }

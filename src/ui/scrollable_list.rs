@@ -44,7 +44,7 @@ pub fn spawn_scrollable_list(
             },
         ))
         .with_children(|parent| {
-            for i in 0..spells.len() {
+            for (i, spell) in spells.iter().enumerate() {
                 parent
                     .spawn((
                         ImageBundle {
@@ -73,7 +73,7 @@ pub fn spawn_scrollable_list(
                                     ..default()
                                 },
                                 image: UiImage {
-                                    texture: item_icon(assets, &spells[i]),
+                                    texture: item_icon(assets, spell),
                                     ..default()
                                 },
                                 ..default()
@@ -135,15 +135,11 @@ fn scroll_lists(
 
         let max_scroll = (items_height - container_height).abs() + 2.0 * OFFSET;
 
-        if keys.just_pressed(KeyCode::J) {
-            if scrolling_list.index != scrolling_list.count - 1 {
-                scrolling_list.index += 1;
-            }
+        if keys.just_pressed(KeyCode::J) && scrolling_list.index != scrolling_list.count - 1 {
+            scrolling_list.index += 1;
         }
-        if keys.just_pressed(KeyCode::K) {
-            if scrolling_list.index != 0 {
-                scrolling_list.index -= 1;
-            }
+        if keys.just_pressed(KeyCode::K) && scrolling_list.index != 0 {
+            scrolling_list.index -= 1;
         }
 
         let pos_index = if scrolling_list.index <= INDEX_THRESHOLD {
@@ -180,11 +176,8 @@ fn update_selector_icon(
         }
     }
 
-    match icon {
-        Some(icon) => {
-            commands.entity(icon).push_children(&[selector_entity]);
-        }
-        None => {}
+    if let Some(icon) = icon {
+        commands.entity(icon).push_children(&[selector_entity]);
     };
 }
 

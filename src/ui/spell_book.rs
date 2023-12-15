@@ -74,7 +74,7 @@ fn spawn_spell_book(
                         position_type: PositionType::Absolute,
                         ..default()
                     },
-                    z_index: ZIndex::Local(101),
+                    z_index: ZIndex::Local(200),
                     ..default()
                 },
             ))

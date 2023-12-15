@@ -64,9 +64,7 @@ fn switch_player_mode(player_input: Res<PlayerInput>, mut q_player: Query<&mut P
             }
         }
         PlayerState::SpellBook => {
-            if player_input.escape {
-                player.state = PlayerState::Idling;
-            } else if player_input.toggle_spell_book {
+            if player_input.escape || player_input.toggle_spell_book {
                 player.state = PlayerState::Idling;
             }
         }
