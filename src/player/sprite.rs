@@ -10,6 +10,7 @@ fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
         PlayerState::Idling => (0, 5),
         PlayerState::Moving => (6, 11),
         PlayerState::Casting => (12, 17),
+        PlayerState::SpellBook => (0, 5),
         PlayerState::Staggering => (18, 18),
     }
 }

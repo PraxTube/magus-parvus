@@ -12,6 +12,8 @@ pub struct MouseWorldCoords(pub Vec2);
 pub struct PlayerInput {
     pub move_direction: Vec2,
     pub zoom: f32,
+    pub escape: bool,
+    pub casting: bool,
     pub toggle_fullscreen: bool,
     pub toggle_spell_book: bool,
 }
@@ -101,6 +103,14 @@ fn player_movement(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInp
     player_input.move_direction = direction.normalize_or_zero();
 }
 
+fn input_escape(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+    player_input.escape = keys.just_pressed(KeyCode::Escape);
+}
+
+fn input_casting(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+    player_input.casting = keys.just_pressed(KeyCode::I);
+}
+
 fn toggle_fullscreen(
     keys: Res<Input<KeyCode>>,
     gamepads: Res<Gamepads>,
@@ -133,6 +143,8 @@ impl Plugin for InputPlugin {
                 fetch_mouse_world_coords,
                 zoom_camera,
                 player_movement,
+                input_escape,
+                input_casting,
                 toggle_fullscreen,
                 toggle_spell_book,
             )

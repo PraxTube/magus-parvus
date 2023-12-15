@@ -1,15 +1,14 @@
 use bevy::prelude::*;
 
-use crate::GameState;
+use super::{input::PlayerInput, Player};
 
-use super::Player;
-
-#[derive(Default, PartialEq, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Clone, Copy)]
 pub enum PlayerState {
     #[default]
     Idling,
     Moving,
     Casting,
+    SpellBook,
     Staggering,
 }
 
@@ -38,7 +37,7 @@ fn player_changed_state(
     }
 }
 
-fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player>) {
+fn switch_player_mode(player_input: Res<PlayerInput>, mut q_player: Query<&mut Player>) {
     let mut player = match q_player.get_single_mut() {
         Ok(p) => p,
         Err(_) => return,
@@ -46,17 +45,28 @@ fn switch_player_mode(keys: Res<Input<KeyCode>>, mut q_player: Query<&mut Player
 
     match player.state {
         PlayerState::Idling => {
-            if keys.just_pressed(KeyCode::I) {
+            if player_input.casting {
                 player.state = PlayerState::Casting;
+            } else if player_input.toggle_spell_book {
+                player.state = PlayerState::SpellBook;
             }
         }
         PlayerState::Moving => {
-            if keys.just_pressed(KeyCode::I) {
+            if player_input.casting {
                 player.state = PlayerState::Casting;
+            } else if player_input.toggle_spell_book {
+                player.state = PlayerState::SpellBook;
             }
         }
         PlayerState::Casting => {
-            if keys.just_pressed(KeyCode::Escape) {
+            if player_input.escape {
+                player.state = PlayerState::Idling;
+            }
+        }
+        PlayerState::SpellBook => {
+            if player_input.escape {
+                player.state = PlayerState::Idling;
+            } else if player_input.toggle_spell_book {
                 player.state = PlayerState::Idling;
             }
         }
@@ -85,13 +95,12 @@ pub struct PlayerStatePlugin;
 impl Plugin for PlayerStatePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            PostUpdate,
+            Update,
             (
                 switch_player_mode,
                 player_changed_state.after(switch_player_mode),
                 tick_staggering_timer,
-            )
-                .run_if(in_state(GameState::Gaming)),
+            ),
         )
         .add_event::<PlayerChangedState>();
     }
