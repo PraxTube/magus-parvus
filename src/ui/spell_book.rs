@@ -20,24 +20,10 @@ fn spawn_background(commands: &mut Commands, texture: Handle<Image>) -> Entity {
                 texture,
                 ..default()
             },
-            background_color: BackgroundColor(Color::rgba(0.2, 0.2, 0.2, 0.85)),
             z_index: ZIndex::Local(-1),
             ..default()
         },))
         .id()
-}
-
-fn spawn_title(commands: &mut Commands, font: Handle<Font>) -> Entity {
-    let text_style = TextStyle {
-        font,
-        font_size: 50.0,
-        color: Color::WHITE,
-    };
-    let text_bundle = TextBundle::from_sections([TextSection::new(
-        "SPELL BOOK".to_string(),
-        text_style.clone(),
-    )]);
-    commands.spawn(text_bundle).id()
 }
 
 fn spawn_scrollable_spell_list(commands: &mut Commands) -> Entity {
@@ -45,8 +31,7 @@ fn spawn_scrollable_spell_list(commands: &mut Commands) -> Entity {
 }
 
 fn spawn_spell_book(commands: &mut Commands, assets: &Res<GameAssets>) {
-    let background = spawn_background(commands, assets.white_pixel.clone());
-    let title = spawn_title(commands, assets.font.clone());
+    let background = spawn_background(commands, assets.spell_book_container.clone());
     let scrollable_list = spawn_scrollable_spell_list(commands);
 
     commands
@@ -59,7 +44,6 @@ fn spawn_spell_book(commands: &mut Commands, assets: &Res<GameAssets>) {
                     top: Val::Percent(10.0),
                     left: Val::Percent(30.0),
                     flex_direction: FlexDirection::Column,
-                    row_gap: Val::Vh(10.0),
                     align_items: AlignItems::Center,
                     position_type: PositionType::Absolute,
                     ..default()
@@ -68,7 +52,7 @@ fn spawn_spell_book(commands: &mut Commands, assets: &Res<GameAssets>) {
                 ..default()
             },
         ))
-        .push_children(&[background, title, scrollable_list]);
+        .push_children(&[background, scrollable_list]);
 }
 
 fn despawn_spell_bock(commands: &mut Commands, entity: Entity) {

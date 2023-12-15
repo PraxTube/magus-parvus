@@ -37,13 +37,13 @@ pub fn spawn_scrollable_list(commands: &mut Commands) -> Entity {
     commands
         .spawn(NodeBundle {
             style: Style {
+                top: Val::Percent(25.0),
+                height: Val::Percent(55.0),
                 flex_direction: FlexDirection::Column,
                 align_self: AlignSelf::Stretch,
-                height: Val::Percent(30.0),
                 overflow: Overflow::clip_y(),
                 ..default()
             },
-            background_color: Color::rgb(0.1, 0.1, 0.1).into(),
             ..default()
         })
         .push_children(&[moving_panel])
@@ -52,12 +52,15 @@ pub fn spawn_scrollable_list(commands: &mut Commands) -> Entity {
 
 fn scroll_lists(
     keys: Res<Input<KeyCode>>,
-    mut query_list: Query<(&mut ScrollingList, &mut Style, &Parent, &Node)>,
-    query_node: Query<&Node>,
+    mut q_scrollable_lists: Query<(&mut ScrollingList, &mut Style, &Parent, &Node)>,
+    q_nodes: Query<&Node>,
 ) {
-    for (mut scrolling_list, mut style, parent, list_node) in &mut query_list {
+    for (mut scrolling_list, mut style, parent, list_node) in &mut q_scrollable_lists {
         let items_height = list_node.size().y;
-        let container_height = query_node.get(parent.get()).unwrap().size().y;
+        let container_height = match q_nodes.get(parent.get()) {
+            Ok(n) => n.size().y,
+            Err(_) => continue,
+        };
 
         let max_scroll = (items_height - container_height).max(0.);
         let mut dy = 0.0;

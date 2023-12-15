@@ -84,6 +84,9 @@ pub struct GameAssets {
     #[asset(path = "ui/keys.png")]
     pub keyboard_ui: Handle<TextureAtlas>,
 
+    #[asset(path = "ui/spell_book_container.png")]
+    pub spell_book_container: Handle<Image>,
+
     // --- SOUND ---
     #[asset(path = "sounds/player_footstep.ogg")]
     pub player_footstep: Handle<AudioSource>,
