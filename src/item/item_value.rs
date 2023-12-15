@@ -11,14 +11,14 @@ use super::{
 pub fn item_title(item: &Item) -> String {
     match item {
         Item::NotImplemented => "NOT IMPLEMENTED, you should not see this, please report",
-        Item::Tutorial => "TUTORIAL: Spell Console",
-        Item::IgnisPila => "UNLOCKED SPELL: Ignis Pila",
-        Item::InfernoPila => "UNLOCKED SPELL: Inferno Pila",
-        Item::Fulgur => "UNLOCKED SPELL: Fulgur",
-        Item::ScutumGlaciei => "UNLOCKED SPELL: Scutum Glaciei",
-        Item::AerTracto => "UNLOCKED SPELL: Aer Tracto",
-        Item::AerPello => "UNLOCKED SPELL: Aer Pello",
-        Item::FulgurAvis => "UNLOCKED SPELL: Fulgur Avis",
+        Item::Tutorial => "Spell Console",
+        Item::IgnisPila => "Ignis Pila",
+        Item::InfernoPila => "Inferno Pila",
+        Item::Fulgur => "Fulgur",
+        Item::ScutumGlaciei => "Scutum Glaciei",
+        Item::AerTracto => "Aer Tracto",
+        Item::AerPello => "Aer Pello",
+        Item::FulgurAvis => "Fulgur Avis",
     }
     .to_string()
 }
@@ -45,7 +45,7 @@ pub fn item_description(item: &Item) -> String {
 pub fn item_icon(assets: &Res<GameAssets>, item: &Item) -> Handle<Image> {
     match item {
         Item::NotImplemented => assets.placeholder_icon.clone(),
-        Item::Tutorial => assets.placeholder_icon.clone(),
+        Item::Tutorial => assets.spell_console_icon.clone(),
         Item::IgnisPila => assets.placeholder_icon.clone(),
         Item::InfernoPila => assets.placeholder_icon.clone(),
         Item::Fulgur => assets.fulgur_icon.clone(),

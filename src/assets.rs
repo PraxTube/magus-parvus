@@ -97,6 +97,8 @@ pub struct GameAssets {
     #[asset(path = "ui/spell_field_selector.png")]
     pub spell_field_selector: Handle<Image>,
 
+    #[asset(path = "ui/spell_console_icon.png")]
+    pub spell_console_icon: Handle<Image>,
     #[asset(path = "ui/fulgur_icon.png")]
     pub fulgur_icon: Handle<Image>,
     #[asset(path = "ui/inferno_pila_icon.png")]

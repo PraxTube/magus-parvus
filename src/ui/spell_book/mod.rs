@@ -3,12 +3,17 @@ mod scrollable_list;
 use bevy::prelude::*;
 
 use crate::{
-    item::ActiveItems,
+    item::{
+        item_value::{item_description, item_icon, item_title},
+        ActiveItems,
+    },
     player::{PlayerChangedState, PlayerState},
     GameAssets, GameState,
 };
 
 use scrollable_list::spawn_scrollable_list;
+
+use self::scrollable_list::ScrollingList;
 
 pub struct SpellBookPlugin;
 
@@ -16,7 +21,7 @@ impl Plugin for SpellBookPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawn_spell_book, despawn_spell_bock).run_if(in_state(GameState::Gaming)),
+            (spawn_spell_book, despawn_spell_bock, update_view).run_if(in_state(GameState::Gaming)),
         )
         .add_plugins(scrollable_list::ScrollableListPlugin);
     }
@@ -137,7 +142,7 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
     let title = commands.spawn((SpellbookViewTitle, text_bundle)).id();
     let text_style = TextStyle {
         font: assets.font.clone(),
-        font_size: 12.0,
+        font_size: 14.0,
         color: Color::WHITE,
     };
     let text_bundle = TextBundle {
@@ -148,6 +153,7 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
         style: Style {
             top: Val::Percent(58.0),
             left: Val::Percent(10.0),
+            width: Val::Percent(80.0),
             position_type: PositionType::Absolute,
             ..default()
         },
@@ -230,4 +236,52 @@ fn despawn_spell_bock(
             commands.entity(entity).despawn_recursive();
         }
     }
+}
+
+fn update_view(
+    assets: Res<GameAssets>,
+    active_items: Res<ActiveItems>,
+    q_scrolling_list: Query<&ScrollingList>,
+    mut q_view_icon: Query<&mut UiImage, With<SpellbookViewIcon>>,
+    mut q_view_title: Query<&mut Text, With<SpellbookViewTitle>>,
+    mut q_view_description: Query<
+        &mut Text,
+        (With<SpellbookViewDescription>, Without<SpellbookViewTitle>),
+    >,
+) {
+    if active_items.is_empty() {
+        return;
+    }
+
+    let scrolling_list = match q_scrolling_list.get_single() {
+        Ok(s) => s,
+        Err(_) => return,
+    };
+    let mut icon = match q_view_icon.get_single_mut() {
+        Ok(i) => i,
+        Err(_) => return,
+    };
+    let mut title = match q_view_title.get_single_mut() {
+        Ok(i) => i,
+        Err(_) => return,
+    };
+    let mut description = match q_view_description.get_single_mut() {
+        Ok(i) => i,
+        Err(_) => return,
+    };
+
+    if scrolling_list.index >= active_items.len() {
+        return;
+    }
+    let item = &active_items[scrolling_list.index];
+
+    let target_texture = item_icon(&assets, item);
+    let target_title = item_title(item);
+    let target_description = item_description(item);
+
+    if icon.texture != target_texture {
+        icon.texture = target_texture;
+    }
+    title.sections[0].value = target_title;
+    description.sections[0].value = target_description;
 }

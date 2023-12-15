@@ -7,7 +7,7 @@ use crate::{
 
 #[derive(Component)]
 pub struct ScrollingList {
-    index: usize,
+    pub index: usize,
 }
 
 #[derive(Component)]
