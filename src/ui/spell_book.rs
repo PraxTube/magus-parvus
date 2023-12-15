@@ -36,6 +36,8 @@ fn spawn_scrollable_spell_list(commands: &mut Commands, assets: &Res<GameAssets>
             Item::ScutumGlaciei,
             Item::Fulgur,
             Item::InfernoPila,
+            Item::Fulgur,
+            Item::InfernoPila,
             Item::ScutumGlaciei,
         ],
     )

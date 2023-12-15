@@ -19,6 +19,9 @@ struct ScrollingIcon {
 #[derive(Component)]
 struct SelectorIcon;
 
+const OFFSET: f32 = 25.0;
+const INDEX_THRESHOLD: usize = 2;
+
 pub fn spawn_scrollable_list(
     commands: &mut Commands,
     assets: &Res<GameAssets>,
@@ -130,7 +133,7 @@ fn scroll_lists(
             Err(_) => continue,
         };
 
-        let max_scroll = (items_height - container_height).abs();
+        let max_scroll = (items_height - container_height).abs() + 2.0 * OFFSET;
 
         if keys.just_pressed(KeyCode::J) {
             if scrolling_list.index != scrolling_list.count - 1 {
@@ -143,8 +146,13 @@ fn scroll_lists(
             }
         }
 
-        let position = (-100.0 * scrolling_list.index as f32).clamp(-max_scroll, 0.0);
-        style.top = Val::Px(position);
+        let pos_index = if scrolling_list.index <= INDEX_THRESHOLD {
+            0
+        } else {
+            scrolling_list.index - INDEX_THRESHOLD
+        };
+        let position = (-103.0 * pos_index as f32).clamp(-max_scroll, 0.0);
+        style.top = Val::Px(position + OFFSET);
     }
 }
 
