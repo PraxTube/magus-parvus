@@ -1,4 +1,5 @@
 use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
+use bevy::input::InputSystem;
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, Window};
 
@@ -134,7 +135,8 @@ impl Plugin for InputPlugin {
                 player_movement,
                 toggle_fullscreen,
                 toggle_spell_book,
-            ),
+            )
+                .after(InputSystem),
         )
         .init_resource::<PlayerInput>()
         .init_resource::<MouseWorldCoords>()
