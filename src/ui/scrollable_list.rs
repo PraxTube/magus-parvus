@@ -135,10 +135,14 @@ fn scroll_lists(
 
         let max_scroll = (items_height - container_height).abs() + 2.0 * OFFSET;
 
-        if keys.just_pressed(KeyCode::J) && scrolling_list.index != scrolling_list.count - 1 {
+        if (keys.just_pressed(KeyCode::J) || keys.just_pressed(KeyCode::S))
+            && scrolling_list.index != scrolling_list.count - 1
+        {
             scrolling_list.index += 1;
         }
-        if keys.just_pressed(KeyCode::K) && scrolling_list.index != 0 {
+        if (keys.just_pressed(KeyCode::K) || keys.just_pressed(KeyCode::W))
+            && scrolling_list.index != 0
+        {
             scrolling_list.index -= 1;
         }
 

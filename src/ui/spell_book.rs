@@ -47,6 +47,48 @@ fn spawn_scrollable_spell_list(commands: &mut Commands, assets: &Res<GameAssets>
     )
 }
 
+fn spawn_movement_hint_up(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
+    commands
+        .spawn((ImageBundle {
+            style: Style {
+                bottom: Val::Percent(53.0),
+                left: Val::Percent(105.0),
+                width: Val::Percent(10.0),
+                aspect_ratio: Some(0.5),
+                position_type: PositionType::Absolute,
+                ..default()
+            },
+            image: UiImage {
+                texture: assets.spell_book_hint_up.clone(),
+                ..default()
+            },
+            z_index: ZIndex::Local(-1),
+            ..default()
+        },))
+        .id()
+}
+
+fn spawn_movement_hint_down(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
+    commands
+        .spawn((ImageBundle {
+            style: Style {
+                top: Val::Percent(53.0),
+                left: Val::Percent(105.0),
+                width: Val::Percent(10.0),
+                aspect_ratio: Some(0.5),
+                position_type: PositionType::Absolute,
+                ..default()
+            },
+            image: UiImage {
+                texture: assets.spell_book_hint_down.clone(),
+                ..default()
+            },
+            z_index: ZIndex::Local(-1),
+            ..default()
+        },))
+        .id()
+}
+
 fn spawn_spell_book(
     mut commands: Commands,
     assets: Res<GameAssets>,
@@ -59,6 +101,8 @@ fn spawn_spell_book(
 
         let background = spawn_background(&mut commands, assets.spell_book_container.clone());
         let scrollable_list = spawn_scrollable_spell_list(&mut commands, &assets);
+        let hint_up = spawn_movement_hint_up(&mut commands, &assets);
+        let hint_down = spawn_movement_hint_down(&mut commands, &assets);
 
         commands
             .spawn((
@@ -78,7 +122,7 @@ fn spawn_spell_book(
                     ..default()
                 },
             ))
-            .push_children(&[background, scrollable_list]);
+            .push_children(&[background, scrollable_list, hint_up, hint_down]);
     }
 }
 

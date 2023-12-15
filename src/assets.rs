@@ -83,6 +83,10 @@ pub struct GameAssets {
     #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 3, rows = 5))]
     #[asset(path = "ui/keys.png")]
     pub keyboard_ui: Handle<TextureAtlas>,
+    #[asset(path = "ui/movement_hint_up.png")]
+    pub spell_book_hint_up: Handle<Image>,
+    #[asset(path = "ui/movement_hint_down.png")]
+    pub spell_book_hint_down: Handle<Image>,
 
     #[asset(path = "ui/spell_book_container.png")]
     pub spell_book_container: Handle<Image>,
