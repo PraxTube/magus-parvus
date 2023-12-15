@@ -87,6 +87,8 @@ pub struct GameAssets {
     pub spell_book_hint_up: Handle<Image>,
     #[asset(path = "ui/movement_hint_down.png")]
     pub spell_book_hint_down: Handle<Image>,
+    #[asset(path = "ui/spell_book_view.png")]
+    pub spell_book_view: Handle<Image>,
 
     #[asset(path = "ui/spell_book_container.png")]
     pub spell_book_container: Handle<Image>,

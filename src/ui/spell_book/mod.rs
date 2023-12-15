@@ -1,3 +1,5 @@
+mod scrollable_list;
+
 use bevy::prelude::*;
 
 use crate::{
@@ -6,10 +8,29 @@ use crate::{
     GameAssets, GameState,
 };
 
-use super::scrollable_list::spawn_scrollable_list;
+use scrollable_list::spawn_scrollable_list;
+
+pub struct SpellBookPlugin;
+
+impl Plugin for SpellBookPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            (spawn_spell_book, despawn_spell_bock).run_if(in_state(GameState::Gaming)),
+        )
+        .add_plugins(scrollable_list::ScrollableListPlugin);
+    }
+}
 
 #[derive(Component)]
 struct SpellBook;
+
+#[derive(Component)]
+pub struct SpellbookViewIcon;
+#[derive(Component)]
+pub struct SpellbookViewTitle;
+#[derive(Component)]
+pub struct SpellbookViewDescription;
 
 fn spawn_background(commands: &mut Commands, texture: Handle<Image>) -> Entity {
     commands
@@ -52,7 +73,7 @@ fn spawn_movement_hint_up(commands: &mut Commands, assets: &Res<GameAssets>) -> 
         .spawn((ImageBundle {
             style: Style {
                 bottom: Val::Percent(53.0),
-                left: Val::Percent(105.0),
+                right: Val::Percent(105.0),
                 width: Val::Percent(10.0),
                 aspect_ratio: Some(0.5),
                 position_type: PositionType::Absolute,
@@ -73,7 +94,7 @@ fn spawn_movement_hint_down(commands: &mut Commands, assets: &Res<GameAssets>) -
         .spawn((ImageBundle {
             style: Style {
                 top: Val::Percent(53.0),
-                left: Val::Percent(105.0),
+                right: Val::Percent(105.0),
                 width: Val::Percent(10.0),
                 aspect_ratio: Some(0.5),
                 position_type: PositionType::Absolute,
@@ -86,6 +107,86 @@ fn spawn_movement_hint_down(commands: &mut Commands, assets: &Res<GameAssets>) -
             z_index: ZIndex::Local(-1),
             ..default()
         },))
+        .id()
+}
+
+fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
+    let icon = commands
+        .spawn((
+            SpellbookViewIcon,
+            ImageBundle {
+                style: Style {
+                    top: Val::Percent(16.5),
+                    left: Val::Percent(44.87),
+                    width: Val::Percent(10.26),
+                    height: Val::Percent(16.7),
+                    ..default()
+                },
+                image: UiImage {
+                    // texture: assets.inferno_pila_icon.clone(),
+                    ..default()
+                },
+                ..default()
+            },
+        ))
+        .id();
+    let text_style = TextStyle {
+        font: assets.font.clone(),
+        font_size: 20.0,
+        color: Color::WHITE,
+    };
+    let text_bundle = TextBundle {
+        text: Text::from_sections([TextSection {
+            value: "NOT IMPLEMENTED".to_string(),
+            style: text_style,
+        }]),
+        style: Style {
+            top: Val::Percent(45.0),
+            left: Val::Percent(10.0),
+            position_type: PositionType::Absolute,
+            ..default()
+        },
+        ..default()
+    };
+    let title = commands.spawn((SpellbookViewTitle, text_bundle)).id();
+    let text_style = TextStyle {
+        font: assets.font.clone(),
+        font_size: 12.0,
+        color: Color::WHITE,
+    };
+    let text_bundle = TextBundle {
+        text: Text::from_sections([TextSection {
+            value: "DESCRIPTION, YOU SHOULD NOT SEE THIS".to_string(),
+            style: text_style,
+        }]),
+        style: Style {
+            top: Val::Percent(58.0),
+            left: Val::Percent(10.0),
+            position_type: PositionType::Absolute,
+            ..default()
+        },
+        ..default()
+    };
+    let description = commands.spawn((SpellbookViewDescription, text_bundle)).id();
+
+    commands
+        .spawn((ImageBundle {
+            style: Style {
+                top: Val::Percent(20.0),
+                left: Val::Percent(107.0),
+                width: Val::Percent(110.0),
+                height: Val::Percent(60.0),
+                position_type: PositionType::Absolute,
+                ..default()
+            },
+            image: UiImage {
+                texture: assets.spell_book_view.clone(),
+                ..default()
+            },
+            z_index: ZIndex::Local(-1),
+            ..default()
+        },))
+        .push_children(&[icon, title, description])
         .id()
 }
 
@@ -103,6 +204,7 @@ fn spawn_spell_book(
         let scrollable_list = spawn_scrollable_spell_list(&mut commands, &assets);
         let hint_up = spawn_movement_hint_up(&mut commands, &assets);
         let hint_down = spawn_movement_hint_down(&mut commands, &assets);
+        let view = spawn_spell_book_view(&mut commands, &assets);
 
         commands
             .spawn((
@@ -112,7 +214,7 @@ fn spawn_spell_book(
                         height: Val::Percent(80.0),
                         width: Val::Percent(40.0),
                         top: Val::Percent(10.0),
-                        left: Val::Percent(30.0),
+                        left: Val::Percent(10.0),
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
                         position_type: PositionType::Absolute,
@@ -122,7 +224,7 @@ fn spawn_spell_book(
                     ..default()
                 },
             ))
-            .push_children(&[background, scrollable_list, hint_up, hint_down]);
+            .push_children(&[background, scrollable_list, hint_up, hint_down, view]);
     }
 }
 
@@ -140,16 +242,5 @@ fn despawn_spell_bock(
         if ev.old_state == PlayerState::SpellBook {
             commands.entity(entity).despawn_recursive();
         }
-    }
-}
-
-pub struct SpellBookPlugin;
-
-impl Plugin for SpellBookPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (spawn_spell_book, despawn_spell_bock).run_if(in_state(GameState::Gaming)),
-        );
     }
 }
