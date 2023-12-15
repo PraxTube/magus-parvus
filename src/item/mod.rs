@@ -16,6 +16,7 @@ impl Plugin for ItemPlugin {
             enemy_spawner::EnemySpawnerPlugin,
             enemy_sub_spawner::EnemySubSpawnerPlugin,
         ))
+        .init_resource::<ActiveItems>()
         .register_ldtk_entity::<ItemBundle>("Item");
     }
 }
@@ -32,6 +33,19 @@ pub enum Item {
     AerTracto,
     AerPello,
     FulgurAvis,
+}
+
+#[derive(Resource, Default, Deref, DerefMut)]
+pub struct ActiveItems(pub Vec<Item>);
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct ItemBundle {
+    #[with(Item::from_field)]
+    item: Item,
+    #[grid_coords]
+    grid_coords: GridCoords,
+    #[worldly]
+    worldly: Worldly,
 }
 
 impl Item {
@@ -55,14 +69,4 @@ impl Item {
             Err(_) => Item::default(),
         }
     }
-}
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct ItemBundle {
-    #[with(Item::from_field)]
-    item: Item,
-    #[grid_coords]
-    grid_coords: GridCoords,
-    #[worldly]
-    worldly: Worldly,
 }

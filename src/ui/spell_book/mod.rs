@@ -3,7 +3,7 @@ mod scrollable_list;
 use bevy::prelude::*;
 
 use crate::{
-    item::Item,
+    item::ActiveItems,
     player::{PlayerChangedState, PlayerState},
     GameAssets, GameState,
 };
@@ -24,13 +24,12 @@ impl Plugin for SpellBookPlugin {
 
 #[derive(Component)]
 struct SpellBook;
-
 #[derive(Component)]
-pub struct SpellbookViewIcon;
+struct SpellbookViewIcon;
 #[derive(Component)]
-pub struct SpellbookViewTitle;
+struct SpellbookViewTitle;
 #[derive(Component)]
-pub struct SpellbookViewDescription;
+struct SpellbookViewDescription;
 
 fn spawn_background(commands: &mut Commands, texture: Handle<Image>) -> Entity {
     commands
@@ -51,21 +50,12 @@ fn spawn_background(commands: &mut Commands, texture: Handle<Image>) -> Entity {
         .id()
 }
 
-fn spawn_scrollable_spell_list(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
-    spawn_scrollable_list(
-        commands,
-        assets,
-        vec![
-            Item::Fulgur,
-            Item::InfernoPila,
-            Item::ScutumGlaciei,
-            Item::Fulgur,
-            Item::InfernoPila,
-            Item::Fulgur,
-            Item::InfernoPila,
-            Item::ScutumGlaciei,
-        ],
-    )
+fn spawn_scrollable_spell_list(
+    commands: &mut Commands,
+    assets: &Res<GameAssets>,
+    active_items: &Res<ActiveItems>,
+) -> Entity {
+    spawn_scrollable_list(commands, assets, active_items)
 }
 
 fn spawn_movement_hint_up(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
@@ -120,10 +110,6 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
                     left: Val::Percent(44.87),
                     width: Val::Percent(10.26),
                     height: Val::Percent(16.7),
-                    ..default()
-                },
-                image: UiImage {
-                    // texture: assets.inferno_pila_icon.clone(),
                     ..default()
                 },
                 ..default()
@@ -193,6 +179,7 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
 fn spawn_spell_book(
     mut commands: Commands,
     assets: Res<GameAssets>,
+    active_items: Res<ActiveItems>,
     mut ev_player_changed_state: EventReader<PlayerChangedState>,
 ) {
     for ev in ev_player_changed_state.read() {
@@ -201,7 +188,7 @@ fn spawn_spell_book(
         }
 
         let background = spawn_background(&mut commands, assets.spell_book_container.clone());
-        let scrollable_list = spawn_scrollable_spell_list(&mut commands, &assets);
+        let scrollable_list = spawn_scrollable_spell_list(&mut commands, &assets, &active_items);
         let hint_up = spawn_movement_hint_up(&mut commands, &assets);
         let hint_down = spawn_movement_hint_down(&mut commands, &assets);
         let view = spawn_spell_book_view(&mut commands, &assets);

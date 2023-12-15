@@ -10,7 +10,7 @@ use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
 use crate::world::BACKGROUND_ZINDEX_ABS;
 use crate::{GameAssets, GameState};
 
-use super::Item;
+use super::{ActiveItems, Item};
 
 const BLINK_OFFSET: Vec3 = Vec3::new(0.0, 32.0, 0.0);
 const BEAM_OFFSET: Vec3 = Vec3::new(1.0, 45.0, -10.0);
@@ -218,6 +218,7 @@ fn trigger_statues(
 }
 
 fn unlock_statues(
+    mut active_items: ResMut<ActiveItems>,
     q_enemies: Query<&Enemy>,
     mut q_statues: Query<&mut Statue>,
     mut ev_statue_unlocked: EventWriter<StatueUnlocked>,
@@ -235,6 +236,7 @@ fn unlock_statues(
         }
 
         statue.unlocked = true;
+        active_items.push(statue.item.clone());
         ev_statue_unlocked.send(StatueUnlocked {
             statue: statue.clone(),
         })
