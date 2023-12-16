@@ -19,7 +19,7 @@ struct ScrollingIcon {
 struct SelectorIcon;
 
 const OFFSET: f32 = 25.0;
-const INDEX_THRESHOLD: usize = 2;
+const INDEX_THRESHOLD: usize = 1;
 
 pub fn spawn_scrollable_list(
     commands: &mut Commands,

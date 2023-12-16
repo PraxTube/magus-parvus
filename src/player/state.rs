@@ -93,7 +93,7 @@ pub struct PlayerStatePlugin;
 impl Plugin for PlayerStatePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
+            PostUpdate,
             (
                 switch_player_mode,
                 player_changed_state.after(switch_player_mode),

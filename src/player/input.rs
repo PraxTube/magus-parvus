@@ -152,6 +152,6 @@ impl Plugin for InputPlugin {
         )
         .init_resource::<PlayerInput>()
         .init_resource::<MouseWorldCoords>()
-        .add_systems(PostUpdate, reset_player_input);
+        .add_systems(PreUpdate, reset_player_input.before(InputSystem));
     }
 }
