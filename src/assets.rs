@@ -115,10 +115,18 @@ pub struct GameAssets {
     pub spell_console_icon: Handle<Image>,
     #[asset(path = "ui/fulgur_icon.png")]
     pub fulgur_icon: Handle<Image>,
+    #[asset(path = "ui/fulgur_avis_icon.png")]
+    pub fulgur_avis_icon: Handle<Image>,
+    #[asset(path = "ui/ignis_pila_icon.png")]
+    pub ignis_pila_icon: Handle<Image>,
     #[asset(path = "ui/inferno_pila_icon.png")]
     pub inferno_pila_icon: Handle<Image>,
     #[asset(path = "ui/scutum_glaciei_icon.png")]
     pub scutum_glaciei_icon: Handle<Image>,
+    #[asset(path = "ui/aer_tracto_icon.png")]
+    pub aer_tracto_icon: Handle<Image>,
+    #[asset(path = "ui/aer_pello_icon.png")]
+    pub aer_pello_icon: Handle<Image>,
     #[asset(path = "ui/placeholder_icon.png")]
     pub placeholder_icon: Handle<Image>,
 

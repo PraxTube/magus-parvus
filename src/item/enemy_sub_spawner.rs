@@ -32,7 +32,7 @@ impl Default for EnemySubSpawner {
             statue: Statue::default(),
             count: 0,
             current_index: 0,
-            offset: 200.0,
+            offset: 150.0,
             angle: 0.0,
             spawn_formation: SpawnFormation::Circle,
             timer: Timer::from_seconds(0.0, TimerMode::Once),

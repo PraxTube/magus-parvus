@@ -128,7 +128,7 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
     };
     let text_bundle = TextBundle {
         text: Text::from_sections([TextSection {
-            value: "NOT IMPLEMENTED".to_string(),
+            value: "NO SPELL YET".to_string(),
             style: text_style,
         }]),
         style: Style {
@@ -147,7 +147,7 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
     };
     let text_bundle = TextBundle {
         text: Text::from_sections([TextSection {
-            value: "DESCRIPTION, YOU SHOULD NOT SEE THIS".to_string(),
+            value: "Walk up to a statue and defeat all slimes. You will get a new spell from each statue.\nPress 'i' to open your spell console and type your spell. Try 'fireball'.".to_string(),
             style: text_style,
         }]),
         style: Style {

@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::prelude::*;
 
 use crate::GameAssets;
@@ -46,13 +48,13 @@ pub fn item_icon(assets: &Res<GameAssets>, item: &Item) -> Handle<Image> {
     match item {
         Item::NotImplemented => assets.placeholder_icon.clone(),
         Item::Tutorial => assets.spell_console_icon.clone(),
-        Item::IgnisPila => assets.placeholder_icon.clone(),
-        Item::InfernoPila => assets.placeholder_icon.clone(),
+        Item::IgnisPila => assets.ignis_pila_icon.clone(),
+        Item::InfernoPila => assets.inferno_pila_icon.clone(),
         Item::Fulgur => assets.fulgur_icon.clone(),
         Item::ScutumGlaciei => assets.scutum_glaciei_icon.clone(),
-        Item::AerTracto => assets.placeholder_icon.clone(),
-        Item::AerPello => assets.placeholder_icon.clone(),
-        Item::FulgurAvis => assets.placeholder_icon.clone(),
+        Item::AerTracto => assets.aer_tracto_icon.clone(),
+        Item::AerPello => assets.aer_pello_icon.clone(),
+        Item::FulgurAvis => assets.fulgur_avis_icon.clone(),
     }
 }
 
@@ -79,6 +81,8 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
             EnemySubSpawner {
                 statue: statue.clone(),
                 count: 1,
+                angle: PI / 2.0,
+                spawn_formation: SpawnFormation::Group,
                 ..default()
             },
         )],
@@ -86,8 +90,8 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
             0.0,
             EnemySubSpawner {
                 statue: statue.clone(),
-                count: 8,
-                timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+                count: 6,
+                timer: Timer::from_seconds(0.5, TimerMode::Repeating),
                 spawn_formation: SpawnFormation::Circle,
                 ..default()
             },
@@ -162,7 +166,7 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
                     statue: statue.clone(),
                     count: 20,
                     spawn_formation: SpawnFormation::Random,
-                    offset: 300.0,
+                    offset: 200.0,
                     timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                     ..default()
                 },
