@@ -9,7 +9,8 @@ use bevy_trickfilm::animation::AnimationPlayer2D;
 
 use crate::audio::PlaySound;
 use crate::player::Player;
-use crate::utils::quat_from_vec2;
+use crate::utils::{quat_from_vec2, NoRotation};
+use crate::world::camera::YSort;
 use crate::{GameAssets, GameState};
 
 use super::{Spell, SpellCasted};
@@ -71,15 +72,30 @@ fn spawn_lightning_bird(commands: &mut Commands, assets: &Res<GameAssets>, trans
         .play(assets.lightning_bird_animations[1].clone())
         .repeat();
 
-    commands.spawn((
-        LightningBird::default(),
-        animation_player,
-        SpriteSheetBundle {
-            transform,
-            texture_atlas: assets.lightning_bird.clone(),
-            ..default()
-        },
-    ));
+    let shadow = commands
+        .spawn((
+            YSort(-1.0),
+            NoRotation {
+                offset: Vec3::new(0.0, -30.0, 0.0),
+            },
+            SpriteBundle {
+                texture: assets.lightning_bird_shadow.clone(),
+                ..default()
+            },
+        ))
+        .id();
+
+    commands
+        .spawn((
+            LightningBird::default(),
+            animation_player,
+            SpriteSheetBundle {
+                transform,
+                texture_atlas: assets.lightning_bird.clone(),
+                ..default()
+            },
+        ))
+        .push_children(&[shadow]);
 }
 
 fn spawn_lightning_birds(

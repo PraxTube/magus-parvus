@@ -26,6 +26,8 @@ pub struct GameAssets {
         collection(typed)
     )]
     pub enemy_boss_animations: Vec<Handle<AnimationClip2D>>,
+    #[asset(path = "enemy/enemy_boss_shadow.png")]
+    pub enemy_boss_shadow: Handle<Image>,
 
     // --- SPELL ---
     #[asset(texture_atlas(tile_size_x = 70.0, tile_size_y = 11.0, columns = 10, rows = 6))]
@@ -58,6 +60,8 @@ pub struct GameAssets {
     pub lightning_bird_death: Handle<TextureAtlas>,
     #[asset(paths("spell/lightning_bird_death.trickfilm#main"), collection(typed))]
     pub lightning_bird_death_animations: Vec<Handle<AnimationClip2D>>,
+    #[asset(path = "spell/lightning_bird_shadow.png")]
+    pub lightning_bird_shadow: Handle<Image>,
 
     #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 7, rows = 1))]
     #[asset(path = "spell/aer_tracto.png")]
