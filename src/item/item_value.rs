@@ -56,6 +56,20 @@ pub fn item_icon(assets: &Res<GameAssets>, item: &Item) -> Handle<Image> {
     }
 }
 
+pub fn item_wall_offset(item: &Item) -> f32 {
+    match item {
+        Item::NotImplemented => 0.0,
+        Item::Tutorial => 0.0,
+        Item::IgnisPila => 200.0,
+        Item::InfernoPila => 300.0,
+        Item::Fulgur => 300.0,
+        Item::ScutumGlaciei => 300.0,
+        Item::AerTracto => 300.0,
+        Item::AerPello => 300.0,
+        Item::FulgurAvis => 300.0,
+    }
+}
+
 pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
     match statue.item {
         Item::NotImplemented => Vec::new(),

@@ -249,7 +249,9 @@ fn despawn_lightning_birds(
     for (entity, transform, lightning_bird) in &q_lightning_birds {
         if lightning_bird.disabled {
             let mut animator = AnimationPlayer2D::default();
-            animator.play(assets.lightning_bird_death_animations[0].clone());
+            animator
+                .play(assets.lightning_bird_death_animations[0].clone())
+                .repeat();
             commands.spawn((
                 animator,
                 LightningBirdDeath,

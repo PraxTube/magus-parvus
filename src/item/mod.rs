@@ -3,6 +3,7 @@ pub mod statue;
 
 mod enemy_spawner;
 mod enemy_sub_spawner;
+mod statue_wall;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
@@ -15,6 +16,7 @@ impl Plugin for ItemPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
             statue::StatuePlugin,
+            statue_wall::StatueWallsPlugin,
             enemy_spawner::EnemySpawnerPlugin,
             enemy_sub_spawner::EnemySubSpawnerPlugin,
         ))

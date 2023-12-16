@@ -61,6 +61,18 @@ pub struct GameAssets {
     #[asset(path = "spell/death.png")]
     pub death: Handle<TextureAtlas>,
 
+    #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 4, rows = 4))]
+    #[asset(path = "spell/earth_wall.png")]
+    pub earth_wall: Handle<TextureAtlas>,
+    #[asset(
+        paths(
+            "spell/earth_wall.trickfilm#spawn",
+            "spell/earth_wall.trickfilm#despawn"
+        ),
+        collection(typed)
+    )]
+    pub earth_wall_animations: Vec<Handle<AnimationClip2D>>,
+
     // --- MAP ---
     #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,

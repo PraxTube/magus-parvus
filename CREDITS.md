@@ -40,6 +40,10 @@ https://creativekind.itch.io/necromancer-free
 
 https://pimen.itch.io/wind-spell-effect
 
+### Earth wall
+
+https://pimen.itch.io/earth-spell-effect-2
+
 ---
 
 ## UI
