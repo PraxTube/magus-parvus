@@ -228,7 +228,7 @@ fn icicle_collisions(
 }
 
 fn aer_tracto_collisions(
-    mut q_enemies: Query<(&mut SlimeEnemy, &mut Velocity)>,
+    mut q_enemies: Query<(&mut SlimeEnemy, &mut Health, &mut Velocity)>,
     q_aer_tractos: Query<(&Transform, &AerTracto)>,
     q_colliders: Query<&Parent, With<Collider>>,
     mut ev_collision_events: EventReader<CollisionEvent>,
@@ -248,13 +248,14 @@ fn aer_tracto_collisions(
             Err(_) => continue,
         };
 
-        let (mut slime, mut velocity) = if let Ok(s) = q_enemies.get_mut(source_parent) {
-            s
-        } else if let Ok(s) = q_enemies.get_mut(target_parent) {
-            s
-        } else {
-            continue;
-        };
+        let (mut slime, mut slime_health, mut velocity) =
+            if let Ok(s) = q_enemies.get_mut(source_parent) {
+                s
+            } else if let Ok(s) = q_enemies.get_mut(target_parent) {
+                s
+            } else {
+                continue;
+            };
 
         let (aer_tracto_transform, aer_tracto) = if let Ok(a) = q_aer_tractos.get(source_parent) {
             a
@@ -266,6 +267,7 @@ fn aer_tracto_collisions(
 
         let dir = -aer_tracto_transform.rotation.mul_vec3(Vec3::X).truncate();
         velocity.linvel = dir * aer_tracto.pull_intensity;
+        slime_health.health -= aer_tracto.damage;
         slime.state = SlimeState::Staggering;
     }
 }

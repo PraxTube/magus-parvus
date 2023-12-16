@@ -10,22 +10,26 @@ use crate::{GameAssets, GameState};
 use super::{Spell, SpellCasted};
 
 const SCALE: f32 = 2.0;
-const PULL_INTENSITY: f32 = 300.0;
-const PUSH_INTENSITY: f32 = 300.0;
+const PULL_INTENSITY: f32 = 400.0;
+const PUSH_INTENSITY: f32 = 400.0;
 
 const AER_TRACTO_COUNT: usize = 15;
 const AER_PELLO_COUNT: usize = 10;
-const AER_TRACTO_OFFSET: Vec3 = Vec3::new(150.0, 0.0, 0.0);
-const AER_PELLO_OFFSET: Vec3 = Vec3::new(75.0, 0.0, 0.0);
+const AER_TRACTO_OFFSET: Vec3 = Vec3::new(125.0, 0.0, 0.0);
+const AER_PELLO_OFFSET: Vec3 = Vec3::new(125.0, 0.0, 0.0);
 
 #[derive(Component)]
 pub struct AerTracto {
+    pub damage: f32,
     pub pull_intensity: f32,
 }
 
 impl AerTracto {
     fn new(pull_intensity: f32) -> Self {
-        Self { pull_intensity }
+        Self {
+            damage: 1.0,
+            pull_intensity,
+        }
     }
 }
 
@@ -44,7 +48,7 @@ fn spawn_air_pull(
                 ..default()
             },
             AnimSprite::new(7, false),
-            AnimSpriteTimer::new(0.12),
+            AnimSpriteTimer::new(0.10),
         ))
         .id();
 
@@ -79,6 +83,30 @@ fn spawn_aer_tracto(
                     .with_rotation(rot)
                     .with_scale(Vec3::splat(SCALE));
                 spawn_air_pull(&mut commands, &assets, transform, PULL_INTENSITY);
+
+                let local_scale = 0.5;
+                let offset = rot.mul_vec3(local_scale * AER_TRACTO_OFFSET);
+                let transform = Transform::from_translation(player_pos + offset)
+                    .with_rotation(rot)
+                    .with_scale(Vec3::splat(local_scale * SCALE));
+                spawn_air_pull(
+                    &mut commands,
+                    &assets,
+                    transform,
+                    PULL_INTENSITY * local_scale,
+                );
+
+                let local_scale = 1.5;
+                let offset = rot.mul_vec3(local_scale * AER_TRACTO_OFFSET);
+                let transform = Transform::from_translation(player_pos + offset)
+                    .with_rotation(rot)
+                    .with_scale(Vec3::splat(local_scale * SCALE));
+                spawn_air_pull(
+                    &mut commands,
+                    &assets,
+                    transform,
+                    PULL_INTENSITY * local_scale,
+                );
             }
         }
     }
@@ -104,6 +132,30 @@ fn spawn_aer_pello(
                     .with_rotation(rot)
                     .with_scale(Vec3::splat(SCALE));
                 spawn_air_pull(&mut commands, &assets, transform, PUSH_INTENSITY);
+
+                let local_scale = 0.5;
+                let offset = rot.mul_vec3(-local_scale * AER_PELLO_OFFSET);
+                let transform = Transform::from_translation(player_pos + offset)
+                    .with_rotation(rot)
+                    .with_scale(Vec3::splat(local_scale * SCALE));
+                spawn_air_pull(
+                    &mut commands,
+                    &assets,
+                    transform,
+                    PUSH_INTENSITY * local_scale,
+                );
+
+                let local_scale = 1.5;
+                let offset = rot.mul_vec3(-local_scale * AER_PELLO_OFFSET);
+                let transform = Transform::from_translation(player_pos + offset)
+                    .with_rotation(rot)
+                    .with_scale(Vec3::splat(local_scale * SCALE));
+                spawn_air_pull(
+                    &mut commands,
+                    &assets,
+                    transform,
+                    PUSH_INTENSITY * local_scale,
+                );
             }
         }
     }
