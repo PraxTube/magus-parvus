@@ -14,11 +14,15 @@ https://cazwolf.itch.io/caz-pixel-free
 
 https://greenpixels.itch.io/pixel-art-assets-5
 
-### Slime (Enemy)
+### Slime
 
 https://free-game-assets.itch.io/free-field-enemies-pixel-art-for-tower-defense
 
 NOTE: Only the slime was used. It was modified slightly.
+
+### Demon Boss
+
+https://chierit.itch.io/boss-demon-slime
 
 ### Fireball
 
