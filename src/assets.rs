@@ -11,8 +11,21 @@ pub struct GameAssets {
     pub player: Handle<TextureAtlas>,
 
     #[asset(texture_atlas(tile_size_x = 48.0, tile_size_y = 48.0, columns = 6, rows = 4))]
-    #[asset(path = "enemy.png")]
+    #[asset(path = "enemy/enemy.png")]
     pub enemy: Handle<TextureAtlas>,
+
+    #[asset(texture_atlas(tile_size_x = 288.0, tile_size_y = 160.0, columns = 22, rows = 5))]
+    #[asset(path = "enemy/enemy_boss.png")]
+    pub enemy_boss: Handle<TextureAtlas>,
+    #[asset(
+        paths(
+            "enemy/enemy_boss.trickfilm#idle",
+            "enemy/enemy_boss.trickfilm#casting",
+            "enemy/enemy_boss.trickfilm#walking",
+        ),
+        collection(typed)
+    )]
+    pub enemy_boss_animations: Vec<Handle<AnimationClip2D>>,
 
     // --- SPELL ---
     #[asset(texture_atlas(tile_size_x = 70.0, tile_size_y = 11.0, columns = 10, rows = 6))]

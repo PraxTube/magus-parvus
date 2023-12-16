@@ -1,0 +1,17 @@
+[
+    (
+        name: "idle",
+        keyframes: KeyframesRange((start: 0, end: 6)),
+        duration: 0.6,
+    ),
+    (
+        name: "casting",
+        keyframes: KeyframesRange((start: 7, end: 13)),
+        duration: 0.6,
+    ),
+    (
+        name: "walking",
+        keyframes: KeyframesRange((start: 22, end: 34)),
+        duration: 1.2,
+    ),
+]
