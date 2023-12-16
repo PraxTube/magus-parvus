@@ -7,6 +7,8 @@ mod enemy_sub_spawner;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+const STATUE_COUNT: usize = 8;
+
 pub struct ItemPlugin;
 
 impl Plugin for ItemPlugin {
@@ -17,6 +19,7 @@ impl Plugin for ItemPlugin {
             enemy_sub_spawner::EnemySubSpawnerPlugin,
         ))
         .init_resource::<ActiveItems>()
+        .insert_resource(MaxItems(STATUE_COUNT))
         .register_ldtk_entity::<ItemBundle>("Item");
     }
 }
@@ -37,6 +40,8 @@ pub enum Item {
 
 #[derive(Resource, Default, Deref, DerefMut)]
 pub struct ActiveItems(pub Vec<Item>);
+#[derive(Resource, Deref, DerefMut)]
+pub struct MaxItems(pub usize);
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct ItemBundle {

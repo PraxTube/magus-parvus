@@ -56,7 +56,7 @@ fn spawn_deaths(
                     ..default()
                 },
                 pos,
-                content: "Did you mean 'fireball'?".to_string(),
+                content: "Press 'H' for help".to_string(),
             });
         }
     }

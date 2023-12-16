@@ -6,6 +6,7 @@ mod game_over_ui;
 mod keyboard_ui;
 mod pop_up;
 mod spell_book;
+mod statue_counter;
 
 use bevy::prelude::*;
 
@@ -21,6 +22,7 @@ impl Plugin for UiPlugin {
             keyboard_ui::KeyboardUiPlugin,
             game_over_ui::GameOverUiPlugin,
             spell_book::SpellBookPlugin,
+            statue_counter::StatueCounterUiPlugin,
         ));
     }
 }
