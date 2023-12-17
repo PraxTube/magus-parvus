@@ -12,7 +12,7 @@ use crate::{GameAssets, GameState};
 use super::{Spell, SpellCasted};
 
 const SCALE: f32 = 3.0;
-const FULGUR_COUNT: usize = 5;
+const FULGUR_COUNT: usize = 3;
 
 const SPRITES_COUNT: usize = 12;
 const SPRITES_TIME: f32 = 0.05;
@@ -28,7 +28,7 @@ pub struct Lightning {
 
 impl Default for Lightning {
     fn default() -> Self {
-        Self { damage: 4.0 }
+        Self { damage: 3.0 }
     }
 }
 

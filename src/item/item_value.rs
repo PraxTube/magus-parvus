@@ -108,7 +108,7 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
         )],
         Item::ScutumGlaciei => vec![
             (
-                10.0,
+                5.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
                     count: 5,

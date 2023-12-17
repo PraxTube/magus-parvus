@@ -11,10 +11,17 @@ use crate::{GameAssets, GameState};
 
 use super::{Spell, SpellCasted};
 
+const SPEED: f32 = 300.0;
+const SCALE: f32 = 1.25;
+const SCALE_TIME: f32 = 0.35;
+const DELTA_STEERING: f32 = 3.0;
+const INFERNO_COUNT: usize = 25;
+
 #[derive(Component)]
 pub struct Fireball {
     pub disabled: bool,
     pub damage: f32,
+    timer: Timer,
 }
 
 impl Default for Fireball {
@@ -22,20 +29,23 @@ impl Default for Fireball {
         Self {
             disabled: false,
             damage: 5.0,
+            timer: Timer::from_seconds(5.0, TimerMode::Once),
         }
     }
 }
 
-const SPEED: f32 = 300.0;
-const SCALE: f32 = 1.5;
-const SCALE_TIME: f32 = 0.35;
-const DELTA_STEERING: f32 = 2.5;
-const INFERNO_COUNT: usize = 50;
-
-fn spawn_fireball(commands: &mut Commands, assets: &Res<GameAssets>, transform: Transform) {
+fn spawn_fireball(
+    commands: &mut Commands,
+    assets: &Res<GameAssets>,
+    transform: Transform,
+    damage: f32,
+) {
     let entity = commands
         .spawn((
-            Fireball::default(),
+            Fireball {
+                damage,
+                ..default()
+            },
             SpriteSheetBundle {
                 transform,
                 texture_atlas: assets.fireball.clone(),
@@ -75,7 +85,7 @@ fn spawn_fireballs(
             let transform = Transform::from_translation(player_transform.translation)
                 .with_scale(Vec3::splat(SCALE))
                 .with_rotation(quat_from_vec2(-player.current_direction));
-            spawn_fireball(&mut commands, &assets, transform);
+            spawn_fireball(&mut commands, &assets, transform, 5.0);
         }
     }
 }
@@ -93,20 +103,12 @@ fn spawn_ignis_pila(
 
     for ev in ev_spell_casted.read() {
         if ev.spell == Spell::IgnisPila {
-            for dir in [
-                Vec2::new(1.0, 0.0),
-                Vec2::new(0.0, 1.0),
-                Vec2::new(1.0, 1.0),
-                Vec2::new(-1.0, 1.0),
-            ] {
+            let count = 8;
+            for i in 0..count {
                 let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
-                    .with_rotation(quat_from_vec2(dir));
-                spawn_fireball(&mut commands, &assets, transform);
-                let transform = Transform::from_translation(player_pos)
-                    .with_scale(Vec3::ZERO)
-                    .with_rotation(quat_from_vec2(-dir));
-                spawn_fireball(&mut commands, &assets, transform);
+                    .with_rotation(Quat::from_rotation_z(TAU * i as f32 / count as f32));
+                spawn_fireball(&mut commands, &assets, transform, 3.0);
             }
         }
     }
@@ -129,7 +131,7 @@ fn spawn_inferno_pila(
                 let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
                     .with_rotation(Quat::from_rotation_z(TAU * i as f32 / INFERNO_COUNT as f32));
-                spawn_fireball(&mut commands, &assets, transform);
+                spawn_fireball(&mut commands, &assets, transform, 2.0);
             }
         }
     }
@@ -184,6 +186,15 @@ fn steer_fireballs(
     }
 }
 
+fn tick_fireball_timers(time: Res<Time>, mut q_fireballs: Query<&mut Fireball>) {
+    for mut fireball in &mut q_fireballs {
+        fireball.timer.tick(time.delta());
+        if fireball.timer.just_finished() {
+            fireball.disabled = true;
+        }
+    }
+}
+
 fn despawn_fireballs(mut commands: Commands, q_fireballs: Query<(Entity, &Fireball)>) {
     for (entity, fireball) in &q_fireballs {
         if fireball.disabled {
@@ -206,6 +217,7 @@ impl Plugin for FireballPlugin {
                 scale_fireballs,
                 move_fireballs,
                 steer_fireballs,
+                tick_fireball_timers,
             )
                 .run_if(in_state(GameState::Gaming)),
         );
