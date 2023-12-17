@@ -3,6 +3,7 @@ pub mod statue;
 
 mod enemy_spawner;
 mod enemy_sub_spawner;
+mod sound;
 mod statue_wall;
 
 use bevy::prelude::*;
@@ -19,6 +20,7 @@ impl Plugin for ItemPlugin {
             statue_wall::StatueWallsPlugin,
             enemy_spawner::EnemySpawnerPlugin,
             enemy_sub_spawner::EnemySubSpawnerPlugin,
+            sound::ItemSoundPlugin,
         ))
         .init_resource::<ActiveItems>()
         .insert_resource(MaxItems(STATUE_COUNT))
