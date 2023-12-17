@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
-use crate::{audio::GameAudio, GameAssets, GameState};
+use crate::{
+    audio::{GameAudio, PlaySound},
+    GameAssets, GameState,
+};
 
-const AUDIO_SILENCE_TIME: f64 = 3.0;
+const AUDIO_SILENCE_TIME: f64 = 1.0;
 
 #[derive(Component)]
 struct GameOverScreen;
@@ -100,14 +103,24 @@ fn reduce_audio_volume(
         (game_audio.main_volume - 1.0 / AUDIO_SILENCE_TIME * time.delta_seconds_f64()).max(0.0);
 }
 
+fn play_sound(assets: Res<GameAssets>, mut ev_play_sound: EventWriter<PlaySound>) {
+    ev_play_sound.send(PlaySound {
+        clip: assets.game_over_sound.clone(),
+        ..default()
+    });
+}
+
 pub struct GameOverUiPlugin;
 
 impl Plugin for GameOverUiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::GameOver), (spawn_game_over_screen,))
-            .add_systems(
-                Update,
-                (reduce_audio_volume,).run_if(in_state(GameState::GameOver)),
-            );
+        app.add_systems(
+            OnEnter(GameState::GameOver),
+            (spawn_game_over_screen, play_sound),
+        )
+        .add_systems(
+            Update,
+            (reduce_audio_volume,).run_if(in_state(GameState::GameOver)),
+        );
     }
 }
