@@ -8,7 +8,7 @@ use crate::{
     GameAssets, GameState,
 };
 
-use super::DemonBoss;
+use super::{attack::StrikeHitbox, audio::DemonBossStepsTimer, DemonBoss};
 
 const SCALE: f32 = 1.5;
 
@@ -32,9 +32,16 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
         .spawn((
             Collider::ball(25.0),
             CollisionGroups::default(),
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-                0.0, -30.0, 0.0,
-            ))),
+            TransformBundle::from(Transform::from_translation(Vec3::new(0.0, -30.0, 0.0))),
+        ))
+        .id();
+    let strike_hitbox = commands
+        .spawn((
+            StrikeHitbox,
+            Sensor,
+            Collider::cuboid(25.0, 15.0),
+            CollisionGroups::default(),
+            TransformBundle::default(),
         ))
         .id();
 
@@ -44,6 +51,7 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
             DemonBoss::default(),
+            DemonBossStepsTimer::default(),
             animator,
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {
@@ -53,7 +61,7 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
                 ..default()
             },
         ))
-        .push_children(&[shadow, collider]);
+        .push_children(&[shadow, collider, strike_hitbox]);
 }
 
 pub struct DemonBossSpawnPlugin;

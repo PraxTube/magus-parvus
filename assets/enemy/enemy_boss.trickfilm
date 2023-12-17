@@ -14,4 +14,9 @@
         keyframes: KeyframesRange((start: 22, end: 30)),
         duration: 1.6,
     ),
+    (
+        name: "striking",
+        keyframes: KeyframesRange((start: 44, end: 59)),
+        duration: 2.0,
+    ),
 ]

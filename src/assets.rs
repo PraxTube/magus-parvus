@@ -22,6 +22,7 @@ pub struct GameAssets {
             "enemy/enemy_boss.trickfilm#idle",
             "enemy/enemy_boss.trickfilm#casting",
             "enemy/enemy_boss.trickfilm#walking",
+            "enemy/enemy_boss.trickfilm#striking",
         ),
         collection(typed)
     )]
@@ -149,7 +150,7 @@ pub struct GameAssets {
 
     // --- SOUND ---
     #[asset(path = "sounds/player_footstep.ogg")]
-    pub player_footstep: Handle<AudioSource>,
+    pub player_step_sound: Handle<AudioSource>,
 
     #[asset(path = "sounds/slime_jump.ogg")]
     pub slime_jump_sound: Handle<AudioSource>,
@@ -159,6 +160,9 @@ pub struct GameAssets {
     pub slime_hit_sound: Handle<AudioSource>,
     #[asset(path = "sounds/slime_death.ogg")]
     pub slime_death_sound: Handle<AudioSource>,
+
+    #[asset(path = "sounds/demon_boss_step.ogg")]
+    pub demon_boss_step_sound: Handle<AudioSource>,
 
     #[asset(path = "sounds/lightning_bird_flap.ogg")]
     pub lightning_bird_flap_sound: Handle<AudioSource>,

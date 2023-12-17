@@ -1,6 +1,5 @@
+pub mod demon_boss;
 pub mod slime;
-
-mod demon_boss;
 
 use bevy::prelude::*;
 

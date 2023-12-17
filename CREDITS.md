@@ -79,11 +79,11 @@ Placeholder Icon: https://cazwolf.itch.io/caz-pixel-free
 
 ### Sounds
 
-#### Player Footsteps
+#### Footsteps
 
 https://dryoma.itch.io/footsteps-sounds
 
-### Music
+### Music and Fanfare
 
 https://shononoki.itch.io/rpg-music-pack-svl
 

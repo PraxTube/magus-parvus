@@ -6,10 +6,10 @@ use crate::{player::Player, GameState};
 use super::{DemonBoss, DemonBossState, MOVE_SPEED};
 
 fn movement(
-    mut q_demon_boss: Query<(&Transform, &mut Velocity, &mut DemonBoss)>,
+    mut q_demon_boss: Query<(&Transform, &mut Velocity, &DemonBoss)>,
     q_player: Query<&Transform, (With<Player>, Without<DemonBoss>)>,
 ) {
-    let (demon_boss_transform, mut velocity, mut demon_boss) = match q_demon_boss.get_single_mut() {
+    let (demon_boss_transform, mut velocity, demon_boss) = match q_demon_boss.get_single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -18,10 +18,14 @@ fn movement(
         Err(_) => return,
     };
 
+    if demon_boss.state != DemonBossState::Moving {
+        velocity.linvel = Vec2::ZERO;
+        return;
+    }
+
     let direction = (player_transform.translation - demon_boss_transform.translation)
         .truncate()
         .normalize_or_zero();
-    demon_boss.state = DemonBossState::Moving;
     velocity.linvel = direction * MOVE_SPEED;
 }
 
