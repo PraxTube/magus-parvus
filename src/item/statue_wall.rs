@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use bevy_trickfilm::animation::AnimationPlayer2D;
 
-use crate::{world::camera::YSort, GameAssets, GameState};
+use crate::{audio::PlaySound, world::camera::YSort, GameAssets, GameState};
 
 use super::{
     item_value::item_wall_offset,
@@ -65,9 +65,19 @@ fn spawn_statue_walls(
     mut commands: Commands,
     assets: Res<GameAssets>,
     mut ev_statue_triggered: EventReader<StatueTriggered>,
+    mut ev_play_sound: EventWriter<PlaySound>,
 ) {
     for ev in ev_statue_triggered.read() {
         let offset = item_wall_offset(&ev.statue.item);
+        let count = wall_count(offset);
+
+        if count > 0 {
+            ev_play_sound.send(PlaySound {
+                clip: assets.earth_wall_sound.clone(),
+                ..default()
+            });
+        }
+
         spawn_collider(&mut commands, ev.statue.pos, offset);
         for i in 0..wall_count(offset) {
             let rot = Quat::from_rotation_z(TAU * i as f32 / wall_count(offset) as f32);
