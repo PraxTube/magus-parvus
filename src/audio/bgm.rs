@@ -31,7 +31,7 @@ fn play_bgm(
 ) {
     let volume = game_audio.main_volume * BGM_VOLUME;
     let handle = audio
-        .play(assets.bgm.clone())
+        .play(assets.bgm_boss.clone())
         .with_volume(volume)
         .looped()
         .handle();

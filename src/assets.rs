@@ -171,6 +171,8 @@ pub struct GameAssets {
     // --- MUSIC ---
     #[asset(path = "music/bgm.ogg")]
     pub bgm: Handle<AudioSource>,
+    #[asset(path = "music/bgm_boss.ogg")]
+    pub bgm_boss: Handle<AudioSource>,
 
     // --- FONT ---
     #[asset(path = "fonts/PressStart2P.ttf")]

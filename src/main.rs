@@ -62,7 +62,7 @@ fn main() {
             ScreenFrameDiagnosticsPlugin,
             ScreenEntityDiagnosticsPlugin,
             RapierPhysicsPlugin::<NoUserData>::default(),
-            // RapierDebugRenderPlugin::default(),
+            RapierDebugRenderPlugin::default(),
             Animation2DPlugin,
         ))
         .insert_resource(Msaa::Off)

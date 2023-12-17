@@ -11,7 +11,7 @@
     ),
     (
         name: "walking",
-        keyframes: KeyframesRange((start: 22, end: 34)),
-        duration: 1.2,
+        keyframes: KeyframesRange((start: 22, end: 30)),
+        duration: 1.6,
     ),
 ]
