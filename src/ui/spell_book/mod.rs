@@ -1,3 +1,4 @@
+mod bundle;
 mod scrollable_list;
 
 use bevy::prelude::*;
@@ -11,9 +12,12 @@ use crate::{
     GameAssets, GameState,
 };
 
-use scrollable_list::spawn_scrollable_list;
-
-use self::scrollable_list::ScrollingList;
+use bundle::{
+    BackgroundBundle, MovementHintDownBundle, MovementHintUpBundle, SpellbookBundle,
+    SpellbookViewBundle, SpellbookViewDescriptionBundle, SpellbookViewIconBundle,
+    SpellbookViewTitleBundle,
+};
+use scrollable_list::{spawn_scrollable_list, ScrollingList};
 
 pub struct SpellBookPlugin;
 
@@ -36,148 +40,15 @@ struct SpellbookViewTitle;
 #[derive(Component)]
 struct SpellbookViewDescription;
 
-fn spawn_background(commands: &mut Commands, texture: Handle<Image>) -> Entity {
-    commands
-        .spawn((ImageBundle {
-            style: Style {
-                height: Val::Percent(100.0),
-                width: Val::Percent(100.0),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            image: UiImage {
-                texture,
-                ..default()
-            },
-            z_index: ZIndex::Local(-1),
-            ..default()
-        },))
-        .id()
-}
-
-fn spawn_scrollable_spell_list(
-    commands: &mut Commands,
-    assets: &Res<GameAssets>,
-    active_items: &Res<ActiveItems>,
-) -> Entity {
-    spawn_scrollable_list(commands, assets, active_items)
-}
-
-fn spawn_movement_hint_up(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
-    commands
-        .spawn((ImageBundle {
-            style: Style {
-                bottom: Val::Percent(53.0),
-                right: Val::Percent(105.0),
-                width: Val::Percent(10.0),
-                aspect_ratio: Some(0.5),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            image: UiImage {
-                texture: assets.spell_book_hint_up.clone(),
-                ..default()
-            },
-            z_index: ZIndex::Local(-1),
-            ..default()
-        },))
-        .id()
-}
-
-fn spawn_movement_hint_down(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
-    commands
-        .spawn((ImageBundle {
-            style: Style {
-                top: Val::Percent(53.0),
-                right: Val::Percent(105.0),
-                width: Val::Percent(10.0),
-                aspect_ratio: Some(0.5),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            image: UiImage {
-                texture: assets.spell_book_hint_down.clone(),
-                ..default()
-            },
-            z_index: ZIndex::Local(-1),
-            ..default()
-        },))
-        .id()
-}
-
 fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> Entity {
-    let icon = commands
-        .spawn((
-            SpellbookViewIcon,
-            ImageBundle {
-                style: Style {
-                    top: Val::Percent(16.5),
-                    left: Val::Percent(44.87),
-                    width: Val::Percent(10.26),
-                    height: Val::Percent(16.7),
-                    ..default()
-                },
-                ..default()
-            },
-        ))
+    let icon = commands.spawn(SpellbookViewIconBundle::default()).id();
+    let title = commands.spawn(SpellbookViewTitleBundle::new(assets)).id();
+    let description = commands
+        .spawn(SpellbookViewDescriptionBundle::new(assets))
         .id();
-    let text_style = TextStyle {
-        font: assets.font.clone(),
-        font_size: 20.0,
-        color: Color::WHITE,
-    };
-    let text_bundle = TextBundle {
-        text: Text::from_sections([TextSection {
-            value: "NO SPELL YET".to_string(),
-            style: text_style,
-        }]),
-        style: Style {
-            top: Val::Percent(45.0),
-            left: Val::Percent(10.0),
-            position_type: PositionType::Absolute,
-            ..default()
-        },
-        ..default()
-    };
-    let title = commands.spawn((SpellbookViewTitle, text_bundle)).id();
-    let text_style = TextStyle {
-        font: assets.font.clone(),
-        font_size: 14.0,
-        color: Color::WHITE,
-    };
-    let text_bundle = TextBundle {
-        text: Text::from_sections([TextSection {
-            value: "Walk up to a statue and defeat all slimes. You will get a new spell from each statue.\nPress 'i' to open your spell console and type your spell. Try 'fireball'.".to_string(),
-            style: text_style,
-        }]),
-        style: Style {
-            top: Val::Percent(58.0),
-            left: Val::Percent(10.0),
-            width: Val::Percent(80.0),
-            position_type: PositionType::Absolute,
-            ..default()
-        },
-        ..default()
-    };
-    let description = commands.spawn((SpellbookViewDescription, text_bundle)).id();
 
     commands
-        .spawn((ImageBundle {
-            style: Style {
-                top: Val::Percent(20.0),
-                left: Val::Percent(107.0),
-                width: Val::Percent(110.0),
-                height: Val::Percent(60.0),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            image: UiImage {
-                texture: assets.spell_book_view.clone(),
-                ..default()
-            },
-            z_index: ZIndex::Local(-1),
-            ..default()
-        },))
+        .spawn(SpellbookViewBundle::new(assets))
         .push_children(&[icon, title, description])
         .id()
 }
@@ -193,31 +64,19 @@ fn spawn_spell_book(
             continue;
         }
 
-        let background = spawn_background(&mut commands, assets.spell_book_container.clone());
-        let scrollable_list = spawn_scrollable_spell_list(&mut commands, &assets, &active_items);
-        let hint_up = spawn_movement_hint_up(&mut commands, &assets);
-        let hint_down = spawn_movement_hint_down(&mut commands, &assets);
+        let background = commands.spawn(BackgroundBundle::new(&assets)).id();
+        let hint_up = commands.spawn(MovementHintUpBundle::new(&assets)).id();
+        let hint_down = commands.spawn(MovementHintDownBundle::new(&assets)).id();
+        let scrollable_list = spawn_scrollable_list(&mut commands, &assets, &active_items);
         let view = spawn_spell_book_view(&mut commands, &assets);
 
-        commands
-            .spawn((
-                SpellBook,
-                NodeBundle {
-                    style: Style {
-                        height: Val::Percent(80.0),
-                        width: Val::Percent(40.0),
-                        top: Val::Percent(10.0),
-                        left: Val::Percent(10.0),
-                        flex_direction: FlexDirection::Column,
-                        align_items: AlignItems::Center,
-                        position_type: PositionType::Absolute,
-                        ..default()
-                    },
-                    z_index: ZIndex::Local(200),
-                    ..default()
-                },
-            ))
-            .push_children(&[background, scrollable_list, hint_up, hint_down, view]);
+        commands.spawn(SpellbookBundle::default()).push_children(&[
+            background,
+            scrollable_list,
+            hint_up,
+            hint_down,
+            view,
+        ]);
     }
 }
 

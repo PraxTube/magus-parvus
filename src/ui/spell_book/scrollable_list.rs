@@ -5,18 +5,23 @@ use crate::{
     GameAssets,
 };
 
+use super::bundle::{
+    MovingPanelBundle, MovingPanelLabelBundle, ScrollableListBundle, ScrollingIconBundle,
+    SelectorIconBundle,
+};
+
 #[derive(Component)]
 pub struct ScrollingList {
     pub index: usize,
 }
 
 #[derive(Component)]
-struct ScrollingIcon {
-    index: usize,
+pub struct ScrollingIcon {
+    pub index: usize,
 }
 
 #[derive(Component)]
-struct SelectorIcon;
+pub struct SelectorIcon;
 
 const OFFSET: f32 = 25.0;
 const INDEX_THRESHOLD: usize = 1;
@@ -27,74 +32,17 @@ pub fn spawn_scrollable_list(
     active_items: &Res<ActiveItems>,
 ) -> Entity {
     let moving_panel = commands
-        .spawn((
-            NodeBundle {
-                style: Style {
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
-                    row_gap: Val::Px(25.0),
-                    ..default()
-                },
-                ..default()
-            },
-            ScrollingList { index: 0 },
-        ))
+        .spawn(MovingPanelBundle::default())
         .with_children(|parent| {
             for (i, spell) in active_items.iter().enumerate() {
                 parent
-                    .spawn((
-                        ImageBundle {
-                            style: Style {
-                                width: Val::Px(78.0),
-                                height: Val::Px(78.0),
-                                ..default()
-                            },
-                            image: UiImage {
-                                texture: assets.spell_field.clone(),
-                                ..default()
-                            },
-                            ..default()
-                        },
-                        Label,
-                    ))
+                    .spawn(MovingPanelLabelBundle::new(assets))
                     .with_children(|parent| {
-                        parent.spawn((
-                            ScrollingIcon { index: i },
-                            ImageBundle {
-                                style: Style {
-                                    top: Val::Px(7.0),
-                                    left: Val::Px(7.0),
-                                    width: Val::Px(64.0),
-                                    height: Val::Px(64.0),
-                                    ..default()
-                                },
-                                image: UiImage {
-                                    texture: item_icon(assets, spell),
-                                    ..default()
-                                },
-                                ..default()
-                            },
-                        ));
+                        parent.spawn(ScrollingIconBundle::new(item_icon(assets, spell), i));
                     })
                     .with_children(|parent| {
                         if i == 0 {
-                            parent.spawn((
-                                SelectorIcon,
-                                ImageBundle {
-                                    style: Style {
-                                        top: Val::Px(-15.0),
-                                        left: Val::Px(-15.0),
-                                        width: Val::Px(94.0),
-                                        height: Val::Px(94.0),
-                                        ..default()
-                                    },
-                                    image: UiImage {
-                                        texture: assets.spell_field_selector.clone(),
-                                        ..default()
-                                    },
-                                    ..default()
-                                },
-                            ));
+                            parent.spawn(SelectorIconBundle::new(assets));
                         }
                     });
             }
@@ -102,17 +50,7 @@ pub fn spawn_scrollable_list(
         .id();
 
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                top: Val::Percent(25.0),
-                height: Val::Percent(55.0),
-                flex_direction: FlexDirection::Column,
-                align_self: AlignSelf::Stretch,
-                overflow: Overflow::clip_y(),
-                ..default()
-            },
-            ..default()
-        })
+        .spawn(ScrollableListBundle::default())
         .push_children(&[moving_panel])
         .id()
 }
