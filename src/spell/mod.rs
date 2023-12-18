@@ -9,15 +9,13 @@ mod flub;
 mod kill_player;
 mod phantasma;
 mod speed_boost;
+mod spell;
 
-use std::time::Duration;
+use std::error::Error;
+use std::fmt::Display;
+use std::str::FromStr;
 
 use bevy::prelude::*;
-
-use crate::{
-    player::{Player, PlayerState},
-    ui::text_field::TypingSubmitEvent,
-};
 
 pub struct SpellPlugin;
 
@@ -34,13 +32,13 @@ impl Plugin for SpellPlugin {
             death::DeathPlugin,
             flub::FlubPlugin,
             kill_player::KillPlayerPlugin,
+            spell::SpellPlugin,
         ))
-        .add_event::<SpellCasted>()
-        .add_systems(Update, (double_j_escape, submit_spell));
+        .add_event::<SpellCasted>();
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug, Clone)]
 enum Spell {
     Fireball,
     IgnisPila,
@@ -57,104 +55,45 @@ enum Spell {
     KillPlayer,
 }
 
+#[derive(Debug)]
+struct InvalidSpell;
+
+impl Display for InvalidSpell {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Not a valid spell")
+    }
+}
+
+impl Error for InvalidSpell {}
+
+impl FromStr for Spell {
+    type Err = InvalidSpell;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let spell_str: &str = &s.trim_start().trim_end().to_lowercase();
+        if spell_str.is_empty() {
+            return Err(InvalidSpell);
+        }
+
+        match spell_str {
+            "fireball" => Ok(Spell::Fireball),
+            "ignis pila" => Ok(Spell::IgnisPila),
+            "inferno pila" => Ok(Spell::InfernoPila),
+            "fulgur" => Ok(Spell::Fulgur),
+            "fulgur avis" => Ok(Spell::FulgurAvis),
+            "scutum glaciei" => Ok(Spell::ScutumGlaciei),
+            "aer tracto" => Ok(Spell::AerTracto),
+            "aer pello" => Ok(Spell::AerPello),
+            "cito" => Ok(Spell::SpeedBoost),
+            "phantasma" => Ok(Spell::Phantasma),
+            "now you" | "jetzt du" => Ok(Spell::Death),
+            "kill player" => Ok(Spell::KillPlayer),
+            _ => Ok(Spell::Flub),
+        }
+    }
+}
+
 #[derive(Event)]
 pub struct SpellCasted {
     spell: Spell,
-}
-
-fn double_j_escape(
-    keys: Res<Input<KeyCode>>,
-    time: Res<Time>,
-    mut q_player: Query<&mut Player>,
-    mut timer: Local<Timer>,
-) {
-    let mut player = match q_player.get_single_mut() {
-        Ok(p) => p,
-        Err(_) => return,
-    };
-
-    let duration = Duration::from_secs_f32(0.2);
-    if player.state != PlayerState::Casting {
-        timer.set_elapsed(duration);
-        return;
-    }
-
-    timer.tick(time.delta());
-    if keys.just_pressed(KeyCode::J) {
-        if timer.finished() {
-            timer.set_duration(duration);
-            timer.reset();
-            return;
-        }
-
-        player.state = PlayerState::Idling;
-    }
-}
-
-fn submit_spell(
-    mut q_player: Query<&mut Player>,
-    mut ev_typing_submit_event: EventReader<TypingSubmitEvent>,
-    mut ev_spell_casted: EventWriter<SpellCasted>,
-) {
-    let mut player = match q_player.get_single_mut() {
-        Ok(p) => p,
-        Err(_) => return,
-    };
-
-    for ev in ev_typing_submit_event.read() {
-        player.state = PlayerState::Idling;
-        let spell_str = ev.value.trim_start().trim_end().to_lowercase();
-
-        if spell_str == "fireball" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::Fireball,
-            });
-        } else if spell_str == "ignis pila" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::IgnisPila,
-            });
-        } else if spell_str == "inferno pila" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::InfernoPila,
-            });
-        } else if spell_str == "fulgur" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::Fulgur,
-            });
-        } else if spell_str == "fulgur avis" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::FulgurAvis,
-            });
-        } else if spell_str == "scutum glaciei" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::ScutumGlaciei,
-            });
-        } else if spell_str == "aer tracto" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::AerTracto,
-            });
-        } else if spell_str == "aer pello" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::AerPello,
-            });
-        } else if spell_str == "cito" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::SpeedBoost,
-            });
-        } else if spell_str == "phantasma" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::Phantasma,
-            });
-        } else if spell_str == "now you" || spell_str == "jetzt du" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::Death,
-            });
-        } else if spell_str == "kill player" {
-            ev_spell_casted.send(SpellCasted {
-                spell: Spell::KillPlayer,
-            });
-        } else if !spell_str.is_empty() {
-            ev_spell_casted.send(SpellCasted { spell: Spell::Flub })
-        }
-    }
 }
