@@ -2,7 +2,10 @@ use bevy::prelude::*;
 
 use crate::{audio::PlaySound, GameAssets, GameState};
 
-use super::{DemonBoss, DemonBossState};
+use super::{
+    cast::{DemonSpell, DemonSpellCast},
+    DemonBoss, DemonBossState,
+};
 
 const TIME_BETWEEN_STEPS: f32 = 0.8;
 const RAND_SPEED_INTENSITY: f64 = 0.2;
@@ -56,13 +59,46 @@ fn play_step_sounds(
     });
 }
 
+fn play_cast_vocals(
+    assets: Res<GameAssets>,
+    q_demon_spells: Query<&DemonSpellCast, Added<DemonSpellCast>>,
+    mut play_sound: EventWriter<PlaySound>,
+) {
+    for demon_spell in &q_demon_spells {
+        let vocals = match demon_spell.spell {
+            DemonSpell::Explosion => assets.demon_boss_vocal_explosion_sound.clone(),
+        };
+
+        play_sound.send(PlaySound {
+            clip: vocals,
+            ..default()
+        });
+    }
+}
+
+fn play_git_gud(
+    assets: Res<GameAssets>,
+    q_demon_boss: Query<&DemonBoss>,
+    mut play_sound: EventWriter<PlaySound>,
+) {
+    if q_demon_boss.is_empty() {
+        return;
+    }
+
+    play_sound.send(PlaySound {
+        clip: assets.git_gud.clone(),
+        ..default()
+    });
+}
+
 pub struct DemonBossAudioPlugin;
 
 impl Plugin for DemonBossAudioPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (play_step_sounds, tick_timers).run_if(in_state(GameState::Gaming)),
-        );
+            (play_step_sounds, play_cast_vocals, tick_timers).run_if(in_state(GameState::Gaming)),
+        )
+        .add_systems(OnEnter(GameState::GameOver), play_git_gud);
     }
 }

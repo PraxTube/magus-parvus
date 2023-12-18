@@ -171,6 +171,8 @@ pub struct GameAssets {
     pub demon_boss_step_sound: Handle<AudioSource>,
     #[asset(path = "sounds/demon_boss_vocal_explosion.ogg")]
     pub demon_boss_vocal_explosion_sound: Handle<AudioSource>,
+    #[asset(path = "sounds/gitgud.ogg")]
+    pub git_gud: Handle<AudioSource>,
 
     #[asset(path = "sounds/lightning_bird_flap.ogg")]
     pub lightning_bird_flap_sound: Handle<AudioSource>,

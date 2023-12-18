@@ -56,8 +56,10 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {
                 texture_atlas: assets.enemy_boss.clone(),
-                transform: Transform::from_translation(PLAYER_SPAWN_POS)
-                    .with_scale(Vec3::splat(SCALE)),
+                transform: Transform::from_translation(
+                    PLAYER_SPAWN_POS - Vec3::new(0.0, 100.0, 0.0),
+                )
+                .with_scale(Vec3::splat(SCALE)),
                 ..default()
             },
         ))

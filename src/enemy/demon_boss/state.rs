@@ -98,9 +98,7 @@ fn switch_state(
         Err(_) => return,
     };
 
-    if demon_boss.state == DemonBossState::Striking {
-        return;
-    } else if demon_boss.state == DemonBossState::Casting {
+    if demon_boss.state == DemonBossState::Striking || demon_boss.state == DemonBossState::Casting {
         return;
     }
 

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use super::{state::DemonBossState, DemonBoss};
-use crate::{audio::PlaySound, GameAssets, GameState};
+use crate::GameState;
 
 #[derive(Clone, PartialEq)]
 pub enum DemonSpell {
@@ -40,23 +40,6 @@ fn spawn_demon_spell(
     });
 }
 
-fn play_cast_vocals(
-    assets: Res<GameAssets>,
-    q_demon_spells: Query<&DemonSpellCast, Added<DemonSpellCast>>,
-    mut play_sound: EventWriter<PlaySound>,
-) {
-    for demon_spell in &q_demon_spells {
-        let vocals = match demon_spell.spell {
-            DemonSpell::Explosion => assets.demon_boss_vocal_explosion_sound.clone(),
-        };
-
-        play_sound.send(PlaySound {
-            clip: vocals,
-            ..default()
-        });
-    }
-}
-
 fn relay_demon_spells(
     mut commands: Commands,
     time: Res<Time>,
@@ -78,8 +61,7 @@ impl Plugin for DemonBossCastPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawn_demon_spell, relay_demon_spells, play_cast_vocals)
-                .run_if(in_state(GameState::Gaming)),
+            (spawn_demon_spell, relay_demon_spells).run_if(in_state(GameState::Gaming)),
         )
         .add_event::<SpawnDemonSpell>();
     }

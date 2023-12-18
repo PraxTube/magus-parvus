@@ -39,7 +39,7 @@ pub struct DemonBoss {
 impl Default for DemonBoss {
     fn default() -> Self {
         Self {
-            damage: 1.0,
+            damage: 999.0,
             state: DemonBossState::Idling,
         }
     }
