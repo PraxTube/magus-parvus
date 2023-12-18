@@ -91,6 +91,12 @@ pub struct GameAssets {
     )]
     pub earth_wall_animations: Vec<Handle<AnimationClip2D>>,
 
+    #[asset(texture_atlas(tile_size_x = 64.0, tile_size_y = 64.0, columns = 4, rows = 4))]
+    #[asset(path = "spell/explosion.png")]
+    pub demon_boss_explosion: Handle<TextureAtlas>,
+    #[asset(paths("spell/explosion.trickfilm#main"), collection(typed))]
+    pub demon_boss_explosion_animations: Vec<Handle<AnimationClip2D>>,
+
     // --- MAP ---
     #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,
@@ -163,6 +169,8 @@ pub struct GameAssets {
 
     #[asset(path = "sounds/demon_boss_step.ogg")]
     pub demon_boss_step_sound: Handle<AudioSource>,
+    #[asset(path = "sounds/demon_boss_vocal_explosion.ogg")]
+    pub demon_boss_vocal_explosion_sound: Handle<AudioSource>,
 
     #[asset(path = "sounds/lightning_bird_flap.ogg")]
     pub lightning_bird_flap_sound: Handle<AudioSource>,

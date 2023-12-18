@@ -50,6 +50,10 @@ https://pimen.itch.io/wind-spell-effect
 
 https://pimen.itch.io/earth-spell-effect-2
 
+### Explosion (Demon Boss Spell)
+
+https://pimen.itch.io/fire-spell-effect-02
+
 ---
 
 ## UI
