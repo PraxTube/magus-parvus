@@ -3,7 +3,9 @@ pub mod anim_sprite;
 mod diagnostics;
 
 use bevy::prelude::*;
-use bevy_rapier2d::plugin::RapierTransformPropagateSet;
+use bevy_rapier2d::{plugin::RapierTransformPropagateSet, prelude::*};
+
+pub const COLLISION_GROUPS_NONE: CollisionGroups = CollisionGroups::new(Group::NONE, Group::NONE);
 
 pub struct UtilsPlugin;
 

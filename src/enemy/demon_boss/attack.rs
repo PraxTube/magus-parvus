@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use bevy_trickfilm::prelude::*;
 
-use crate::GameState;
+use crate::{utils::COLLISION_GROUPS_NONE, GameState};
 
 use super::{DemonBoss, DemonBossState};
 
@@ -10,7 +10,6 @@ pub const STRIKE_HITBOX_OFFSET: Vec3 = Vec3::new(100.0, -25.0, 0.0);
 const STRIKE_HITBOX_START: f32 = 1.2;
 const STRIKE_HITBOX_TIME: f32 = 0.2;
 const ACTIVE_GROUPS: CollisionGroups = CollisionGroups::new(Group::ALL, Group::ALL);
-const INACTIVE_GROUPS: CollisionGroups = CollisionGroups::new(Group::NONE, Group::NONE);
 
 #[derive(Component)]
 pub struct StrikeHitbox;
@@ -37,7 +36,7 @@ fn toggle_hitbox(
     {
         *collision_groups = ACTIVE_GROUPS;
     } else {
-        *collision_groups = INACTIVE_GROUPS;
+        *collision_groups = COLLISION_GROUPS_NONE;
     }
 }
 

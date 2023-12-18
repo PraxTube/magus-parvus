@@ -1,7 +1,8 @@
+pub mod explosion;
+
 mod attack;
 mod audio;
 mod cast;
-mod explosion;
 mod movement;
 mod spawn;
 mod state;

@@ -94,7 +94,10 @@ pub struct GameAssets {
     #[asset(texture_atlas(tile_size_x = 64.0, tile_size_y = 64.0, columns = 4, rows = 4))]
     #[asset(path = "spell/explosion.png")]
     pub demon_boss_explosion: Handle<TextureAtlas>,
-    #[asset(paths("spell/explosion.trickfilm#main"), collection(typed))]
+    #[asset(
+        paths("spell/explosion.trickfilm#blink", "spell/explosion.trickfilm#explode"),
+        collection(typed)
+    )]
     pub demon_boss_explosion_animations: Vec<Handle<AnimationClip2D>>,
 
     // --- MAP ---
