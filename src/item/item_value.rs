@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 
-use crate::GameAssets;
+use crate::{spell::Spell, GameAssets};
 
 use super::{
     enemy_sub_spawner::{EnemySubSpawner, SpawnFormation},
@@ -69,6 +69,20 @@ pub fn item_wall_offset(item: &Item) -> f32 {
         Item::AerTracto => 300.0,
         Item::AerPello => 300.0,
         Item::FulgurAvis => 300.0,
+    }
+}
+
+pub fn item_spell(item: &Item) -> Spell {
+    match item {
+        Item::NotImplemented => Spell::Flub,
+        Item::Tutorial => Spell::Fireball,
+        Item::IgnisPila => Spell::IgnisPila,
+        Item::InfernoPila => Spell::InfernoPila,
+        Item::Fulgur => Spell::Fulgur,
+        Item::ScutumGlaciei => Spell::ScutumGlaciei,
+        Item::AerTracto => Spell::AerTracto,
+        Item::AerPello => Spell::AerPello,
+        Item::FulgurAvis => Spell::FulgurAvis,
     }
 }
 

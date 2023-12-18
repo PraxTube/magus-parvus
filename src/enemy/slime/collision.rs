@@ -106,6 +106,9 @@ fn fireball_collisions(
             continue;
         };
 
+        if fireball.disabled {
+            continue;
+        }
         fireball.disabled = true;
 
         let dir = (slime_transform.translation - fireball_transform.translation)

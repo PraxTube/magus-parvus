@@ -18,9 +18,6 @@ use bevy::window::{PresentMode, Window, WindowMode};
 
 use bevy_asset_loader::prelude::*;
 use bevy_rapier2d::prelude::*;
-use bevy_screen_diagnostics::{
-    ScreenDiagnosticsPlugin, ScreenEntityDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin,
-};
 use bevy_trickfilm::Animation2DPlugin;
 
 const BACKGROUND_COLOR: Color = Color::rgb(0.95, 0.90, 0.75);
@@ -49,18 +46,6 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest())
                 .build(),
-            ScreenDiagnosticsPlugin {
-                timestep: 1.0,
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    top: Val::Px(5.0),
-                    left: Val::Px(15.0),
-                    ..default()
-                },
-                ..default()
-            },
-            ScreenFrameDiagnosticsPlugin,
-            ScreenEntityDiagnosticsPlugin,
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default(),
             Animation2DPlugin,

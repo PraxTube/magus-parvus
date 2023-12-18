@@ -3,11 +3,12 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use crate::{
+    item::{item_value::item_spell, ActiveItems},
     player::{Player, PlayerState},
     ui::text_field::TypingSubmitEvent,
 };
 
-use super::{Spell, SpellCasted};
+use super::{debug_spell::DebugSpell, Spell, SpellCasted};
 
 fn double_j_escape(
     keys: Res<Input<KeyCode>>,
@@ -38,7 +39,22 @@ fn double_j_escape(
     }
 }
 
+fn is_spell_active(active_items: &Res<ActiveItems>, spell: &Spell) -> bool {
+    if spell == &Spell::Debug || spell == &Spell::Flub {
+        return true;
+    }
+
+    for item in &active_items.0 {
+        if &item_spell(item) == spell {
+            return true;
+        }
+    }
+    false
+}
+
 fn submit_spell(
+    active_items: Res<ActiveItems>,
+    debug_spell: Res<DebugSpell>,
     mut q_player: Query<&mut Player>,
     mut ev_typing_submit_event: EventReader<TypingSubmitEvent>,
     mut ev_spell_casted: EventWriter<SpellCasted>,
@@ -51,16 +67,18 @@ fn submit_spell(
     for ev in ev_typing_submit_event.read() {
         player.state = PlayerState::Idling;
         if let Ok(spell) = &ev.value.parse::<Spell>() {
-            ev_spell_casted.send(SpellCasted {
-                spell: spell.clone(),
-            });
+            if debug_spell.active || is_spell_active(&active_items, spell) {
+                ev_spell_casted.send(SpellCasted {
+                    spell: spell.clone(),
+                });
+            }
         }
     }
 }
 
-pub struct SpellPlugin;
+pub struct CastSpellPlugin;
 
-impl Plugin for SpellPlugin {
+impl Plugin for CastSpellPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (double_j_escape, submit_spell));
     }

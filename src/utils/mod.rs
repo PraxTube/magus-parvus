@@ -1,5 +1,7 @@
 pub mod anim_sprite;
 
+mod diagnostics;
+
 use bevy::prelude::*;
 use bevy_rapier2d::plugin::RapierTransformPropagateSet;
 
@@ -7,7 +9,11 @@ pub struct UtilsPlugin;
 
 impl Plugin for UtilsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(anim_sprite::AnimSpritePlugin).add_systems(
+        app.add_plugins((
+            anim_sprite::AnimSpritePlugin,
+            diagnostics::DiagnosticsPlugin,
+        ))
+        .add_systems(
             PostUpdate,
             reset_rotations.before(RapierTransformPropagateSet),
         );

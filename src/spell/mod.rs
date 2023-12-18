@@ -1,15 +1,16 @@
 pub mod aer_tracto;
+pub mod debug_spell;
 pub mod fireball;
 pub mod icicle;
 pub mod lightning;
 pub mod lightning_bird;
 
+mod cast_spell;
 mod death;
 mod flub;
 mod kill_player;
 mod phantasma;
 mod speed_boost;
-mod spell;
 
 use std::error::Error;
 use std::fmt::Display;
@@ -32,14 +33,15 @@ impl Plugin for SpellPlugin {
             death::DeathPlugin,
             flub::FlubPlugin,
             kill_player::KillPlayerPlugin,
-            spell::SpellPlugin,
+            cast_spell::CastSpellPlugin,
+            debug_spell::DebugSpellPlugin,
         ))
         .add_event::<SpellCasted>();
     }
 }
 
 #[derive(PartialEq, Debug, Clone)]
-enum Spell {
+pub enum Spell {
     Fireball,
     IgnisPila,
     InfernoPila,
@@ -53,10 +55,11 @@ enum Spell {
     Death,
     Flub,
     KillPlayer,
+    Debug,
 }
 
 #[derive(Debug)]
-struct InvalidSpell;
+pub struct InvalidSpell;
 
 impl Display for InvalidSpell {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -88,6 +91,7 @@ impl FromStr for Spell {
             "phantasma" => Ok(Spell::Phantasma),
             "now you" | "jetzt du" => Ok(Spell::Death),
             "kill player" => Ok(Spell::KillPlayer),
+            "debug" => Ok(Spell::Debug),
             _ => Ok(Spell::Flub),
         }
     }
