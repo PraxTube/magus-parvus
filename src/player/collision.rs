@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::enemy::demon_boss::explosion::DemonBossExplosion;
+use crate::enemy::demon_boss::explosion::{DemonBossExplosion, DemonBossStrikeExplosion};
 use crate::enemy::demon_boss::DemonBoss;
 use crate::ui::health::Health;
 use crate::{enemy::Enemy, GameState};
@@ -110,6 +110,7 @@ fn demon_boss_collisions(
 fn demon_boss_explosion_collisions(
     mut q_player: Query<(&mut Velocity, &mut Player, &mut Health, &Transform)>,
     q_explosions: Query<(&Transform, &DemonBossExplosion), Without<Player>>,
+    q_strike_explosions: Query<(&Transform, &DemonBossStrikeExplosion), Without<Player>>,
     q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>, Without<Player>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
@@ -138,15 +139,18 @@ fn demon_boss_explosion_collisions(
             continue;
         };
 
-        let (explosion_transform, explosion) = match q_explosions.get(enemy_parent.get()) {
-            Ok(e) => (e.0, e.1),
-            Err(_) => continue,
+        let (explosion_pos, damage) = if let Ok(r) = q_explosions.get(enemy_parent.get()) {
+            (r.0.translation, r.1.damage)
+        } else if let Ok(r) = q_strike_explosions.get(enemy_parent.get()) {
+            (r.0.translation, r.1.damage)
+        } else {
+            continue;
         };
 
-        health.health -= explosion.damage;
+        health.health -= damage;
         player.state = PlayerState::Staggering;
 
-        let dir = (player_transform.translation - explosion_transform.translation)
+        let dir = (player_transform.translation - explosion_pos)
             .truncate()
             .normalize_or_zero();
         // This makes the player look towards the impact

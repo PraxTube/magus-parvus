@@ -1,0 +1,7 @@
+[
+    (
+        name: "main",
+        keyframes: KeyframesRange((start: 7, end: 18)),
+        duration: 0.8,
+    ),
+]

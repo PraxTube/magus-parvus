@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use rand::{thread_rng, Rng};
 
 use bevy::prelude::*;
@@ -6,7 +8,12 @@ use bevy_trickfilm::prelude::*;
 
 use crate::{player::Player, world::camera::YSort, GameAssets, GameState};
 
-use super::cast::{DemonSpell, SpawnDemonSpell};
+use super::{
+    cast::{DemonSpell, SpawnDemonSpell},
+    state::DemonBossState,
+    strike::DemonBossStrike,
+    DemonBoss,
+};
 
 const RAND_OFFSET_INTENSITY: f32 = 150.0;
 const COUNT: usize = 10;
@@ -17,6 +24,11 @@ pub struct DemonBossExplosion {
     activation_timer: Timer,
 }
 
+#[derive(Component)]
+pub struct DemonBossStrikeExplosion {
+    pub damage: f32,
+}
+
 #[derive(Component, Deref, DerefMut)]
 struct ColliderTimer(Timer);
 
@@ -24,6 +36,56 @@ struct ColliderTimer(Timer);
 struct ExplosionDelayTimer {
     timer: Timer,
     pos: Vec3,
+    normal_explosion: bool,
+}
+
+fn spawn_normal_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3) {
+    let mut animator = AnimationPlayer2D::default();
+    animator
+        .play(assets.demon_boss_explosion_animations[0].clone())
+        .repeat();
+
+    commands.spawn((
+        DemonBossExplosion {
+            damage: 1.0,
+            activation_timer: Timer::from_seconds(2.0, TimerMode::Once),
+        },
+        animator,
+        YSort(1.0),
+        SpriteSheetBundle {
+            texture_atlas: assets.demon_boss_explosion.clone(),
+            transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
+            ..default()
+        },
+    ));
+}
+
+fn spawn_strike_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3) {
+    let mut animator = AnimationPlayer2D::default();
+    animator.play(assets.demon_boss_explosion2_animations[0].clone());
+
+    let collider = commands
+        .spawn((
+            ColliderTimer(Timer::from_seconds(0.3, TimerMode::Once)),
+            Sensor,
+            Collider::ball(20.0),
+            CollisionGroups::default(),
+            TransformBundle::default(),
+        ))
+        .id();
+
+    commands
+        .spawn((
+            DemonBossStrikeExplosion { damage: 2.0 },
+            animator,
+            YSort(0.0),
+            SpriteSheetBundle {
+                texture_atlas: assets.demon_boss_explosion2.clone(),
+                transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.5)),
+                ..default()
+            },
+        ))
+        .push_children(&[collider]);
 }
 
 fn spawn_explosions(
@@ -38,24 +100,11 @@ fn spawn_explosions(
             continue;
         }
 
-        let mut animator = AnimationPlayer2D::default();
-        animator
-            .play(assets.demon_boss_explosion_animations[0].clone())
-            .repeat();
-
-        commands.spawn((
-            DemonBossExplosion {
-                damage: 1.0,
-                activation_timer: Timer::from_seconds(2.0, TimerMode::Once),
-            },
-            animator,
-            YSort(1.0),
-            SpriteSheetBundle {
-                texture_atlas: assets.demon_boss_explosion.clone(),
-                transform: Transform::from_translation(timer.pos).with_scale(Vec3::splat(2.0)),
-                ..default()
-            },
-        ));
+        if timer.normal_explosion {
+            spawn_normal_explosion(&mut commands, &assets, timer.pos);
+        } else {
+            spawn_strike_explosion(&mut commands, &assets, timer.pos);
+        }
     }
 }
 
@@ -87,6 +136,7 @@ fn spawn_explosion_delays(
             commands.spawn(ExplosionDelayTimer {
                 timer: Timer::from_seconds(0.1 * i as f32, TimerMode::Once),
                 pos,
+                normal_explosion: true,
             });
         }
     }
@@ -127,6 +177,17 @@ fn despawn_explosions(
     }
 }
 
+fn despawn_strike_explosions(
+    mut commands: Commands,
+    q_explosions: Query<(Entity, &AnimationPlayer2D), With<DemonBossStrikeExplosion>>,
+) {
+    for (entity, animator) in &q_explosions {
+        if animator.is_finished() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 fn despawn_colliders(
     mut commands: Commands,
     time: Res<Time>,
@@ -140,6 +201,60 @@ fn despawn_colliders(
     }
 }
 
+fn spawn_strike_explosions(
+    mut commands: Commands,
+    q_demon_boss: Query<(&Transform, &DemonBoss, &TextureAtlasSprite)>,
+    mut q_strike_hitbox: Query<&mut DemonBossStrike>,
+) {
+    let (transform, demon_boss, sprite) = match q_demon_boss.get_single() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+    let mut strike = match q_strike_hitbox.get_single_mut() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+
+    if demon_boss.state != DemonBossState::Striking {
+        return;
+    }
+
+    if strike.striked && !strike.spawned_explosions {
+        strike.spawned_explosions = true;
+
+        let num = 5;
+        let dis = 100.0;
+        let delay = 0.1;
+        for i in 0..num {
+            let offset = if sprite.flip_x {
+                Quat::from_rotation_z(PI * i as f32 / num as f32).mul_vec3(Vec3::X)
+            } else {
+                Quat::from_rotation_z(PI - PI * i as f32 / num as f32).mul_vec3(Vec3::X)
+            };
+            let pos = transform.translation + dis * offset;
+
+            commands.spawn(ExplosionDelayTimer {
+                timer: Timer::from_seconds(delay * i as f32, TimerMode::Once),
+                pos,
+                normal_explosion: false,
+            });
+
+            let offset = if sprite.flip_x {
+                Quat::from_rotation_z(2.0 * PI - PI * i as f32 / num as f32).mul_vec3(Vec3::X)
+            } else {
+                Quat::from_rotation_z(PI + PI * i as f32 / num as f32).mul_vec3(Vec3::X)
+            };
+            let pos = transform.translation + dis * offset;
+
+            commands.spawn(ExplosionDelayTimer {
+                timer: Timer::from_seconds(delay * i as f32, TimerMode::Once),
+                pos,
+                normal_explosion: false,
+            });
+        }
+    }
+}
+
 pub struct DemonBossExplosionPlugin;
 
 impl Plugin for DemonBossExplosionPlugin {
@@ -149,7 +264,9 @@ impl Plugin for DemonBossExplosionPlugin {
             (
                 spawn_explosions,
                 spawn_explosion_delays,
+                spawn_strike_explosions,
                 despawn_explosions,
+                despawn_strike_explosions,
                 despawn_colliders,
                 change_animations,
             )

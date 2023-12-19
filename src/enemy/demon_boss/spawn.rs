@@ -10,7 +10,9 @@ use crate::{
     GameAssets, GameState,
 };
 
-use super::{audio::DemonBossStepsTimer, state::DemonBossState, strike::StrikeHitbox, DemonBoss};
+use super::{
+    audio::DemonBossStepsTimer, state::DemonBossState, strike::DemonBossStrike, DemonBoss,
+};
 
 const SCALE: f32 = 1.5;
 
@@ -48,7 +50,7 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
     let strike_hitbox = commands
         .spawn((
             DemonCollider,
-            StrikeHitbox,
+            DemonBossStrike::default(),
             Sensor,
             Collider::cuboid(25.0, 15.0),
             CollisionGroups::default(),

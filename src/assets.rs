@@ -103,6 +103,11 @@ pub struct GameAssets {
         collection(typed)
     )]
     pub demon_boss_explosion_animations: Vec<Handle<AnimationClip2D>>,
+    #[asset(texture_atlas(tile_size_x = 50.0, tile_size_y = 50.0, columns = 18, rows = 1))]
+    #[asset(path = "spell/explosion2.png")]
+    pub demon_boss_explosion2: Handle<TextureAtlas>,
+    #[asset(paths("spell/explosion2.trickfilm#main"), collection(typed))]
+    pub demon_boss_explosion2_animations: Vec<Handle<AnimationClip2D>>,
 
     // --- MAP ---
     #[asset(path = "map/level.ldtk")]

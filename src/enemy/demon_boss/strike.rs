@@ -11,8 +11,11 @@ const STRIKE_HITBOX_START: f32 = 1.2;
 const STRIKE_HITBOX_TIME: f32 = 0.2;
 const ACTIVE_GROUPS: CollisionGroups = CollisionGroups::new(Group::ALL, Group::ALL);
 
-#[derive(Component)]
-pub struct StrikeHitbox;
+#[derive(Component, Default)]
+pub struct DemonBossStrike {
+    pub striked: bool,
+    pub spawned_explosions: bool,
+}
 
 #[derive(Component)]
 pub struct StrikeCooldown {
@@ -55,33 +58,37 @@ fn despawn_strike_cooldown(
 
 fn toggle_hitbox(
     q_demon_boss: Query<(&DemonBoss, &AnimationPlayer2D)>,
-    mut q_strike_hitbox: Query<&mut CollisionGroups, With<StrikeHitbox>>,
+    mut q_strike_hitbox: Query<(&mut CollisionGroups, &mut DemonBossStrike)>,
 ) {
     let (demon_boss, animator) = match q_demon_boss.get_single() {
         Ok(r) => r,
         Err(_) => return,
     };
-    let mut collision_groups = match q_strike_hitbox.get_single_mut() {
+    let (mut collision_groups, mut strike) = match q_strike_hitbox.get_single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
 
     if demon_boss.state != DemonBossState::Striking {
+        strike.striked = false;
+        strike.spawned_explosions = false;
         return;
     }
 
     if animator.elapsed() >= STRIKE_HITBOX_START
         && animator.elapsed() <= STRIKE_HITBOX_START + STRIKE_HITBOX_TIME
     {
+        strike.striked = true;
         *collision_groups = ACTIVE_GROUPS;
     } else {
+        strike.striked = false;
         *collision_groups = COLLISION_GROUPS_NONE;
     }
 }
 
 fn update_hitbox_position(
     q_demon_boss: Query<&TextureAtlasSprite, With<DemonBoss>>,
-    mut q_strike_hitbox: Query<&mut Transform, With<StrikeHitbox>>,
+    mut q_strike_hitbox: Query<&mut Transform, With<DemonBossStrike>>,
 ) {
     let sprite = match q_demon_boss.get_single() {
         Ok(r) => r,
