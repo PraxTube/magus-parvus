@@ -14,6 +14,45 @@ const ACTIVE_GROUPS: CollisionGroups = CollisionGroups::new(Group::ALL, Group::A
 #[derive(Component)]
 pub struct StrikeHitbox;
 
+#[derive(Component)]
+pub struct StrikeCooldown {
+    timer: Timer,
+}
+
+fn spawn_strike_cooldown(
+    mut commands: Commands,
+    q_demon_boss: Query<&DemonBoss>,
+    q_strike_cooldowns: Query<&StrikeCooldown>,
+) {
+    if !q_strike_cooldowns.is_empty() {
+        return;
+    }
+    let demon_boss = match q_demon_boss.get_single() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+    if demon_boss.state != DemonBossState::Striking {
+        return;
+    }
+
+    commands.spawn(StrikeCooldown {
+        timer: Timer::from_seconds(5.0, TimerMode::Once),
+    });
+}
+
+fn despawn_strike_cooldown(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut q_strike_cooldowns: Query<(Entity, &mut StrikeCooldown)>,
+) {
+    for (entity, mut cooldown) in &mut q_strike_cooldowns {
+        cooldown.timer.tick(time.delta());
+        if cooldown.timer.just_finished() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 fn toggle_hitbox(
     q_demon_boss: Query<(&DemonBoss, &AnimationPlayer2D)>,
     mut q_strike_hitbox: Query<&mut CollisionGroups, With<StrikeHitbox>>,
@@ -67,7 +106,13 @@ impl Plugin for DemonBossAttackPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (toggle_hitbox, update_hitbox_position).run_if(in_state(GameState::Gaming)),
+            (
+                spawn_strike_cooldown,
+                despawn_strike_cooldown,
+                toggle_hitbox,
+                update_hitbox_position,
+            )
+                .run_if(in_state(GameState::Gaming)),
         );
     }
 }

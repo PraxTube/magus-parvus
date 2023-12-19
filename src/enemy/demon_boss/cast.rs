@@ -17,10 +17,18 @@ pub struct DemonSpellCast {
 #[derive(Event, Deref, DerefMut)]
 pub struct SpawnDemonSpell(pub DemonSpellCast);
 
+#[derive(Component)]
+pub struct DemonSpellCooldown {
+    #[allow(dead_code)]
+    spell: DemonSpell,
+    timer: Timer,
+}
+
 fn spawn_demon_spell(
     mut commands: Commands,
     q_demon_boss: Query<&DemonBoss>,
     q_demon_spells: Query<&DemonSpellCast>,
+    q_demon_spell_cooldowns: Query<&DemonSpellCooldown>,
 ) {
     let demon_boss = match q_demon_boss.get_single() {
         Ok(r) => r,
@@ -33,7 +41,14 @@ fn spawn_demon_spell(
     if !q_demon_spells.is_empty() {
         return;
     }
+    if !q_demon_spell_cooldowns.is_empty() {
+        return;
+    }
 
+    commands.spawn(DemonSpellCooldown {
+        spell: DemonSpell::Explosion,
+        timer: Timer::from_seconds(5.0, TimerMode::Once),
+    });
     commands.spawn(DemonSpellCast {
         spell: DemonSpell::Explosion,
         timer: Timer::from_seconds(1.5, TimerMode::Once),
@@ -55,13 +70,31 @@ fn relay_demon_spells(
     }
 }
 
+fn despawn_spell_cooldowns(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut q_demon_spell_cooldowns: Query<(Entity, &mut DemonSpellCooldown)>,
+) {
+    for (entity, mut cooldown) in &mut q_demon_spell_cooldowns {
+        cooldown.timer.tick(time.delta());
+        if cooldown.timer.just_finished() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 pub struct DemonBossCastPlugin;
 
 impl Plugin for DemonBossCastPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawn_demon_spell, relay_demon_spells).run_if(in_state(GameState::Gaming)),
+            (
+                spawn_demon_spell,
+                despawn_spell_cooldowns,
+                relay_demon_spells,
+            )
+                .run_if(in_state(GameState::Gaming)),
         )
         .add_event::<SpawnDemonSpell>();
     }

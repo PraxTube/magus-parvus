@@ -8,7 +8,7 @@ use crate::{
     GameAssets, GameState,
 };
 
-use super::{attack::StrikeHitbox, audio::DemonBossStepsTimer, DemonBoss};
+use super::{audio::DemonBossStepsTimer, strike::StrikeHitbox, DemonBoss};
 
 const SCALE: f32 = 1.5;
 

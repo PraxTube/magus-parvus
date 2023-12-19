@@ -5,6 +5,9 @@ use crate::{player::Player, GameState};
 
 use super::{DemonBoss, DemonBossState, MOVE_SPEED};
 
+#[derive(Component, Deref, DerefMut)]
+pub struct MovementCooldownTimer(pub Timer);
+
 fn movement(
     mut q_demon_boss: Query<(&Transform, &mut Velocity, &DemonBoss)>,
     q_player: Query<&Transform, (With<Player>, Without<DemonBoss>)>,
@@ -29,10 +32,26 @@ fn movement(
     velocity.linvel = direction * MOVE_SPEED;
 }
 
+fn despawn_cooldowns(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut q_timers: Query<(Entity, &mut MovementCooldownTimer)>,
+) {
+    for (entity, mut timer) in &mut q_timers {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 pub struct DemonBossMovementPlugin;
 
 impl Plugin for DemonBossMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (movement,).run_if(in_state(GameState::Gaming)));
+        app.add_systems(
+            Update,
+            (movement, despawn_cooldowns).run_if(in_state(GameState::Gaming)),
+        );
     }
 }

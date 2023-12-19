@@ -1,11 +1,11 @@
 pub mod explosion;
 
-mod attack;
 mod audio;
 mod cast;
 mod movement;
 mod spawn;
 mod state;
+mod strike;
 
 use bevy::prelude::*;
 
@@ -18,7 +18,7 @@ impl Plugin for DemonBossPlugin {
         app.add_plugins((
             spawn::DemonBossSpawnPlugin,
             movement::DemonBossMovementPlugin,
-            attack::DemonBossAttackPlugin,
+            strike::DemonBossAttackPlugin,
             state::DemonBossStatePlugin,
             audio::DemonBossAudioPlugin,
             cast::DemonBossCastPlugin,
