@@ -225,13 +225,14 @@ fn spawn_strike_explosions(
         let num = 5;
         let dis = 100.0;
         let delay = 0.1;
+        let offset = Vec3::new(0.0, -40.0, 0.0);
         for i in 0..num {
-            let offset = if sprite.flip_x {
+            let dir = if sprite.flip_x {
                 Quat::from_rotation_z(PI * i as f32 / num as f32).mul_vec3(Vec3::X)
             } else {
                 Quat::from_rotation_z(PI - PI * i as f32 / num as f32).mul_vec3(Vec3::X)
             };
-            let pos = transform.translation + dis * offset;
+            let pos = transform.translation + dis * dir + offset;
 
             commands.spawn(ExplosionDelayTimer {
                 timer: Timer::from_seconds(delay * i as f32, TimerMode::Once),
@@ -239,12 +240,12 @@ fn spawn_strike_explosions(
                 normal_explosion: false,
             });
 
-            let offset = if sprite.flip_x {
+            let dir = if sprite.flip_x {
                 Quat::from_rotation_z(2.0 * PI - PI * i as f32 / num as f32).mul_vec3(Vec3::X)
             } else {
                 Quat::from_rotation_z(PI + PI * i as f32 / num as f32).mul_vec3(Vec3::X)
             };
-            let pos = transform.translation + dis * offset;
+            let pos = transform.translation + dis * dir + offset;
 
             commands.spawn(ExplosionDelayTimer {
                 timer: Timer::from_seconds(delay * i as f32, TimerMode::Once),

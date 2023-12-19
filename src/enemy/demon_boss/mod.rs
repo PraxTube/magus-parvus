@@ -62,7 +62,7 @@ impl DemonBossRage {
 impl Default for DemonBoss {
     fn default() -> Self {
         Self {
-            damage: 999.0,
+            damage: 2.0,
             rage: DemonBossRage {
                 active: false,
                 rage_stack: 0,

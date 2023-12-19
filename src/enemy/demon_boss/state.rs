@@ -179,6 +179,9 @@ fn switch_to_casting(
     if demon_boss.state == DemonBossState::Casting {
         return;
     }
+    if demon_boss.state == DemonBossState::Striking {
+        return;
+    }
 
     let dis = player_pos
         .truncate()

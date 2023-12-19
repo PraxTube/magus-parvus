@@ -47,16 +47,6 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
             TransformBundle::from(Transform::from_translation(Vec3::new(0.0, -30.0, 0.0))),
         ))
         .id();
-    let strike_hitbox = commands
-        .spawn((
-            DemonCollider,
-            DemonBossStrike::default(),
-            Sensor,
-            Collider::cuboid(25.0, 15.0),
-            CollisionGroups::default(),
-            TransformBundle::default(),
-        ))
-        .id();
 
     commands
         .spawn((
@@ -65,8 +55,9 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
             Velocity::zero(),
             DemonBoss::default(),
             DemonBossStepsTimer::default(),
+            DemonBossStrike::default(),
             Enemy { damage: 0.0 },
-            Health::new(100.0),
+            Health::new(10.0),
             animator,
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {
@@ -78,7 +69,7 @@ fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
                 ..default()
             },
         ))
-        .push_children(&[shadow, collider, strike_hitbox]);
+        .push_children(&[shadow, collider]);
 }
 
 fn despawn_demon_boss(

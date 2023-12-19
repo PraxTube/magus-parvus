@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::player::Player;
 use crate::GameState;
+use crate::{player::Player, utils::COLLISION_GROUPS_NONE};
 
 use super::{Spell, SpellCasted};
 
@@ -19,7 +19,6 @@ const PHANTASMA_COLOR: Color = Color::Rgba {
     alpha: 0.5,
 };
 const DEFAULT_COLLISION_GROUPS: CollisionGroups = CollisionGroups::new(Group::ALL, Group::ALL);
-const PHANTASMA_COLLISION_GROUPS: CollisionGroups = CollisionGroups::new(Group::NONE, Group::NONE);
 
 #[derive(Component)]
 struct PhantasmaTimer {
@@ -51,7 +50,7 @@ fn activate_phantasma(
 
             for child in children {
                 if let Ok(mut c) = q_colliders.get_mut(*child) {
-                    *c = PHANTASMA_COLLISION_GROUPS;
+                    *c = COLLISION_GROUPS_NONE;
                     break;
                 };
             }
