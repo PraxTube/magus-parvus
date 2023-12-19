@@ -17,6 +17,8 @@ pub enum DemonBossState {
     Casting,
     Moving,
     Striking,
+    Staggering,
+    Dying,
 }
 
 fn update_animation(
@@ -33,6 +35,8 @@ fn update_animation(
         DemonBossState::Casting => (assets.enemy_boss_animations[1].clone(), true),
         DemonBossState::Moving => (assets.enemy_boss_animations[2].clone(), true),
         DemonBossState::Striking => (assets.enemy_boss_animations[3].clone(), false),
+        DemonBossState::Staggering => (assets.enemy_boss_animations[4].clone(), false),
+        DemonBossState::Dying => (assets.enemy_boss_animations[5].clone(), false),
     };
 
     if repeat {
@@ -100,6 +104,28 @@ fn casting_to_idle(
     }
     ev_spawn_demon_spell.clear();
     demon_boss.state = DemonBossState::Idling;
+}
+
+fn staggering_to_idle(
+    mut commands: Commands,
+    mut q_demon_boss: Query<(&mut DemonBoss, &AnimationPlayer2D)>,
+) {
+    let (mut demon_boss, animator) = match q_demon_boss.get_single_mut() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+    if demon_boss.state != DemonBossState::Staggering {
+        return;
+    }
+
+    if animator.is_finished() {
+        demon_boss.state = DemonBossState::Idling;
+    }
+
+    commands.spawn(MovementCooldownTimer(Timer::from_seconds(
+        1.0,
+        TimerMode::Once,
+    )));
 }
 
 fn switch_to_striking(
@@ -194,10 +220,12 @@ impl Plugin for DemonBossStatePlugin {
                 adjust_sprite_flip,
                 striking_to_idle,
                 casting_to_idle,
+                staggering_to_idle,
                 switch_to_striking,
                 switch_to_casting,
                 switch_to_moving,
             )
+                .chain()
                 .run_if(in_state(GameState::Gaming)),
         );
     }

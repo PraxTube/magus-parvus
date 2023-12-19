@@ -23,6 +23,8 @@ pub struct GameAssets {
             "enemy/enemy_boss.trickfilm#casting",
             "enemy/enemy_boss.trickfilm#walking",
             "enemy/enemy_boss.trickfilm#striking",
+            "enemy/enemy_boss.trickfilm#staggering",
+            "enemy/enemy_boss.trickfilm#dying",
         ),
         collection(typed)
     )]

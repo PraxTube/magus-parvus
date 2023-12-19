@@ -19,4 +19,14 @@
         keyframes: KeyframesRange((start: 44, end: 59)),
         duration: 2.0,
     ),
+    (
+        name: "staggering",
+        keyframes: KeyframesRange((start: 66, end: 71)),
+        duration: 0.5,
+    ),
+    (
+        name: "dying",
+        keyframes: KeyframesRange((start: 88, end: 110)),
+        duration: 2.0,
+    ),
 ]

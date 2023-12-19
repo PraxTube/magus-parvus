@@ -21,6 +21,9 @@ fn movement(
         Err(_) => return,
     };
 
+    if demon_boss.state == DemonBossState::Staggering {
+        return;
+    }
     if demon_boss.state != DemonBossState::Moving {
         velocity.linvel = Vec2::ZERO;
         return;

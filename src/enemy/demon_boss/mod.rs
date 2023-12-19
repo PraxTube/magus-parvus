@@ -2,6 +2,7 @@ pub mod explosion;
 
 mod audio;
 mod cast;
+mod collision;
 mod movement;
 mod spawn;
 mod state;
@@ -23,6 +24,7 @@ impl Plugin for DemonBossPlugin {
             audio::DemonBossAudioPlugin,
             cast::DemonBossCastPlugin,
             explosion::DemonBossExplosionPlugin,
+            collision::DemonBossCollisionPlugin,
         ));
     }
 }
