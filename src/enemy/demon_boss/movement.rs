@@ -32,7 +32,8 @@ fn movement(
     let direction = (player_transform.translation - demon_boss_transform.translation)
         .truncate()
         .normalize_or_zero();
-    velocity.linvel = direction * MOVE_SPEED;
+    let mul = if demon_boss.rage.active { 2.0 } else { 1.0 };
+    velocity.linvel = direction * mul * MOVE_SPEED;
 }
 
 fn despawn_cooldowns(

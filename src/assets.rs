@@ -31,6 +31,8 @@ pub struct GameAssets {
     pub enemy_boss_animations: Vec<Handle<AnimationClip2D>>,
     #[asset(path = "enemy/enemy_boss_shadow.png")]
     pub enemy_boss_shadow: Handle<Image>,
+    #[asset(path = "enemy/enemy_boss_aura.png")]
+    pub enemy_boss_aura: Handle<Image>,
 
     // --- SPELL ---
     #[asset(texture_atlas(tile_size_x = 70.0, tile_size_y = 11.0, columns = 10, rows = 6))]

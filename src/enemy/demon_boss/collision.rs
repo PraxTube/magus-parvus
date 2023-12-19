@@ -177,7 +177,7 @@ fn aer_tracto_collisions(
             Err(_) => continue,
         };
 
-        let (mut slime, mut slime_health, mut velocity) =
+        let (mut demon_boss, mut health, mut velocity) =
             if let Ok(s) = q_enemies.get_mut(source_parent) {
                 s
             } else if let Ok(s) = q_enemies.get_mut(target_parent) {
@@ -195,9 +195,14 @@ fn aer_tracto_collisions(
         };
 
         let dir = -aer_tracto_transform.rotation.mul_vec3(Vec3::X).truncate();
-        velocity.linvel = 0.5 * dir * aer_tracto.pull_intensity;
-        slime_health.health -= aer_tracto.damage;
-        slime.state = DemonBossState::Staggering;
+        let mul = if demon_boss.rage.active { 0.25 } else { 0.5 };
+        velocity.linvel = mul * dir * aer_tracto.pull_intensity;
+        health.health -= aer_tracto.damage;
+
+        if !demon_boss.rage.active {
+            demon_boss.state = DemonBossState::Staggering;
+            demon_boss.rage.add();
+        }
     }
 }
 
