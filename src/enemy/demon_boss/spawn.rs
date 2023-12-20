@@ -104,7 +104,7 @@ fn spawn_demon_boss(
             DemonBossStepsTimer::default(),
             DemonBossStrike::default(),
             Enemy { damage: 0.0 },
-            Health::new(10.0),
+            Health::new(100.0),
             animator,
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {

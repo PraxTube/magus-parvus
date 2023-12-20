@@ -154,6 +154,8 @@ pub struct GameAssets {
     pub keyboard_ui: Handle<TextureAtlas>,
     #[asset(path = "ui/vignette.png")]
     pub vignette: Handle<Image>,
+    #[asset(path = "ui/platform_arrow.png")]
+    pub platform_arrow: Handle<Image>,
 
     #[asset(path = "ui/movement_hint_up.png")]
     pub spell_book_hint_up: Handle<Image>,

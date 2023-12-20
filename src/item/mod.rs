@@ -10,7 +10,7 @@ mod statue_wall;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-pub const STATUE_COUNT: usize = 1;
+pub const STATUE_COUNT: usize = 8;
 
 pub struct ItemPlugin;
 

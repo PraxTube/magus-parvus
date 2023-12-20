@@ -4,6 +4,7 @@ pub mod world_text;
 
 mod game_over_ui;
 mod keyboard_ui;
+mod platform_arrow;
 mod pop_up;
 mod spell_book;
 mod statue_counter;
@@ -25,6 +26,7 @@ impl Plugin for UiPlugin {
             spell_book::SpellBookPlugin,
             statue_counter::StatueCounterUiPlugin,
             vignette::VignettePlugin,
+            platform_arrow::PlatformArrowPlugin,
         ));
     }
 }
