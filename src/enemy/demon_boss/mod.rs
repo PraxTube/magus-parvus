@@ -3,6 +3,7 @@ pub mod explosion;
 mod audio;
 mod cast;
 mod collision;
+mod earth_prison;
 mod movement;
 mod rage;
 mod spawn;
@@ -27,6 +28,7 @@ impl Plugin for DemonBossPlugin {
             explosion::DemonBossExplosionPlugin,
             collision::DemonBossCollisionPlugin,
             rage::DemonBossRagePlugin,
+            earth_prison::DemonBossEarthPrisonPlugin,
         ));
     }
 }

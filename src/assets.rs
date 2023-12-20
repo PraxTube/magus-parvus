@@ -183,6 +183,8 @@ pub struct GameAssets {
     pub demon_boss_step_sound: Handle<AudioSource>,
     #[asset(path = "sounds/demon_boss_vocal_explosion.ogg")]
     pub demon_boss_vocal_explosion_sound: Handle<AudioSource>,
+    #[asset(path = "sounds/demon_boss_vocal_earth_prison.ogg")]
+    pub demon_boss_vocal_earth_prison_sound: Handle<AudioSource>,
     #[asset(path = "sounds/gitgud.ogg")]
     pub git_gud: Handle<AudioSource>,
 

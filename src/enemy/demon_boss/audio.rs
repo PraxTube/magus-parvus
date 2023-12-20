@@ -67,6 +67,7 @@ fn play_cast_vocals(
     for demon_spell in &q_demon_spells {
         let vocals = match demon_spell.spell {
             DemonSpell::Explosion => assets.demon_boss_vocal_explosion_sound.clone(),
+            DemonSpell::EarthPrison => assets.demon_boss_vocal_earth_prison_sound.clone(),
         };
 
         play_sound.send(PlaySound {

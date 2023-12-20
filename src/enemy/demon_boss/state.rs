@@ -4,7 +4,7 @@ use bevy_trickfilm::prelude::*;
 use crate::{player::Player, GameAssets, GameState};
 
 use super::{
-    cast::{DemonSpellCooldown, SpawnDemonSpell},
+    cast::{DemonSpellCooldown, LastSpellTimer, SpawnDemonSpell},
     movement::MovementCooldownTimer,
     strike::StrikeCooldown,
     DemonBoss, INV_CAST_RANGE, STRIKE_RANGE,
@@ -163,6 +163,7 @@ fn switch_to_casting(
     mut q_demon_boss: Query<(&Transform, &mut DemonBoss)>,
     q_player: Query<&Transform, (With<Player>, Without<DemonBoss>)>,
     q_demon_spell_cooldown: Query<&DemonSpellCooldown>,
+    q_last_spell_timer: Query<&LastSpellTimer>,
 ) {
     if !q_demon_spell_cooldown.is_empty() {
         return;
@@ -173,6 +174,10 @@ fn switch_to_casting(
     };
     let player_pos = match q_player.get_single() {
         Ok(p) => p.translation,
+        Err(_) => return,
+    };
+    let last_spell_timer = match q_last_spell_timer.get_single() {
+        Ok(r) => r,
         Err(_) => return,
     };
 
@@ -188,7 +193,7 @@ fn switch_to_casting(
         .distance_squared(demon_boss_transform.translation.truncate());
     let inv_cast_range = INV_CAST_RANGE.powi(2);
 
-    if dis >= inv_cast_range {
+    if dis >= inv_cast_range || last_spell_timer.finished() {
         demon_boss.state = DemonBossState::Casting;
     }
 }
