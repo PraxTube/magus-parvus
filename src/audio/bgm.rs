@@ -3,7 +3,10 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
-use crate::{item::statue::StatueUnlockedDelayed, GameAssets, GameState};
+use crate::{
+    item::{platform::TriggerFinalAct, statue::StatueUnlockedDelayed},
+    GameAssets, GameState,
+};
 
 use super::GameAudio;
 
@@ -32,6 +35,31 @@ fn play_bgm(
     let volume = game_audio.main_volume * BGM_VOLUME;
     let handle = audio
         .play(assets.bgm.clone())
+        .with_volume(volume)
+        .looped()
+        .handle();
+    commands.spawn(Bgm { handle });
+}
+
+fn play_boss_bgm(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    audio: Res<Audio>,
+    game_audio: Res<GameAudio>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    let volume = game_audio.main_volume * BGM_VOLUME;
+    let handle = audio
+        .play(assets.bgm_boss.clone())
+        .fade_in(AudioTween::new(
+            Duration::from_secs_f32(3.0),
+            AudioEasing::InPowi(3),
+        ))
         .with_volume(volume)
         .looped()
         .handle();
@@ -104,6 +132,25 @@ fn unmute_bgms(
     }
 }
 
+fn despawn_normal_bgm(
+    mut commands: Commands,
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
+    q_bgms: Query<(Entity, &Bgm)>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    for (entity, bgm) in &q_bgms {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+            instance.stop(AudioTween::default());
+        }
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 pub struct BgmPlugin;
 
 impl Plugin for BgmPlugin {
@@ -112,9 +159,11 @@ impl Plugin for BgmPlugin {
             .add_systems(
                 Update,
                 (
+                    play_boss_bgm.run_if(in_state(GameState::Gaming)),
                     update_bgm_volumes.run_if(in_state(GameState::GameOver)),
                     mute_bgms.after(update_bgm_volumes),
                     unmute_bgms,
+                    despawn_normal_bgm,
                 ),
             );
     }

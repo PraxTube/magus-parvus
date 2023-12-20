@@ -185,8 +185,8 @@ fn trigger_final_act(
             CollisionEvent::Stopped(_, _, _) => continue,
         };
 
-        if !(&player.collider_entity == source && &item_entity == target)
-            && !(&player.collider_entity == target && &item_entity == source)
+        if !(&player.collider_entity == source && &item_entity == target
+            || &player.collider_entity == target && &item_entity == source)
         {
             continue;
         }

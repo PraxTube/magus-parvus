@@ -16,7 +16,7 @@ use super::{
 };
 
 const SCALE: f32 = 1.5;
-const SPAWN_POS: Vec3 = Vec3::new(250.0, 0.0, 0.0);
+const SPAWN_POS: Vec3 = Vec3::new(200.0, 0.0, 0.0);
 
 #[derive(Component)]
 struct Shadow;
@@ -25,11 +25,30 @@ struct DemonCollider;
 
 #[derive(Component, Deref, DerefMut)]
 struct SpawnDelay(Timer);
+#[derive(Component)]
+struct Smoke;
+
+fn spawn_smokes(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3) {
+    let mut animator = AnimationPlayer2D::default();
+    animator.play(assets.demon_boss_smoke_animations[0].clone());
+
+    commands.spawn((
+        Smoke,
+        animator,
+        YSort(1.0),
+        SpriteSheetBundle {
+            texture_atlas: assets.demon_boss_smoke.clone(),
+            transform: Transform::from_translation(pos).with_scale(Vec3::splat(5.0)),
+            ..default()
+        },
+    ));
+}
 
 fn spawn_demon_boss(
     mut commands: Commands,
     assets: Res<GameAssets>,
     time: Res<Time>,
+    q_smoke: Query<Entity, (With<Smoke>, Without<SpawnDelay>)>,
     mut q_delay: Query<(Entity, &mut SpawnDelay)>,
 ) {
     let (entity, mut delay) = match q_delay.get_single_mut() {
@@ -42,6 +61,13 @@ fn spawn_demon_boss(
         return;
     }
     commands.entity(entity).despawn_recursive();
+
+    let pos = PLAYER_SPAWN_POS + SPAWN_POS;
+    if q_smoke.is_empty() {
+        spawn_smokes(&mut commands, &assets, pos);
+        commands.spawn(SpawnDelay(Timer::from_seconds(0.2, TimerMode::Once)));
+        return;
+    }
 
     let mut animator = AnimationPlayer2D::default();
     animator
@@ -83,8 +109,7 @@ fn spawn_demon_boss(
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {
                 texture_atlas: assets.enemy_boss.clone(),
-                transform: Transform::from_translation(PLAYER_SPAWN_POS + SPAWN_POS)
-                    .with_scale(Vec3::splat(SCALE)),
+                transform: Transform::from_translation(pos).with_scale(Vec3::splat(SCALE)),
                 ..default()
             },
         ))
@@ -100,7 +125,7 @@ fn spawn_demon_boss_delay(
     }
     ev_trigger_final_act.clear();
 
-    commands.spawn(SpawnDelay(Timer::from_seconds(3.5, TimerMode::Once)));
+    commands.spawn(SpawnDelay(Timer::from_seconds(5.0, TimerMode::Once)));
 }
 
 fn despawn_demon_boss(
