@@ -8,8 +8,7 @@ use super::{DemonBoss, DemonBossState};
 const STRIKE_HITBOX_START: f32 = 1.2;
 const STRIKE_HITBOX_TIME: f32 = 0.2;
 
-#[derive(Component)]
-#[derive(Default)]
+#[derive(Component, Default)]
 pub struct DemonBossStrike {
     pub striked: bool,
     pub spawned_explosions: bool,
@@ -19,8 +18,6 @@ pub struct DemonBossStrike {
 pub struct StrikeCooldown {
     timer: Timer,
 }
-
-
 
 fn spawn_strike_cooldown(
     mut commands: Commands,

@@ -7,6 +7,7 @@ use bevy_rapier2d::dynamics::Velocity;
 use super::camera_shake::{update_camera, CameraShake};
 use crate::player::input::PlayerInput;
 use crate::player::{Player, PlayerState};
+use crate::spell::debug_spell::DebugSpell;
 use crate::GameState;
 
 // How much `1.0` in bevy coordinates translates to the pixels of a sprite.
@@ -50,9 +51,14 @@ fn update_camera_target(
 }
 
 fn zoom_camera(
+    debug_spell: Res<DebugSpell>,
     mut q_projection: Query<&mut OrthographicProjection, With<MainCamera>>,
     player_input: Res<PlayerInput>,
 ) {
+    if !debug_spell.active {
+        return;
+    }
+
     let mut projection = match q_projection.get_single_mut() {
         Ok(p) => p,
         Err(_) => return,
