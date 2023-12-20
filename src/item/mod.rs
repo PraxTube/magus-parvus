@@ -3,13 +3,14 @@ pub mod statue;
 
 mod enemy_spawner;
 mod enemy_sub_spawner;
+mod platform;
 mod sound;
 mod statue_wall;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-const STATUE_COUNT: usize = 8;
+const STATUE_COUNT: usize = 1;
 
 pub struct ItemPlugin;
 
@@ -21,6 +22,7 @@ impl Plugin for ItemPlugin {
             enemy_spawner::EnemySpawnerPlugin,
             enemy_sub_spawner::EnemySubSpawnerPlugin,
             sound::ItemSoundPlugin,
+            platform::PlatformPlugin,
         ))
         .init_resource::<ActiveItems>()
         .insert_resource(MaxItems(STATUE_COUNT))

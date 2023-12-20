@@ -1,0 +1,12 @@
+[
+    (
+        name: "idle",
+        keyframes: KeyframesRange((start: 0, end: 1)),
+        duration: 0.1,
+    ),
+    (
+        name: "trigger",
+        keyframes: KeyframesRange((start: 1, end: 3)),
+        duration: 0.2,
+    ),
+]

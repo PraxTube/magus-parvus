@@ -36,6 +36,7 @@ pub struct PlaySound {
     pub playback_rate: f64,
     pub rand_speed_intensity: f64,
     pub repeat: bool,
+    pub reverse: bool,
     pub parent: Option<Entity>,
 }
 
@@ -47,6 +48,7 @@ impl Default for PlaySound {
             playback_rate: 1.0,
             rand_speed_intensity: 0.0,
             repeat: false,
+            reverse: false,
             parent: None,
         }
     }
@@ -74,20 +76,19 @@ fn play_sounds(
         };
         let volume_offset = if ev.parent.is_some() { 0.0 } else { 1.0 };
 
-        let audio_instance = if ev.repeat {
-            audio
-                .play(ev.clip.clone())
-                .with_volume(ev.volume * volume_offset * game_audio.main_volume)
-                .with_playback_rate(ev.playback_rate + speed_offset)
-                .looped()
-                .handle()
-        } else {
-            audio
-                .play(ev.clip.clone())
-                .with_volume(ev.volume * volume_offset * game_audio.main_volume)
-                .with_playback_rate(ev.playback_rate + speed_offset)
-                .handle()
-        };
+        let mut audio_command = audio.play(ev.clip.clone());
+        audio_command
+            .with_volume(ev.volume * volume_offset * game_audio.main_volume)
+            .with_playback_rate(ev.playback_rate + speed_offset);
+
+        if ev.repeat {
+            audio_command.looped();
+        }
+        if ev.reverse {
+            audio_command.reverse();
+        }
+
+        let audio_instance = audio_command.handle();
 
         if let Some(parent) = ev.parent {
             let audio_emitter = commands

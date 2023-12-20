@@ -120,6 +120,20 @@ pub struct GameAssets {
     #[asset(texture_atlas(tile_size_x = 32.0, tile_size_y = 64.0, columns = 4, rows = 1))]
     #[asset(path = "map/statue_beam.png")]
     pub statue_beam: Handle<TextureAtlas>,
+    #[asset(texture_atlas(tile_size_x = 112.0, tile_size_y = 80.0, columns = 3, rows = 1))]
+    #[asset(path = "map/platform.png")]
+    pub platform: Handle<TextureAtlas>,
+    #[asset(
+        paths("map/platform.trickfilm#idle", "map/platform.trickfilm#trigger",),
+        collection(typed)
+    )]
+    pub platform_animations: Vec<Handle<AnimationClip2D>>,
+    #[asset(path = "map/platform_item.png")]
+    pub platform_item: Handle<Image>,
+    #[asset(path = "map/platform_item_shadow.png")]
+    pub platform_item_shadow: Handle<Image>,
+    #[asset(path = "map/platform_item_highlight.png")]
+    pub platform_item_highlight: Handle<Image>,
 
     // --- UI ---
     #[asset(path = "ui/white_pixel.png")]
