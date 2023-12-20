@@ -3,6 +3,7 @@ use bevy_rapier2d::prelude::*;
 use bevy_trickfilm::prelude::*;
 
 use crate::{
+    audio::PlaySound,
     player::{Player, PLAYER_SPAWN_POS},
     world::camera::YSort,
     GameAssets, GameState,
@@ -125,6 +126,23 @@ fn trigger_platform(
     animator.play(assets.platform_animations[1].clone());
 }
 
+fn play_trigger_sound(
+    assets: Res<GameAssets>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+    mut ev_play_sound: EventWriter<PlaySound>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    ev_play_sound.send(PlaySound {
+        clip: assets.item_unlock_sound.clone(),
+        reverse: true,
+        ..default()
+    });
+}
+
 fn hover_platform_item(
     time: Res<Time>,
     mut q_platform_item: Query<(&mut Transform, &mut PlatformItem)>,
@@ -187,6 +205,7 @@ impl Plugin for PlatformPlugin {
                 spawn_trigger_item,
                 despawn_trigger_item,
                 hover_platform_item,
+                play_trigger_sound,
                 trigger_platform,
                 trigger_final_act,
             )

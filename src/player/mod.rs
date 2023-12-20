@@ -16,9 +16,9 @@ use bevy::prelude::*;
 use crate::world::CHUNK_SIZE;
 
 pub const PLAYER_SPAWN_POS: Vec3 = Vec3::new(2.5 * CHUNK_SIZE, 16.0 + 2.5 * CHUNK_SIZE, 0.0);
+pub const PLAYER_HEALTH: f32 = 10.0;
 const STAGGERING_TIME: f32 = 0.25;
 const STAGGERING_INTENSITY: f32 = 200.0;
-const PLAYER_HEALTH: f32 = 10.0;
 
 pub struct PlayerPlugin;
 

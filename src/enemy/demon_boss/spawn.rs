@@ -16,21 +16,32 @@ use super::{
 };
 
 const SCALE: f32 = 1.5;
+const SPAWN_POS: Vec3 = Vec3::new(250.0, 0.0, 0.0);
 
 #[derive(Component)]
 struct Shadow;
 #[derive(Component)]
 struct DemonCollider;
 
+#[derive(Component, Deref, DerefMut)]
+struct SpawnDelay(Timer);
+
 fn spawn_demon_boss(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+    time: Res<Time>,
+    mut q_delay: Query<(Entity, &mut SpawnDelay)>,
 ) {
-    if ev_trigger_final_act.is_empty() {
+    let (entity, mut delay) = match q_delay.get_single_mut() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+
+    delay.tick(time.delta());
+    if !delay.just_finished() {
         return;
     }
-    ev_trigger_final_act.clear();
+    commands.entity(entity).despawn_recursive();
 
     let mut animator = AnimationPlayer2D::default();
     animator
@@ -72,14 +83,24 @@ fn spawn_demon_boss(
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
             SpriteSheetBundle {
                 texture_atlas: assets.enemy_boss.clone(),
-                transform: Transform::from_translation(
-                    PLAYER_SPAWN_POS - Vec3::new(0.0, 100.0, 0.0),
-                )
-                .with_scale(Vec3::splat(SCALE)),
+                transform: Transform::from_translation(PLAYER_SPAWN_POS + SPAWN_POS)
+                    .with_scale(Vec3::splat(SCALE)),
                 ..default()
             },
         ))
         .push_children(&[shadow, collider]);
+}
+
+fn spawn_demon_boss_delay(
+    mut commands: Commands,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    commands.spawn(SpawnDelay(Timer::from_seconds(3.5, TimerMode::Once)));
 }
 
 fn despawn_demon_boss(
@@ -153,6 +174,7 @@ impl Plugin for DemonBossSpawnPlugin {
             Update,
             (
                 spawn_demon_boss,
+                spawn_demon_boss_delay,
                 despawn_demon_boss,
                 despawn_shadow,
                 despawn_demon_colliders,

@@ -1,6 +1,11 @@
 use bevy::prelude::*;
 
-use crate::{player::Player, world::CameraShake, GameAssets, GameState};
+use crate::{
+    item::platform::TriggerFinalAct,
+    player::{Player, PLAYER_HEALTH},
+    world::CameraShake,
+    GameAssets, GameState,
+};
 
 use super::world_text::{SpawnWorldText, WorldText};
 
@@ -154,6 +159,23 @@ fn update_player_hearts(
     }
 }
 
+fn full_heal_player(
+    mut q_player: Query<&mut Health, With<Player>>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    let mut health = match q_player.get_single_mut() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+
+    health.health = PLAYER_HEALTH;
+}
+
 pub struct HealthPlugin;
 
 impl Plugin for HealthPlugin {
@@ -165,6 +187,7 @@ impl Plugin for HealthPlugin {
                 check_health_changed,
                 spawn_hearts,
                 update_player_hearts,
+                full_heal_player,
             )
                 .run_if(in_state(GameState::Gaming)),
         )

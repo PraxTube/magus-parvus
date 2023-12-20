@@ -4,7 +4,7 @@ use crate::item::item_value::{item_description, item_title};
 use crate::item::statue::StatueUnlockedDelayed;
 use crate::{GameAssets, GameState};
 
-const TIME: f32 = 10.0;
+const TIME: f32 = 5.0;
 
 #[derive(Component)]
 struct PopUp {

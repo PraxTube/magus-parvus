@@ -54,6 +54,10 @@ https://pimen.itch.io/earth-spell-effect-2
 
 https://pimen.itch.io/fire-spell-effect-02
 
+### Smoke Effect
+
+https://pimen.itch.io/smoke-vfx-1
+
 ---
 
 ## UI
