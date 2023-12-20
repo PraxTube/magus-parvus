@@ -59,7 +59,9 @@ fn adjust_sprite_flip(
         Err(_) => return,
     };
 
-    if demon_boss.state == DemonBossState::Striking {
+    if demon_boss.state == DemonBossState::Striking
+        || demon_boss.state == DemonBossState::Staggering
+    {
         return;
     }
 
@@ -123,7 +125,7 @@ fn staggering_to_idle(
     }
 
     commands.spawn(MovementCooldownTimer(Timer::from_seconds(
-        1.0,
+        0.6,
         TimerMode::Once,
     )));
 }
@@ -145,7 +147,10 @@ fn switch_to_striking(
         Err(_) => return,
     };
 
-    if demon_boss.state == DemonBossState::Striking {
+    if demon_boss.state == DemonBossState::Casting
+        || demon_boss.state == DemonBossState::Striking
+        || demon_boss.state == DemonBossState::Dying
+    {
         return;
     }
 
@@ -181,10 +186,10 @@ fn switch_to_casting(
         Err(_) => return,
     };
 
-    if demon_boss.state == DemonBossState::Casting {
-        return;
-    }
-    if demon_boss.state == DemonBossState::Striking {
+    if demon_boss.state == DemonBossState::Casting
+        || demon_boss.state == DemonBossState::Striking
+        || demon_boss.state == DemonBossState::Dying
+    {
         return;
     }
 
