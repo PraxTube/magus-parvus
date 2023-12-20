@@ -22,6 +22,9 @@ struct Shadow;
 struct DemonCollider;
 
 fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
+    if true {
+        return;
+    }
     let mut animator = AnimationPlayer2D::default();
     animator
         .play(assets.enemy_boss_animations[0].clone())
@@ -139,10 +142,15 @@ pub struct DemonBossSpawnPlugin;
 
 impl Plugin for DemonBossSpawnPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Gaming), (spawn_demon_boss,))
-            .add_systems(
-                Update,
-                (despawn_demon_boss, despawn_shadow, despawn_demon_colliders),
-            );
+        app.add_systems(
+            Update,
+            (
+                spawn_demon_boss,
+                despawn_demon_boss,
+                despawn_shadow,
+                despawn_demon_colliders,
+            )
+                .run_if(in_state(GameState::Gaming)),
+        );
     }
 }

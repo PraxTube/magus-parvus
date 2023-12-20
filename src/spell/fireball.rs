@@ -1,4 +1,4 @@
-use std::f32::consts::TAU;
+use std::f32::consts::{PI, TAU};
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -6,7 +6,7 @@ use bevy_rapier2d::prelude::*;
 use crate::enemy::Enemy;
 use crate::player::Player;
 use crate::utils::anim_sprite::{AnimSprite, AnimSpriteTimer};
-use crate::utils::{quat_from_vec2, quat_from_vec3};
+use crate::utils::quat_from_vec2;
 use crate::{GameAssets, GameState};
 
 use super::{Spell, SpellCasted};
@@ -14,7 +14,6 @@ use super::{Spell, SpellCasted};
 const SPEED: f32 = 300.0;
 const SCALE: f32 = 1.25;
 const SCALE_TIME: f32 = 0.35;
-const DELTA_STEERING: f32 = 3.0;
 const INFERNO_COUNT: usize = 25;
 
 #[derive(Component)]
@@ -73,6 +72,7 @@ fn spawn_fireballs(
     mut commands: Commands,
     assets: Res<GameAssets>,
     q_player: Query<(&Transform, &Player)>,
+    q_enemies: Query<&Transform, With<Enemy>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
     let (player_transform, player) = match q_player.get_single() {
@@ -80,11 +80,24 @@ fn spawn_fireballs(
         Err(_) => return,
     };
 
+    let mut closest_enemy = Vec2::INFINITY;
+    for enemy_transform in &q_enemies {
+        if enemy_transform.translation.truncate().length_squared() < closest_enemy.length_squared()
+        {
+            closest_enemy = enemy_transform.translation.truncate();
+        }
+    }
+    let rot = if closest_enemy == Vec2::INFINITY {
+        quat_from_vec2(Vec2::new(-player.current_direction.x, 0.0))
+    } else {
+        quat_from_vec2(-closest_enemy + player_transform.translation.truncate())
+    };
+
     for ev in ev_spell_casted.read() {
         if ev.spell == Spell::Fireball {
             let transform = Transform::from_translation(player_transform.translation)
                 .with_scale(Vec3::splat(SCALE))
-                .with_rotation(quat_from_vec2(-player.current_direction));
+                .with_rotation(rot);
             spawn_fireball(&mut commands, &assets, transform, 5.0);
         }
     }
@@ -93,21 +106,38 @@ fn spawn_fireballs(
 fn spawn_ignis_pila(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    q_player: Query<&Transform, With<Player>>,
+    q_player: Query<(&Transform, &Player)>,
+    q_enemies: Query<&Transform, With<Enemy>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let player_pos = match q_player.get_single() {
-        Ok(p) => p.translation,
+    let (player_pos, player) = match q_player.get_single() {
+        Ok(p) => (p.0.translation, p.1),
         Err(_) => return,
+    };
+
+    let mut closest_enemy = Vec2::INFINITY;
+    for enemy_transform in &q_enemies {
+        if enemy_transform.translation.truncate().length_squared() < closest_enemy.length_squared()
+        {
+            closest_enemy = enemy_transform.translation.truncate();
+        }
+    }
+    let angle = if closest_enemy == Vec2::INFINITY {
+        if player.current_direction.x < 0.0 {
+            0.0
+        } else {
+            PI
+        }
+    } else {
+        Vec2::X.angle_between(-closest_enemy + player_pos.truncate())
     };
 
     for ev in ev_spell_casted.read() {
         if ev.spell == Spell::IgnisPila {
-            let count = 8;
-            for i in 0..count {
+            for offset in [0.0, 0.08, -0.08, 0.16, -0.16] {
                 let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
-                    .with_rotation(Quat::from_rotation_z(TAU * i as f32 / count as f32));
+                    .with_rotation(Quat::from_rotation_z(angle + offset));
                 spawn_fireball(&mut commands, &assets, transform, 3.0);
             }
         }
@@ -152,40 +182,6 @@ fn move_fireballs(time: Res<Time>, mut q_fireballs: Query<&mut Transform, With<F
     }
 }
 
-fn steer_fireballs(
-    time: Res<Time>,
-    mut q_fireballs: Query<&mut Transform, (With<Fireball>, Without<Enemy>)>,
-    q_enemies: Query<&Transform, With<Enemy>>,
-) {
-    for mut transform in &mut q_fireballs {
-        let point_far_away = transform.translation - transform.local_x() * 100_000_000.0;
-        let mut closest_enemy = Transform::from_translation(point_far_away);
-
-        for enemey_transform in &q_enemies {
-            if enemey_transform
-                .translation
-                .distance_squared(transform.translation)
-                < closest_enemy
-                    .translation
-                    .distance_squared(transform.translation)
-            {
-                closest_enemy = *enemey_transform;
-            }
-        }
-
-        let dir = transform.rotation.mul_vec3(Vec3::X);
-        let target_dir = -closest_enemy.translation + transform.translation;
-        let angle = dir.truncate().angle_between(target_dir.truncate());
-
-        if angle.abs() < DELTA_STEERING * time.delta_seconds() {
-            transform.rotation = quat_from_vec3(target_dir);
-        } else {
-            let sign = angle / angle.abs();
-            transform.rotate_z(sign * time.delta_seconds() * DELTA_STEERING);
-        }
-    }
-}
-
 fn tick_fireball_timers(time: Res<Time>, mut q_fireballs: Query<&mut Fireball>) {
     for mut fireball in &mut q_fireballs {
         fireball.timer.tick(time.delta());
@@ -216,7 +212,6 @@ impl Plugin for FireballPlugin {
                 despawn_fireballs,
                 scale_fireballs,
                 move_fireballs,
-                steer_fireballs,
                 tick_fireball_timers,
             )
                 .run_if(in_state(GameState::Gaming)),
