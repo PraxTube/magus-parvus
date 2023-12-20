@@ -19,13 +19,7 @@ impl PopUp {
     }
 }
 
-fn spawn_item_title(
-    commands: &mut Commands,
-    font: Handle<Font>,
-    ev: &StatueUnlockedDelayed,
-) -> Entity {
-    let text = item_title(&ev.statue.item);
-
+fn spawn_item_title(commands: &mut Commands, font: Handle<Font>, text: String) -> Entity {
     let text_style = TextStyle {
         font,
         font_size: 40.0,
@@ -38,13 +32,7 @@ fn spawn_item_title(
     commands.spawn(text_bundle).id()
 }
 
-fn spawn_item_description(
-    commands: &mut Commands,
-    font: Handle<Font>,
-    ev: &StatueUnlockedDelayed,
-) -> Entity {
-    let text = item_description(&ev.statue.item);
-
+fn spawn_item_description(commands: &mut Commands, font: Handle<Font>, text: String) -> Entity {
     let text_style = TextStyle {
         font,
         font_size: 24.0,
@@ -60,8 +48,8 @@ fn spawn_item_description(
 }
 
 fn spawn_pop_up(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlockedDelayed) {
-    let title = spawn_item_title(commands, font.clone(), ev);
-    let description = spawn_item_description(commands, font, ev);
+    let title = spawn_item_title(commands, font.clone(), item_title(&ev.statue.item));
+    let description = spawn_item_description(commands, font, item_description(&ev.statue.item));
 
     commands
         .spawn((

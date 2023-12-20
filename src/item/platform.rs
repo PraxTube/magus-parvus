@@ -1,11 +1,16 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 use bevy_trickfilm::prelude::*;
 
-use crate::{player::PLAYER_SPAWN_POS, world::camera::YSort, GameAssets, GameState};
+use crate::{
+    player::{Player, PLAYER_SPAWN_POS},
+    world::camera::YSort,
+    GameAssets, GameState,
+};
 
 use super::{statue::StatueUnlockedDelayed, ActiveItems, STATUE_COUNT};
 
-const OFFSET: Vec3 = Vec3::new(0.0, -24.0, 0.0);
+const OFFSET: Vec3 = Vec3::new(0.0, -16.0, 0.0);
 const MAX_ITEM_HEIGHT: f32 = 16.0;
 const ITEM_SPEED: f32 = 15.0;
 
@@ -17,6 +22,9 @@ struct PlatformItem {
 }
 #[derive(Component)]
 struct PlatformItemComponent;
+
+#[derive(Event)]
+pub struct TriggerFinalAct;
 
 fn spawn_platform(mut commands: Commands, assets: Res<GameAssets>) {
     let mut animator = AnimationPlayer2D::default();
@@ -34,11 +42,10 @@ fn spawn_platform(mut commands: Commands, assets: Res<GameAssets>) {
     ));
 }
 
-fn trigger_platform(
+fn spawn_trigger_item(
     mut commands: Commands,
     assets: Res<GameAssets>,
     active_items: Res<ActiveItems>,
-    mut q_platform: Query<&mut AnimationPlayer2D, With<Platform>>,
     mut ev_statue_unlocked_delayed: EventReader<StatueUnlockedDelayed>,
 ) {
     if ev_statue_unlocked_delayed.is_empty() {
@@ -52,6 +59,8 @@ fn trigger_platform(
 
     commands.spawn((
         PlatformItem::default(),
+        Sensor,
+        Collider::ball(15.0),
         SpriteBundle {
             texture: assets.platform_item.clone(),
             transform: Transform::from_translation(PLAYER_SPAWN_POS + OFFSET),
@@ -78,6 +87,36 @@ fn trigger_platform(
             ..default()
         },
     ));
+}
+
+fn despawn_trigger_item(
+    mut commands: Commands,
+    q_platform_items: Query<Entity, With<PlatformItem>>,
+    q_platform_components: Query<Entity, With<PlatformItemComponent>>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    for entity in &q_platform_items {
+        commands.entity(entity).despawn_recursive();
+    }
+    for entity in &q_platform_components {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+fn trigger_platform(
+    assets: Res<GameAssets>,
+    mut q_platform: Query<&mut AnimationPlayer2D, With<Platform>>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
 
     let mut animator = match q_platform.get_single_mut() {
         Ok(r) => r,
@@ -107,14 +146,53 @@ fn hover_platform_item(
     transform.translation += sign * Vec3::Y * ITEM_SPEED * time.delta_seconds();
 }
 
+fn trigger_final_act(
+    mut q_player: Query<&Player>,
+    q_final_act: Query<Entity, With<PlatformItem>>,
+    mut ev_collision_events: EventReader<CollisionEvent>,
+    mut ev_trigger_final_act: EventWriter<TriggerFinalAct>,
+) {
+    let player = match q_player.get_single_mut() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+    let item_entity = match q_final_act.get_single() {
+        Ok(r) => r,
+        Err(_) => return,
+    };
+
+    for ev in ev_collision_events.read() {
+        let (source, target) = match ev {
+            CollisionEvent::Started(source, target, _) => (source, target),
+            CollisionEvent::Stopped(_, _, _) => continue,
+        };
+
+        if !(&player.collider_entity == source && &item_entity == target)
+            && !(&player.collider_entity == target && &item_entity == source)
+        {
+            continue;
+        }
+
+        ev_trigger_final_act.send(TriggerFinalAct);
+    }
+}
+
 pub struct PlatformPlugin;
 
 impl Plugin for PlatformPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Gaming), spawn_platform)
-            .add_systems(
-                Update,
-                (trigger_platform, hover_platform_item).run_if(in_state(GameState::Gaming)),
-            );
+        app.add_systems(
+            Update,
+            (
+                spawn_trigger_item,
+                despawn_trigger_item,
+                hover_platform_item,
+                trigger_platform,
+                trigger_final_act,
+            )
+                .run_if(in_state(GameState::Gaming)),
+        )
+        .add_event::<TriggerFinalAct>()
+        .add_systems(OnEnter(GameState::Gaming), spawn_platform);
     }
 }

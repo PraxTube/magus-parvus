@@ -4,6 +4,7 @@ use bevy_trickfilm::animation::AnimationPlayer2D;
 
 use crate::{
     enemy::Enemy,
+    item::platform::TriggerFinalAct,
     player::PLAYER_SPAWN_POS,
     ui::health::Health,
     world::camera::{YSort, TRANSLATION_TO_PIXEL},
@@ -21,10 +22,16 @@ struct Shadow;
 #[derive(Component)]
 struct DemonCollider;
 
-fn spawn_demon_boss(mut commands: Commands, assets: Res<GameAssets>) {
-    if true {
+fn spawn_demon_boss(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
         return;
     }
+    ev_trigger_final_act.clear();
+
     let mut animator = AnimationPlayer2D::default();
     animator
         .play(assets.enemy_boss_animations[0].clone())

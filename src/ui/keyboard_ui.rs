@@ -1,11 +1,16 @@
 use bevy::prelude::*;
 
+use crate::item::statue::StatueUnlockedDelayed;
+use crate::item::{ActiveItems, STATUE_COUNT};
 use crate::player::PLAYER_SPAWN_POS;
 use crate::utils::anim_sprite::{AnimationIndices, FrameTimer};
 use crate::{GameAssets, GameState};
 
 const ANCHOR: Vec3 = Vec3::new(-150.0, 100.0, -1.0);
 const BLINK_TIME: f32 = 0.5;
+
+#[derive(Component)]
+struct KeyboardIcon;
 
 enum Icon {
     J,
@@ -43,17 +48,23 @@ fn spawn_icon(
     let index = icon_index(icon);
 
     if !(animated) {
-        commands.spawn((SpriteSheetBundle {
-            texture_atlas,
-            sprite: TextureAtlasSprite { index, ..default() },
-            transform: Transform::from_translation(offset.extend(0.0) + ANCHOR + PLAYER_SPAWN_POS)
+        commands.spawn((
+            KeyboardIcon,
+            SpriteSheetBundle {
+                texture_atlas,
+                sprite: TextureAtlasSprite { index, ..default() },
+                transform: Transform::from_translation(
+                    offset.extend(0.0) + ANCHOR + PLAYER_SPAWN_POS,
+                )
                 .with_scale(Vec3::splat(0.75)),
-            ..default()
-        },));
+                ..default()
+            },
+        ));
         return;
     }
 
     commands.spawn((
+        KeyboardIcon,
         AnimationIndices {
             first: index,
             last: index + 1,
@@ -139,10 +150,34 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
     );
 }
 
+fn despawn_keyboard_ui(
+    mut commands: Commands,
+    active_items: Res<ActiveItems>,
+    q_icons: Query<Entity, With<KeyboardIcon>>,
+    mut ev_statue_unlocked_delayed: EventReader<StatueUnlockedDelayed>,
+) {
+    if ev_statue_unlocked_delayed.is_empty() {
+        return;
+    }
+    ev_statue_unlocked_delayed.clear();
+
+    if active_items.len() < STATUE_COUNT {
+        return;
+    }
+
+    for entity in &q_icons {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 pub struct KeyboardUiPlugin;
 
 impl Plugin for KeyboardUiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Gaming), spawn_keyboard_ui);
+        app.add_systems(OnEnter(GameState::Gaming), spawn_keyboard_ui)
+            .add_systems(
+                Update,
+                (despawn_keyboard_ui,).run_if(in_state(GameState::Gaming)),
+            );
     }
 }

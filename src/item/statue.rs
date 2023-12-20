@@ -10,6 +10,7 @@ use crate::world::camera::{YSort, TRANSLATION_TO_PIXEL};
 use crate::world::BACKGROUND_ZINDEX_ABS;
 use crate::{GameAssets, GameState};
 
+use super::platform::TriggerFinalAct;
 use super::{ActiveItems, Item};
 
 const BLINK_OFFSET: Vec3 = Vec3::new(0.0, 32.0, 0.0);
@@ -24,6 +25,8 @@ pub struct Statue {
     pub all_enemies_spawned: bool,
     unlocked: bool,
 }
+#[derive(Component)]
+struct StatueBeam;
 
 #[derive(Component)]
 struct UnlockTimer {
@@ -145,6 +148,7 @@ fn spawn_statue_beams(
 ) {
     for ev in ev_statue_unlocked_delayed.read() {
         commands.spawn((
+            StatueBeam,
             AnimSprite::new(4, true),
             AnimSpriteTimer::new(0.05),
             YSort((BEAM_OFFSET.y - 1.0) * TRANSLATION_TO_PIXEL),
@@ -243,6 +247,36 @@ fn unlock_statues(
     }
 }
 
+fn despawn_statues(
+    mut commands: Commands,
+    q_statues: Query<Entity, With<Statue>>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    for entity in &q_statues {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+fn despawn_statue_beams(
+    mut commands: Commands,
+    q_statue_beams: Query<Entity, With<StatueBeam>>,
+    mut ev_trigger_final_act: EventReader<TriggerFinalAct>,
+) {
+    if ev_trigger_final_act.is_empty() {
+        return;
+    }
+    ev_trigger_final_act.clear();
+
+    for entity in &q_statue_beams {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 pub struct StatuePlugin;
 
 impl Plugin for StatuePlugin {
@@ -259,6 +293,8 @@ impl Plugin for StatuePlugin {
                 despawn_unlock_timers,
                 trigger_statues,
                 unlock_statues,
+                despawn_statues,
+                despawn_statue_beams,
             )
                 .run_if(in_state(GameState::Gaming)),
         )

@@ -1,16 +1,16 @@
 pub mod item_value;
+pub mod platform;
 pub mod statue;
 
 mod enemy_spawner;
 mod enemy_sub_spawner;
-mod platform;
 mod sound;
 mod statue_wall;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-const STATUE_COUNT: usize = 1;
+pub const STATUE_COUNT: usize = 1;
 
 pub struct ItemPlugin;
 
