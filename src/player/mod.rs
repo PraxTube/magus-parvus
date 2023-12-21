@@ -1,4 +1,5 @@
 pub mod input;
+pub mod speed_timer;
 pub mod state;
 pub mod stats;
 
@@ -32,6 +33,7 @@ impl Plugin for PlayerPlugin {
             collision::PlayerCollisionPlugin,
             movement::PlayerMovementPlugin,
             spawn::PlayerSpawnPlugin,
+            speed_timer::SpeedTimerPlugin,
         ));
     }
 }

@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     audio::{GameAudio, PlaySound},
+    player::speed_timer::SpeedTimer,
     GameAssets, GameState,
 };
 
@@ -41,19 +42,45 @@ fn spawn_title(commands: &mut Commands, font: Handle<Font>) -> Entity {
         color: Color::WHITE,
     };
     let text_bundle =
-        TextBundle::from_sections([TextSection::new("WIN".to_string(), text_style.clone())]);
+        TextBundle::from_sections([TextSection::new("YOU WIN".to_string(), text_style.clone())]);
     commands.spawn((GameOverScreen, text_bundle)).id()
 }
 
-fn spawn_text(commands: &mut Commands, font: Handle<Font>) {
+fn spawn_thank_you(commands: &mut Commands, font: Handle<Font>) -> Entity {
+    let text_style = TextStyle {
+        font,
+        font_size: 40.0,
+        color: Color::WHITE,
+    };
+    let text_bundle = TextBundle::from_sections([TextSection::new(
+        "THANKS FOR PLAYING".to_string(),
+        text_style.clone(),
+    )]);
+    commands.spawn((GameOverScreen, text_bundle)).id()
+}
+
+fn spawn_time(commands: &mut Commands, font: Handle<Font>, time: f32) -> Entity {
+    let text = format!("TIME: {:.2} seconds", time);
+    let text_style = TextStyle {
+        font,
+        font_size: 60.0,
+        color: Color::WHITE,
+    };
+    let text_bundle = TextBundle::from_sections([TextSection::new(text, text_style.clone())]);
+    commands.spawn((GameOverScreen, text_bundle)).id()
+}
+
+fn spawn_text(commands: &mut Commands, font: Handle<Font>, time: f32) {
     let title_text = spawn_title(commands, font.clone());
+    let thank_you_text = spawn_thank_you(commands, font.clone());
+    let time_text = spawn_time(commands, font.clone(), time);
 
     commands
         .spawn((
             GameOverScreen,
             NodeBundle {
                 style: Style {
-                    top: Val::Percent(35.0),
+                    top: Val::Percent(20.0),
                     width: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
                     row_gap: Val::Vh(10.0),
@@ -65,16 +92,16 @@ fn spawn_text(commands: &mut Commands, font: Handle<Font>) {
                 ..default()
             },
         ))
-        .push_children(&[title_text]);
+        .push_children(&[title_text, thank_you_text, time_text]);
 }
 
 fn spawn_audio_silence_timer(commands: &mut Commands) {
     commands.spawn(AudioSilenceTimer(Timer::from_seconds(0.1, TimerMode::Once)));
 }
 
-fn spawn_win_screen(mut commands: Commands, assets: Res<GameAssets>) {
+fn spawn_win_screen(mut commands: Commands, assets: Res<GameAssets>, speed_timer: Res<SpeedTimer>) {
     spawn_background(&mut commands, assets.white_pixel.clone());
-    spawn_text(&mut commands, assets.font.clone());
+    spawn_text(&mut commands, assets.font.clone(), speed_timer.elapsed);
     spawn_audio_silence_timer(&mut commands);
 }
 

@@ -58,6 +58,10 @@ https://pimen.itch.io/fire-spell-effect-02
 
 https://pimen.itch.io/smoke-vfx-1
 
+### Portal
+
+https://elthen.itch.io/2d-pixel-art-portal-sprites
+
 ---
 
 ## UI
