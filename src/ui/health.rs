@@ -154,6 +154,8 @@ fn update_player_hearts(
         for (mut ui_image, heart) in &mut q_hearts {
             if heart.index >= threshold_index {
                 ui_image.texture = assets.heart_empty.clone();
+            } else {
+                ui_image.texture = assets.heart_full.clone();
             }
         }
     }
