@@ -11,7 +11,7 @@ use crate::{
 
 const WALL_PADDING: f32 = 10.0;
 const COUNT: usize = 100;
-const RADIUS: f32 = 400.0;
+const RADIUS: f32 = 300.0;
 
 fn spawn_wall(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3, flip_x: bool) {
     let mut animator = AnimationPlayer2D::default();

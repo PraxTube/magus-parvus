@@ -62,12 +62,12 @@ pub fn item_wall_offset(item: &Item) -> f32 {
     match item {
         Item::NotImplemented => 0.0,
         Item::Tutorial => 0.0,
-        Item::IgnisPila => 200.0,
-        Item::InfernoPila => 300.0,
-        Item::Fulgur => 300.0,
-        Item::ScutumGlaciei => 300.0,
-        Item::AerTracto => 300.0,
-        Item::AerPello => 300.0,
+        Item::Fulgur => 150.0,
+        Item::IgnisPila => 150.0,
+        Item::AerTracto => 200.0,
+        Item::InfernoPila => 200.0,
+        Item::ScutumGlaciei => 225.0,
+        Item::AerPello => 250.0,
         Item::FulgurAvis => 300.0,
     }
 }
@@ -90,33 +90,59 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
     match statue.item {
         Item::NotImplemented => Vec::new(),
         Item::Tutorial => Vec::new(),
-        Item::IgnisPila => vec![(
+        Item::Fulgur => vec![(
             0.0,
             EnemySubSpawner {
                 statue: statue.clone(),
                 count: 1,
                 angle: PI / 2.0,
+                radius: 100.0,
                 spawn_formation: SpawnFormation::Group,
                 ..default()
             },
         )],
+        Item::IgnisPila => vec![(
+            0.0,
+            EnemySubSpawner {
+                statue: statue.clone(),
+                count: 3,
+                angle: 0.0,
+                radius: 100.0,
+                spawn_formation: SpawnFormation::Group,
+                ..default()
+            },
+        )],
+        Item::AerTracto => vec![
+            (
+                3.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 3,
+                    spawn_formation: SpawnFormation::Group,
+                    angle: 3.0 / 2.0 * PI,
+                    timer: Timer::from_seconds(0.3, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 3,
+                    spawn_formation: SpawnFormation::Circle,
+                    timer: Timer::from_seconds(0.2, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+        ],
         Item::InfernoPila => vec![(
             0.0,
             EnemySubSpawner {
                 statue: statue.clone(),
-                count: 6,
-                timer: Timer::from_seconds(0.5, TimerMode::Repeating),
+                count: 8,
+                radius: 160.0,
+                timer: Timer::from_seconds(0.25, TimerMode::Repeating),
                 spawn_formation: SpawnFormation::Circle,
-                ..default()
-            },
-        )],
-        Item::Fulgur => vec![(
-            0.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 2,
-                spawn_formation: SpawnFormation::Random,
-                timer: Timer::from_seconds(0.5, TimerMode::Repeating),
                 ..default()
             },
         )],
@@ -125,51 +151,9 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
                 5.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
-                    count: 5,
-                    spawn_formation: SpawnFormation::Circle,
-                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-            (
-                0.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
-                    count: 5,
-                    spawn_formation: SpawnFormation::Group,
-                    timer: Timer::from_seconds(0.25, TimerMode::Repeating),
-                    ..default()
-                },
-            ),
-        ],
-        Item::AerTracto => vec![(
-            0.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 10,
-                spawn_formation: SpawnFormation::Random,
-                timer: Timer::from_seconds(0.3, TimerMode::Repeating),
-                ..default()
-            },
-        )],
-        Item::AerPello => vec![(
-            1.0,
-            EnemySubSpawner {
-                statue: statue.clone(),
-                count: 15,
-                spawn_formation: SpawnFormation::Group,
-                timer: Timer::from_seconds(0.0, TimerMode::Repeating),
-                ..default()
-            },
-        )],
-        Item::FulgurAvis => vec![
-            (
-                5.0,
-                EnemySubSpawner {
-                    statue: statue.clone(),
                     count: 10,
+                    radius: 150.0,
                     spawn_formation: SpawnFormation::Circle,
-                    offset: 100.0,
                     timer: Timer::from_seconds(0.0, TimerMode::Repeating),
                     ..default()
                 },
@@ -178,9 +162,81 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
                 0.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
+                    count: 10,
+                    radius: 200.0,
+                    spawn_formation: SpawnFormation::Circle,
+                    timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+        ],
+        Item::AerPello => vec![
+            (
+                5.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 10,
+                    radius: 200.0,
+                    spawn_formation: SpawnFormation::Circle,
+                    timer: Timer::from_seconds(0.15, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 15,
+                    radius: 240.0,
+                    angle: 0.0,
+                    spawn_formation: SpawnFormation::Group,
+                    timer: Timer::from_seconds(0.05, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 15,
+                    radius: 240.0,
+                    angle: PI,
+                    spawn_formation: SpawnFormation::Group,
+                    timer: Timer::from_seconds(0.05, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+        ],
+        Item::FulgurAvis => vec![
+            (
+                5.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 10,
+                    spawn_formation: SpawnFormation::Circle,
+                    radius: 100.0,
+                    timer: Timer::from_seconds(0.0, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                7.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
                     count: 20,
                     spawn_formation: SpawnFormation::Random,
-                    offset: 200.0,
+                    radius: 200.0,
+                    timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+                    ..default()
+                },
+            ),
+            (
+                0.0,
+                EnemySubSpawner {
+                    statue: statue.clone(),
+                    count: 50,
+                    spawn_formation: SpawnFormation::Circle,
+                    radius: 240.0,
                     timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                     ..default()
                 },

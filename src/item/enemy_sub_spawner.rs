@@ -19,7 +19,7 @@ pub struct EnemySubSpawner {
     pub statue: Statue,
     pub count: usize,
     pub current_index: usize,
-    pub offset: f32,
+    pub radius: f32,
     pub angle: f32,
     pub spawn_formation: SpawnFormation,
     pub timer: Timer,
@@ -32,7 +32,7 @@ impl Default for EnemySubSpawner {
             statue: Statue::default(),
             count: 0,
             current_index: 0,
-            offset: 150.0,
+            radius: 150.0,
             angle: 0.0,
             spawn_formation: SpawnFormation::Circle,
             timer: Timer::from_seconds(0.0, TimerMode::Once),
@@ -78,16 +78,16 @@ fn spawn_enemy(
                     sub_spawner.current_index as f32 / sub_spawner.count as f32 * TAU,
                 )
                 .mul_vec3(Vec3::X)
-                    * sub_spawner.offset
+                    * sub_spawner.radius
         }
         SpawnFormation::Group => {
             sub_spawner.statue.pos
-                + Quat::from_rotation_z(sub_spawner.angle).mul_vec3(Vec3::X) * sub_spawner.offset
+                + Quat::from_rotation_z(sub_spawner.angle).mul_vec3(Vec3::X) * sub_spawner.radius
         }
         SpawnFormation::Random => {
             sub_spawner.statue.pos
                 + Quat::from_rotation_z(rng.gen_range(0.0..TAU)).mul_vec3(Vec3::X)
-                    * sub_spawner.offset
+                    * sub_spawner.radius
         }
     };
 
