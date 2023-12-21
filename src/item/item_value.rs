@@ -67,7 +67,7 @@ pub fn item_wall_offset(item: &Item) -> f32 {
         Item::AerTracto => 200.0,
         Item::InfernoPila => 200.0,
         Item::ScutumGlaciei => 225.0,
-        Item::AerPello => 250.0,
+        Item::AerPello => 300.0,
         Item::FulgurAvis => 300.0,
     }
 }

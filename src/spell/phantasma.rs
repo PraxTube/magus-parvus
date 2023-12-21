@@ -28,7 +28,7 @@ struct PhantasmaTimer {
 impl Default for PhantasmaTimer {
     fn default() -> Self {
         Self {
-            timer: Timer::from_seconds(10.0, TimerMode::Once),
+            timer: Timer::from_seconds(30.0, TimerMode::Once),
         }
     }
 }

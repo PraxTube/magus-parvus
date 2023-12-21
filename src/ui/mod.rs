@@ -9,6 +9,7 @@ mod pop_up;
 mod spell_book;
 mod statue_counter;
 mod vignette;
+mod win_ui;
 
 use bevy::prelude::*;
 
@@ -27,6 +28,7 @@ impl Plugin for UiPlugin {
             statue_counter::StatueCounterUiPlugin,
             vignette::VignettePlugin,
             platform_arrow::PlatformArrowPlugin,
+            win_ui::WinUiPlugin,
         ));
     }
 }

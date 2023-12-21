@@ -114,6 +114,15 @@ pub struct GameAssets {
     #[asset(paths("spell/smoke.trickfilm#main"), collection(typed))]
     pub demon_boss_smoke_animations: Vec<Handle<AnimationClip2D>>,
 
+    #[asset(texture_atlas(tile_size_x = 64.0, tile_size_y = 64.0, columns = 8, rows = 2))]
+    #[asset(path = "spell/portal.png")]
+    pub portal: Handle<TextureAtlas>,
+    #[asset(
+        paths("spell/portal.trickfilm#spawn", "spell/portal.trickfilm#idle"),
+        collection(typed)
+    )]
+    pub portal_animations: Vec<Handle<AnimationClip2D>>,
+
     // --- MAP ---
     #[asset(path = "map/level.ldtk")]
     pub level: Handle<LdtkProject>,

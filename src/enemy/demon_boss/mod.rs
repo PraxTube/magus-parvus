@@ -1,4 +1,5 @@
 pub mod explosion;
+pub mod spawn;
 
 mod audio;
 mod cast;
@@ -6,10 +7,10 @@ mod collision;
 mod earth_prison;
 mod movement;
 mod rage;
-mod spawn;
 mod state;
 mod strike;
 mod wall;
+mod win_item;
 
 use bevy::prelude::*;
 
@@ -31,6 +32,7 @@ impl Plugin for DemonBossPlugin {
             rage::DemonBossRagePlugin,
             earth_prison::DemonBossEarthPrisonPlugin,
             wall::DemonBossWallPlugin,
+            win_item::WinItemPlugin,
         ));
     }
 }

@@ -4,6 +4,7 @@ use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
 use crate::{
+    enemy::demon_boss::spawn::DemonBossDeath,
     item::{platform::TriggerFinalAct, statue::StatueUnlockedDelayed},
     GameAssets, GameState,
 };
@@ -151,6 +152,26 @@ fn despawn_normal_bgm(
     }
 }
 
+fn fade_out_boss_bgm(
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
+    q_bgms: Query<&Bgm>,
+    mut ev_demon_boss_death: EventReader<DemonBossDeath>,
+) {
+    if ev_demon_boss_death.is_empty() {
+        return;
+    }
+    ev_demon_boss_death.clear();
+
+    for bgm in &q_bgms {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+            instance.set_volume(
+                0.0,
+                AudioTween::new(Duration::from_secs_f32(2.5), AudioEasing::Linear),
+            );
+        }
+    }
+}
+
 pub struct BgmPlugin;
 
 impl Plugin for BgmPlugin {
@@ -164,6 +185,7 @@ impl Plugin for BgmPlugin {
                     mute_bgms.after(update_bgm_volumes),
                     unmute_bgms,
                     despawn_normal_bgm,
+                    fade_out_boss_bgm,
                 ),
             );
     }

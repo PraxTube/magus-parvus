@@ -28,6 +28,7 @@ pub enum GameState {
     AssetLoading,
     Gaming,
     GameOver,
+    Win,
 }
 
 fn main() {

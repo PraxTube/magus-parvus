@@ -28,6 +28,9 @@ struct SpawnDelay(Timer);
 #[derive(Component)]
 struct Smoke;
 
+#[derive(Event)]
+pub struct DemonBossDeath;
+
 fn spawn_smokes(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3) {
     let mut animator = AnimationPlayer2D::default();
     animator.play(assets.demon_boss_smoke_animations[0].clone());
@@ -131,6 +134,7 @@ fn spawn_demon_boss_delay(
 fn despawn_demon_boss(
     mut commands: Commands,
     mut q_demon_boss: Query<(Entity, &Health, &mut DemonBoss, &AnimationPlayer2D)>,
+    mut ev_demon_boss_death: EventWriter<DemonBossDeath>,
 ) {
     let (entity, health, mut demon_boss, animator) = match q_demon_boss.get_single_mut() {
         Ok(r) => r,
@@ -143,6 +147,7 @@ fn despawn_demon_boss(
 
     if health.health <= 0.0 && demon_boss.state != DemonBossState::Dying {
         demon_boss.state = DemonBossState::Dying;
+        ev_demon_boss_death.send(DemonBossDeath);
     }
 }
 
@@ -205,6 +210,7 @@ impl Plugin for DemonBossSpawnPlugin {
                 despawn_demon_colliders,
             )
                 .run_if(in_state(GameState::Gaming)),
-        );
+        )
+        .add_event::<DemonBossDeath>();
     }
 }
