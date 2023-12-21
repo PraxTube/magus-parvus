@@ -9,6 +9,7 @@ mod rage;
 mod spawn;
 mod state;
 mod strike;
+mod wall;
 
 use bevy::prelude::*;
 
@@ -29,6 +30,7 @@ impl Plugin for DemonBossPlugin {
             collision::DemonBossCollisionPlugin,
             rage::DemonBossRagePlugin,
             earth_prison::DemonBossEarthPrisonPlugin,
+            wall::DemonBossWallPlugin,
         ));
     }
 }
