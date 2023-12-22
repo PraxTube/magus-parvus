@@ -16,7 +16,7 @@ const PUSH_INTENSITY: f32 = 400.0;
 const AER_TRACTO_COUNT: usize = 15;
 const AER_PELLO_COUNT: usize = 10;
 const AER_TRACTO_OFFSET: Vec3 = Vec3::new(125.0, 0.0, 0.0);
-const AER_PELLO_OFFSET: Vec3 = Vec3::new(125.0, 0.0, 0.0);
+const AER_PELLO_OFFSET: Vec3 = Vec3::new(75.0, 0.0, 0.0);
 
 #[derive(Component)]
 pub struct AerTracto {

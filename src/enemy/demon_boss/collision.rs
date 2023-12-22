@@ -52,10 +52,10 @@ fn fireball_collisions(
             continue;
         };
 
-        if fireball.disabled {
+        if fireball.disabled() {
             continue;
         }
-        fireball.disabled = true;
+        fireball.disable();
 
         health.health -= fireball.damage;
     }

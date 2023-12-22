@@ -106,10 +106,10 @@ fn fireball_collisions(
             continue;
         };
 
-        if fireball.disabled {
+        if fireball.disabled() {
             continue;
         }
-        fireball.disabled = true;
+        fireball.disable();
 
         let dir = (slime_transform.translation - fireball_transform.translation)
             .truncate()

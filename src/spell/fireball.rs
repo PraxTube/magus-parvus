@@ -18,7 +18,8 @@ const INFERNO_COUNT: usize = 25;
 
 #[derive(Component)]
 pub struct Fireball {
-    pub disabled: bool,
+    disabled: bool,
+    piercing: bool,
     pub damage: f32,
     timer: Timer,
 }
@@ -27,9 +28,22 @@ impl Default for Fireball {
     fn default() -> Self {
         Self {
             disabled: false,
+            piercing: false,
             damage: 5.0,
             timer: Timer::from_seconds(5.0, TimerMode::Once),
         }
+    }
+}
+
+impl Fireball {
+    pub fn disable(&mut self) {
+        if !self.piercing {
+            self.disabled = true;
+        }
+    }
+
+    pub fn disabled(&self) -> bool {
+        self.disabled
     }
 }
 
@@ -38,11 +52,13 @@ fn spawn_fireball(
     assets: &Res<GameAssets>,
     transform: Transform,
     damage: f32,
+    piercing: bool,
 ) {
     let entity = commands
         .spawn((
             Fireball {
                 damage,
+                piercing,
                 ..default()
             },
             SpriteSheetBundle {
@@ -98,7 +114,7 @@ fn spawn_fireballs(
             let transform = Transform::from_translation(player_transform.translation)
                 .with_scale(Vec3::splat(SCALE))
                 .with_rotation(rot);
-            spawn_fireball(&mut commands, &assets, transform, 5.0);
+            spawn_fireball(&mut commands, &assets, transform, 5.0, false);
         }
     }
 }
@@ -138,7 +154,7 @@ fn spawn_ignis_pila(
                 let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
                     .with_rotation(Quat::from_rotation_z(angle + offset));
-                spawn_fireball(&mut commands, &assets, transform, 3.0);
+                spawn_fireball(&mut commands, &assets, transform, 3.0, true);
             }
         }
     }
@@ -161,7 +177,7 @@ fn spawn_inferno_pila(
                 let transform = Transform::from_translation(player_pos)
                     .with_scale(Vec3::ZERO)
                     .with_rotation(Quat::from_rotation_z(TAU * i as f32 / INFERNO_COUNT as f32));
-                spawn_fireball(&mut commands, &assets, transform, 2.0);
+                spawn_fireball(&mut commands, &assets, transform, 2.0, true);
             }
         }
     }
