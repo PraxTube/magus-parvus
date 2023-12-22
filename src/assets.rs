@@ -158,7 +158,7 @@ pub struct GameAssets {
     pub heart_empty: Handle<Image>,
     #[asset(path = "ui/statue_icon.png")]
     pub statue_ui_icon: Handle<Image>,
-    #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 3, rows = 5))]
+    #[asset(texture_atlas(tile_size_x = 34.0, tile_size_y = 34.0, columns = 3, rows = 6))]
     #[asset(path = "ui/keys.png")]
     pub keyboard_ui: Handle<TextureAtlas>,
     #[asset(path = "ui/vignette.png")]

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 use crate::item::statue::StatueUnlockedDelayed;
 use crate::item::{ActiveItems, STATUE_COUNT};
@@ -18,6 +19,7 @@ enum Icon {
     A,
     D,
     I,
+    H,
     Left,
     Right,
     Up,
@@ -35,6 +37,7 @@ fn icon_index(icon: Icon) -> usize {
         Icon::D => 9,
         Icon::Right => 11,
         Icon::I => 12,
+        Icon::H => 15,
     }
 }
 
@@ -64,6 +67,7 @@ fn spawn_icon(
     }
 
     commands.spawn((
+        Collider::cuboid(16.0, 16.0),
         KeyboardIcon,
         AnimationIndices {
             first: index,
@@ -146,6 +150,13 @@ fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
         texture_atlas.clone(),
         Icon::I,
         Vec2::new(400.0, 150.0),
+        true,
+    );
+    spawn_icon(
+        &mut commands,
+        texture_atlas.clone(),
+        Icon::H,
+        Vec2::new(30.0, 800.0),
         true,
     );
 }
