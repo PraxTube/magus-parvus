@@ -99,7 +99,15 @@ fn play_sounds(
                     },
                 ))
                 .id();
-            commands.entity(parent).push_children(&[audio_emitter]);
+
+            match commands.get_entity(parent) {
+                Some(mut r) => {
+                    r.push_children(&[audio_emitter]);
+                }
+                None => {
+                    warn!("audio parent does not exist");
+                }
+            };
         };
     }
 }
