@@ -19,6 +19,7 @@ fn spawn_slime(
             RigidBody::Dynamic,
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
+            Ccd::enabled(),
             Enemy { damage: 1.0 },
             Health::new(10.0),
             SlimeEnemy::default(),

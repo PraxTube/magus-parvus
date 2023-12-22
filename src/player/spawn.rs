@@ -20,6 +20,7 @@ fn spawn_player(
             RigidBody::Dynamic,
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
+            Ccd::enabled(),
             Stats::default(),
             Health::new(PLAYER_HEALTH),
             YSort(0.0),

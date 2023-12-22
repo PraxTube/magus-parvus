@@ -103,6 +103,7 @@ fn spawn_demon_boss(
             RigidBody::Dynamic,
             LockedAxes::ROTATION_LOCKED,
             Velocity::zero(),
+            Ccd::enabled(),
             DemonBoss::default(),
             DemonBossStepsTimer::default(),
             DemonBossStrike::default(),

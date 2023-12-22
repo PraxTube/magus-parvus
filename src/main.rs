@@ -48,7 +48,10 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .build(),
             RapierPhysicsPlugin::<NoUserData>::default(),
-            RapierDebugRenderPlugin::default(),
+            RapierDebugRenderPlugin {
+                enabled: false,
+                ..default()
+            },
             Animation2DPlugin,
         ))
         .insert_resource(Msaa::Off)

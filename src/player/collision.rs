@@ -44,6 +44,10 @@ fn slime_collisions(
             Err(_) => continue,
         };
 
+        if player.state == PlayerState::Staggering {
+            continue;
+        }
+
         health.health -= enemy.damage;
         player.state = PlayerState::Staggering;
 

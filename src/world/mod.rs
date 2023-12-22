@@ -2,6 +2,7 @@ pub mod camera;
 pub mod camera_shake;
 
 mod map;
+mod rapier_debug;
 
 pub use camera::MainCamera;
 pub use camera_shake::CameraShake;
@@ -20,6 +21,7 @@ impl Plugin for WorldPlugin {
             camera::CameraPlugin,
             camera_shake::CameraShakePlugin,
             map::MapPlugin,
+            rapier_debug::RapierDebugPlugin,
         ))
         .add_systems(Startup, configure_physics);
     }
