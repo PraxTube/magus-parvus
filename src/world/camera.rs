@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
+#[cfg(not(target_arch = "wasm32"))]
+use bevy::render::view::screenshot::ScreenshotManager;
 use bevy::window::{PrimaryWindow, WindowMode};
 use bevy_kira_audio::prelude::AudioReceiver;
 use bevy_rapier2d::dynamics::Velocity;
@@ -100,6 +102,25 @@ fn toggle_full_screen(
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+fn take_screenshot(
+    keys: Res<Input<KeyCode>>,
+    main_window: Query<Entity, With<PrimaryWindow>>,
+    mut screenshot_manager: ResMut<ScreenshotManager>,
+    mut counter: Local<u32>,
+) {
+    if !keys.just_pressed(KeyCode::F12) {
+        return;
+    }
+
+    let path = format!("./screenshot-{}.png", *counter);
+    *counter += 1;
+    match screenshot_manager.save_screenshot_to_disk(main_window.single(), path) {
+        Ok(()) => {}
+        Err(err) => error!("failed to take screenshot, {}", err),
+    }
+}
+
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
@@ -109,6 +130,8 @@ impl Plugin for CameraPlugin {
             (
                 #[cfg(not(target_arch = "wasm32"))]
                 toggle_full_screen,
+                #[cfg(not(target_arch = "wasm32"))]
+                take_screenshot,
                 apply_y_sort,
                 zoom_camera,
             ),
