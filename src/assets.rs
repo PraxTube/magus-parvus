@@ -228,6 +228,8 @@ pub struct GameAssets {
     #[asset(path = "sounds/earth_wall.ogg")]
     pub earth_wall_sound: Handle<AudioSource>,
 
+    #[asset(path = "sounds/game_won.ogg")]
+    pub game_won_sound: Handle<AudioSource>,
     #[asset(path = "sounds/game_over.ogg")]
     pub game_over_sound: Handle<AudioSource>,
 

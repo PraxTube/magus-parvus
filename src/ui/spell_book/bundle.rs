@@ -153,8 +153,7 @@ pub struct SpellbookViewDescriptionBundle {
 impl SpellbookViewDescriptionBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         let value = "Walk up to a statue and defeat all slimes.".to_string()
-            + " You will get a new spell from each statue.\n"
-            + "Press 'i' to open your spell console and type your spell. Try 'fireball'.";
+            + " You will get a new spell from each statue.\n";
         Self {
             spellbook_view_description: SpellbookViewDescription,
             text_bundle: TextBundle {

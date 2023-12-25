@@ -127,7 +127,7 @@ fn reduce_audio_volume(
 
 fn play_sound(assets: Res<GameAssets>, mut ev_play_sound: EventWriter<PlaySound>) {
     ev_play_sound.send(PlaySound {
-        clip: assets.game_over_sound.clone(),
+        clip: assets.game_won_sound.clone(),
         ..default()
     });
 }
