@@ -38,10 +38,6 @@ fn spawn_slime(
         .spawn((
             Collider::ball(6.0),
             ActiveEvents::COLLISION_EVENTS,
-            // CollisionGroups::new(
-            //     Group::from_bits(0b0100).unwrap(),
-            //     Group::from_bits(0b1000).unwrap(),
-            // ),
             TransformBundle::from_transform(Transform::from_translation(Vec3::new(
                 0.0, -10.0, 0.0,
             ))),

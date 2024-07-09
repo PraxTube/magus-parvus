@@ -151,8 +151,8 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
                 5.0,
                 EnemySubSpawner {
                     statue: statue.clone(),
-                    count: 6,
-                    radius: 175.0,
+                    count: 4,
+                    radius: 150.0,
                     spawn_formation: SpawnFormation::Circle,
                     timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                     ..default()
@@ -163,7 +163,7 @@ pub fn statue_sub_spawner(statue: &Statue) -> Vec<(f32, EnemySubSpawner)> {
                 EnemySubSpawner {
                     statue: statue.clone(),
                     count: 8,
-                    radius: 210.0,
+                    radius: 180.0,
                     spawn_formation: SpawnFormation::Random,
                     timer: Timer::from_seconds(0.3, TimerMode::Repeating),
                     ..default()
