@@ -101,10 +101,7 @@ impl Plugin for PopUpPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (
-                spawn_pop_ups.run_if(in_state(GameState::Gaming)),
-                despawn_pop_ups,
-            ),
+            (spawn_pop_ups, despawn_pop_ups).run_if(in_state(GameState::Gaming)),
         );
     }
 }

@@ -8,14 +8,13 @@
 
 <body>
   <div class="game-container">
-    <div id="canvas-container"></div>
+    <div id="game-canvas"></div>
     <div id="loading">
       <span class="loader"></span>
     </div>
   </div>
 
   <script type="module">
-    console.log("initiating bevy game");
     import './restart-audio-context.js'
     import init from './bevy_game.js'
 
@@ -27,15 +26,6 @@
 
     console.log("loaded bevy game now");
 
-    // Function to move canvas to the specified container
-    function moveCanvas() {
-      const canvas = document.querySelector('canvas');
-      const canvasContainer = document.getElementById('canvas-container');
-      if (canvas && canvasContainer) {
-        canvasContainer.appendChild(canvas);
-      }
-    }
-
     // Hide loading screen and move canvas when the game starts
     const loading = document.getElementById('loading');
     const observer = new MutationObserver(() => {
@@ -43,7 +33,6 @@
       const canvas = document.querySelector('canvas');
       if (canvas) {
         loading.style.display = 'none';
-        moveCanvas();
         observer.disconnect();
       } else {
         console.warn("no canvas item");

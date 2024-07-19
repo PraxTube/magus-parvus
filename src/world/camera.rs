@@ -13,7 +13,6 @@ use crate::player::Player;
 #[cfg(not(target_arch = "wasm32"))]
 use crate::player::PlayerState;
 use crate::spell::debug_spell::DebugSpell;
-use crate::GameState;
 
 // How much `1.0` in bevy coordinates translates to the pixels of a sprite.
 // Only relevant for the ysorting.
@@ -129,7 +128,7 @@ impl Plugin for CameraPlugin {
                 zoom_camera,
             ),
         )
-        .add_systems(OnEnter(GameState::Gaming), spawn_camera)
+        .add_systems(Startup, spawn_camera)
         .add_systems(
             PostUpdate,
             update_camera_target
