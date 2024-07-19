@@ -2607,7 +2607,7 @@ dependencies = [
 
 [[package]]
 name = "magus-parvus"
-version = "0.1.6"
+version = "0.2.0"
 dependencies = [
  "bevy",
  "bevy_asset_loader",

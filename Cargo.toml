@@ -1,6 +1,6 @@
 [package]
 name = "magus-parvus"
-version = "0.1.6"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,6 +12,14 @@ opt-level = 1
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
+
+# https://github.com/rust-lang/cargo/issues/4897
+[profile.wasm]
+inherits = "release"
+panic = "abort"
+opt-level = 'z'
+lto = true
+codegen-units = 1
 
 [dependencies]
 rand = "0.8.5"

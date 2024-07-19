@@ -2,13 +2,16 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 #[cfg(not(target_arch = "wasm32"))]
 use bevy::render::view::screenshot::ScreenshotManager;
+#[cfg(not(target_arch = "wasm32"))]
 use bevy::window::{PrimaryWindow, WindowMode};
 use bevy_kira_audio::prelude::AudioReceiver;
 use bevy_rapier2d::plugin::PhysicsSet;
 
 use super::camera_shake::{update_camera, CameraShake};
 use crate::player::input::PlayerInput;
-use crate::player::{Player, PlayerState};
+use crate::player::Player;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::player::PlayerState;
 use crate::spell::debug_spell::DebugSpell;
 use crate::GameState;
 

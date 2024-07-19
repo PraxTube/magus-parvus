@@ -1,8 +1,21 @@
 <!doctype html>
 <html lang="en">
 
-<body style="margin: 0px;">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="game-container">
+    <div id="canvas-container"></div>
+    <div id="loading">
+      <span class="loader"></span>
+    </div>
+  </div>
+
   <script type="module">
+    console.log("initiating bevy game");
     import './restart-audio-context.js'
     import init from './bevy_game.js'
 
@@ -11,7 +24,34 @@
         throw error;
       }
     });
+
+    console.log("loaded bevy game now");
+
+    // Function to move canvas to the specified container
+    function moveCanvas() {
+      const canvas = document.querySelector('canvas');
+      const canvasContainer = document.getElementById('canvas-container');
+      if (canvas && canvasContainer) {
+        canvasContainer.appendChild(canvas);
+      }
+    }
+
+    // Hide loading screen and move canvas when the game starts
+    const loading = document.getElementById('loading');
+    const observer = new MutationObserver(() => {
+      console.log("checkign for canvas");
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        loading.style.display = 'none';
+        moveCanvas();
+        observer.disconnect();
+      } else {
+        console.warn("no canvas item");
+      }
+    });
+
+    // Start observing the document for changes
+    observer.observe(document.body, { childList: true, subtree: true });
   </script>
 </body>
-
 </html>
