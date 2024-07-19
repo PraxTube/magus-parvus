@@ -79,6 +79,9 @@ impl Plugin for CameraShakePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (decay_shake_trauma,))
             .init_resource::<CameraShake>()
-            .add_systems(PostUpdate, update_camera);
+            .add_systems(
+                PostUpdate,
+                update_camera.before(TransformSystem::TransformPropagate),
+            );
     }
 }
