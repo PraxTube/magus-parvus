@@ -56,7 +56,7 @@ pub fn spawn_scrollable_list(
 }
 
 fn scroll_lists(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     active_items: Res<ActiveItems>,
     mut q_scrollable_lists: Query<(&mut ScrollingList, &mut Style, &Parent, &Node)>,
     q_nodes: Query<&Node>,
@@ -76,12 +76,13 @@ fn scroll_lists(
         return;
     }
 
-    if (keys.just_pressed(KeyCode::J) || keys.just_pressed(KeyCode::S))
+    if (keys.just_pressed(KeyCode::KeyJ) || keys.just_pressed(KeyCode::KeyS))
         && scrolling_list.index != active_items.len() - 1
     {
         scrolling_list.index += 1;
     }
-    if (keys.just_pressed(KeyCode::K) || keys.just_pressed(KeyCode::W)) && scrolling_list.index != 0
+    if (keys.just_pressed(KeyCode::KeyK) || keys.just_pressed(KeyCode::KeyW))
+        && scrolling_list.index != 0
     {
         scrolling_list.index -= 1;
     }

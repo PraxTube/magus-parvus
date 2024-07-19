@@ -31,12 +31,12 @@ fn update_animation(
     };
 
     let (clip, repeat) = match demon_boss.state {
-        DemonBossState::Idling => (assets.enemy_boss_animations[0].clone(), true),
-        DemonBossState::Casting => (assets.enemy_boss_animations[1].clone(), true),
-        DemonBossState::Moving => (assets.enemy_boss_animations[2].clone(), true),
-        DemonBossState::Striking => (assets.enemy_boss_animations[3].clone(), false),
-        DemonBossState::Staggering => (assets.enemy_boss_animations[4].clone(), false),
-        DemonBossState::Dying => (assets.enemy_boss_animations[5].clone(), false),
+        DemonBossState::Idling => (assets.demon_boss_animations[0].clone(), true),
+        DemonBossState::Casting => (assets.demon_boss_animations[1].clone(), true),
+        DemonBossState::Moving => (assets.demon_boss_animations[2].clone(), true),
+        DemonBossState::Striking => (assets.demon_boss_animations[3].clone(), false),
+        DemonBossState::Staggering => (assets.demon_boss_animations[4].clone(), false),
+        DemonBossState::Dying => (assets.demon_boss_animations[5].clone(), false),
     };
 
     if repeat {
@@ -47,7 +47,7 @@ fn update_animation(
 }
 
 fn adjust_sprite_flip(
-    mut q_demon_boss: Query<(&Transform, &mut TextureAtlasSprite, &DemonBoss)>,
+    mut q_demon_boss: Query<(&Transform, &mut Sprite, &DemonBoss)>,
     q_player: Query<&Transform, (With<Player>, Without<DemonBoss>)>,
 ) {
     let (demon_boss_transform, mut sprite, demon_boss) = match q_demon_boss.get_single_mut() {

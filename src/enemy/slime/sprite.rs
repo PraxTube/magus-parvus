@@ -12,16 +12,14 @@ fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
     }
 }
 
-fn update_indicies(
-    mut q_slimes: Query<(&mut AnimationIndices, &mut TextureAtlasSprite, &SlimeEnemy)>,
-) {
-    for (mut indices, mut sprite, slime) in &mut q_slimes {
+fn update_indicies(mut q_slimes: Query<(&mut AnimationIndices, &mut TextureAtlas, &SlimeEnemy)>) {
+    for (mut indices, mut layout, slime) in &mut q_slimes {
         let new_indices = slime_sprite_indices(&slime.state);
 
         if new_indices.0 != indices.first {
             indices.first = new_indices.0;
             indices.last = new_indices.1;
-            sprite.index = indices.first;
+            layout.index = indices.first;
         }
     }
 }

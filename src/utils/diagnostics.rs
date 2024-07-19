@@ -54,7 +54,7 @@ impl Plugin for DiagnosticsPlugin {
         .add_systems(OnEnter(GameState::Gaming), toggle_off)
         .add_systems(
             Update,
-            toggle_diagnostics.run_if(resource_changed::<DebugSpell>()),
+            toggle_diagnostics.run_if(resource_changed::<DebugSpell>),
         );
     }
 }

@@ -6,18 +6,8 @@ use crate::{player::Player, utils::COLLISION_GROUPS_NONE};
 
 use super::{Spell, SpellCasted};
 
-const DEFAULT_COLOR: Color = Color::Rgba {
-    red: 1.0,
-    green: 1.0,
-    blue: 1.0,
-    alpha: 1.0,
-};
-const PHANTASMA_COLOR: Color = Color::Rgba {
-    red: 1.0,
-    green: 1.0,
-    blue: 1.0,
-    alpha: 0.5,
-};
+const DEFAULT_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 1.0);
+const PHANTASMA_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 0.5);
 const DEFAULT_COLLISION_GROUPS: CollisionGroups = CollisionGroups::new(Group::ALL, Group::ALL);
 
 #[derive(Component)]
@@ -35,7 +25,7 @@ impl Default for PhantasmaTimer {
 
 fn activate_phantasma(
     mut commands: Commands,
-    mut q_player: Query<(&Children, &mut TextureAtlasSprite), With<Player>>,
+    mut q_player: Query<(&Children, &mut Sprite), With<Player>>,
     mut q_colliders: Query<&mut CollisionGroups>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
@@ -63,7 +53,7 @@ fn activate_phantasma(
 fn deactivate_phantasma(
     mut commands: Commands,
     time: Res<Time>,
-    mut q_player: Query<(&Children, &mut TextureAtlasSprite), With<Player>>,
+    mut q_player: Query<(&Children, &mut Sprite), With<Player>>,
     mut q_colliders: Query<&mut CollisionGroups>,
     mut q_timers: Query<(Entity, &mut PhantasmaTimer)>,
 ) {

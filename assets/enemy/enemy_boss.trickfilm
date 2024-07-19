@@ -1,32 +1,26 @@
-[
-    (
-        name: "idle",
+{
+    "idle": (
         keyframes: KeyframesRange((start: 0, end: 6)),
         duration: 0.6,
     ),
-    (
-        name: "casting",
+    "casting": (
         keyframes: KeyframesRange((start: 7, end: 13)),
         duration: 0.6,
     ),
-    (
-        name: "walking",
+    "walking": (
         keyframes: KeyframesRange((start: 22, end: 30)),
         duration: 1.6,
     ),
-    (
-        name: "striking",
+    "striking": (
         keyframes: KeyframesRange((start: 44, end: 59)),
         duration: 2.0,
     ),
-    (
-        name: "staggering",
+    "staggering": (
         keyframes: KeyframesRange((start: 66, end: 71)),
         duration: 0.5,
     ),
-    (
-        name: "dying",
+    "dying": (
         keyframes: KeyframesRange((start: 88, end: 110)),
         duration: 2.0,
     ),
-]
+}

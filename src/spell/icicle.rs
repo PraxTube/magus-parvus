@@ -46,14 +46,18 @@ fn spawn_icicle(commands: &mut Commands, assets: &Res<GameAssets>, transform: Tr
     let entity = commands
         .spawn((
             Icicle::default(),
-            SpriteSheetBundle {
-                transform,
-                texture_atlas: assets.icicle.clone(),
-                ..default()
-            },
+            YSort(10.0),
             AnimSprite::new(30, true),
             AnimSpriteTimer::new(0.05),
-            YSort(10.0),
+            SpriteBundle {
+                texture: assets.icicle_texture.clone(),
+                transform,
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.icicle_layout.clone(),
+                ..default()
+            },
         ))
         .id();
 
@@ -96,14 +100,18 @@ fn spawn_scutum_glaciei(
 
 fn spawn_icicle_shatter(commands: &mut Commands, assets: &Res<GameAssets>, position: Vec3) {
     commands.spawn((
-        SpriteSheetBundle {
-            transform: Transform::from_translation(position),
-            texture_atlas: assets.icicle_shatter.clone(),
-            ..default()
-        },
+        YSort(10.0),
         AnimSprite::new(49, false),
         AnimSpriteTimer::new(0.02),
-        YSort(10.0),
+        SpriteBundle {
+            texture: assets.icicle_shatter_texture.clone(),
+            transform: Transform::from_translation(position),
+            ..default()
+        },
+        TextureAtlas {
+            layout: assets.icicle_shatter_layout.clone(),
+            ..default()
+        },
     ));
 }
 

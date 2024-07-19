@@ -42,9 +42,13 @@ fn spawn_win_item(
         Sensor,
         animator,
         YSort(0.0),
-        SpriteSheetBundle {
-            texture_atlas: assets.portal.clone(),
+        SpriteBundle {
+            texture: assets.portal_texture.clone(),
             transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
+            ..default()
+        },
+        TextureAtlas {
+            layout: assets.portal_layout.clone(),
             ..default()
         },
     ));
@@ -87,7 +91,7 @@ fn switch_animations(
 
 fn adjust_flip(
     q_player: Query<&Transform, With<Player>>,
-    mut q_win_item: Query<(&Transform, &mut TextureAtlasSprite), (With<WinItem>, Without<Player>)>,
+    mut q_win_item: Query<(&Transform, &mut Sprite), (With<WinItem>, Without<Player>)>,
 ) {
     let player_pos = match q_player.get_single() {
         Ok(r) => r.translation,

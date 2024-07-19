@@ -33,7 +33,7 @@ fn spawn_rage_aura(
             RageAura,
             YSort(-0.5),
             SpriteBundle {
-                texture: assets.enemy_boss_aura.clone(),
+                texture: assets.demon_boss_aura.clone(),
                 ..default()
             },
         ))

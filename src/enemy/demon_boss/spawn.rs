@@ -39,9 +39,13 @@ fn spawn_smokes(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3) {
         Smoke,
         animator,
         YSort(1.0),
-        SpriteSheetBundle {
-            texture_atlas: assets.demon_boss_smoke.clone(),
+        SpriteBundle {
+            texture: assets.demon_boss_smoke_texture.clone(),
             transform: Transform::from_translation(pos).with_scale(Vec3::splat(5.0)),
+            ..default()
+        },
+        TextureAtlas {
+            layout: assets.demon_boss_smoke_layout.clone(),
             ..default()
         },
     ));
@@ -74,7 +78,7 @@ fn spawn_demon_boss(
 
     let mut animator = AnimationPlayer2D::default();
     animator
-        .play(assets.enemy_boss_animations[0].clone())
+        .play(assets.demon_boss_animations[0].clone())
         .repeat();
 
     let shadow = commands
@@ -82,7 +86,7 @@ fn spawn_demon_boss(
             Shadow,
             YSort(-1.0),
             SpriteBundle {
-                texture: assets.enemy_boss_shadow.clone(),
+                texture: assets.demon_boss_shadow.clone(),
                 transform: Transform::from_translation(Vec3::new(0.0, -44.0, 0.0)),
                 ..default()
             },
@@ -111,9 +115,13 @@ fn spawn_demon_boss(
             Health::new(100.0),
             animator,
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
-            SpriteSheetBundle {
-                texture_atlas: assets.enemy_boss.clone(),
+            SpriteBundle {
+                texture: assets.demon_boss_texture.clone(),
                 transform: Transform::from_translation(pos).with_scale(Vec3::splat(SCALE)),
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.demon_boss_layout.clone(),
                 ..default()
             },
         ))
@@ -170,12 +178,8 @@ fn despawn_shadow(
         return;
     }
 
-    sprite.color = Color::rgba(
-        sprite.color.r(),
-        sprite.color.g(),
-        sprite.color.b(),
-        sprite.color.a() - time.delta_seconds(),
-    );
+    let new_alpha = sprite.color.alpha() - time.delta_seconds();
+    sprite.color.set_alpha(new_alpha);
 }
 
 fn despawn_demon_colliders(

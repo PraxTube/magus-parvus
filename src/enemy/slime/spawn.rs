@@ -26,9 +26,13 @@ fn spawn_slime(
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             YSort(0.0),
-            SpriteSheetBundle {
+            SpriteBundle {
+                texture: assets.slime_texture.clone(),
                 transform: Transform::from_translation(spawn_pos).with_scale(Vec3::splat(1.5)),
-                texture_atlas: assets.enemy.clone(),
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.slime_layout.clone(),
                 ..default()
             },
         ))

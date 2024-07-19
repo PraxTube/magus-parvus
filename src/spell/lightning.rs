@@ -36,13 +36,17 @@ fn spawn_lightning(commands: &mut Commands, assets: &Res<GameAssets>, transform:
     let entity = commands
         .spawn((
             Lightning::default(),
-            SpriteSheetBundle {
-                transform,
-                texture_atlas: assets.lightning.clone(),
-                ..default()
-            },
             AnimSprite::new(SPRITES_COUNT, false),
             AnimSpriteTimer::new(SPRITES_TIME),
+            SpriteBundle {
+                texture: assets.lightning_texture.clone(),
+                transform,
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.lightning_layout.clone(),
+                ..default()
+            },
         ))
         .id();
 

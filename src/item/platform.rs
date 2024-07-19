@@ -35,9 +35,13 @@ fn spawn_platform(mut commands: Commands, assets: Res<GameAssets>) {
         Platform,
         animator,
         YSort(-10.0),
-        SpriteSheetBundle {
-            texture_atlas: assets.platform.clone(),
+        SpriteBundle {
+            texture: assets.platform_texture.clone(),
             transform: Transform::from_translation(PLAYER_SPAWN_POS + OFFSET),
+            ..default()
+        },
+        TextureAtlas {
+            layout: assets.platform_layout.clone(),
             ..default()
         },
     ));

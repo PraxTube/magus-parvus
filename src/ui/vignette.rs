@@ -20,9 +20,9 @@ fn spawn_vignette(
         },
         image: UiImage {
             texture: assets.vignette.clone(),
+            color: Color::BLACK,
             ..default()
         },
-        background_color: BackgroundColor(Color::BLACK),
         ..default()
     });
 }

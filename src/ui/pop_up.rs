@@ -43,7 +43,7 @@ fn spawn_item_description(commands: &mut Commands, font: Handle<Font>, text: Str
         ..default()
     };
     commands
-        .spawn(text_bundle.with_text_alignment(TextAlignment::Center))
+        .spawn(text_bundle.with_text_justify(JustifyText::Center))
         .id()
 }
 

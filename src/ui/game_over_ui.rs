@@ -26,9 +26,9 @@ fn spawn_background(commands: &mut Commands, texture: Handle<Image>) {
             },
             image: UiImage {
                 texture,
+                color: Color::srgba(0.2, 0.2, 0.2, 0.85),
                 ..default()
             },
-            background_color: BackgroundColor(Color::rgba(0.2, 0.2, 0.2, 0.85)),
             z_index: ZIndex::Local(100),
             ..default()
         },

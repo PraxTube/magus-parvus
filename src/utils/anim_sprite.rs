@@ -51,28 +51,24 @@ impl AnimSpriteTimer {
 
 fn animate_sprites(
     time: Res<Time>,
-    mut query: Query<(
-        &mut AnimSprite,
-        &mut AnimSpriteTimer,
-        &mut TextureAtlasSprite,
-    )>,
+    mut query: Query<(&mut AnimSprite, &mut AnimSpriteTimer, &mut TextureAtlas)>,
 ) {
-    for (mut asprite, mut timer, mut sprite) in &mut query {
-        if sprite.index > asprite.sprites {
+    for (mut asprite, mut timer, mut layout) in &mut query {
+        if layout.index > asprite.sprites {
             asprite.disabled = true;
             continue;
         }
 
         timer.timer.tick(time.delta());
         if timer.timer.just_finished() {
-            if sprite.index == asprite.sprites {
+            if layout.index == asprite.sprites {
                 if asprite.repeating {
-                    sprite.index = 0;
+                    layout.index = 0;
                 } else {
                     asprite.disabled = true;
                 }
             } else {
-                sprite.index += 1;
+                layout.index += 1;
             }
         }
     }
@@ -80,15 +76,15 @@ fn animate_sprites(
 
 fn animate_complex_sprites(
     time: Res<Time>,
-    mut q_sprites: Query<(&AnimationIndices, &mut FrameTimer, &mut TextureAtlasSprite)>,
+    mut q_sprites: Query<(&AnimationIndices, &mut FrameTimer, &mut TextureAtlas)>,
 ) {
-    for (indices, mut timer, mut sprite) in &mut q_sprites {
+    for (indices, mut timer, mut layout) in &mut q_sprites {
         timer.tick(time.delta());
         if timer.just_finished() {
-            sprite.index = if sprite.index == indices.last {
+            layout.index = if layout.index == indices.last {
                 indices.first
             } else {
-                sprite.index + 1
+                layout.index + 1
             };
         }
     }

@@ -1,7 +1,6 @@
-[
-    (
-        name: "main",
+{
+    "main": (
         keyframes: KeyframesRange((start: 0, end: 13)),
         duration: 0.6,
     ),
-]
+}

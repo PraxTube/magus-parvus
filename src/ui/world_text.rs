@@ -44,7 +44,7 @@ impl Default for WorldText {
         let alpha_curve = CubicBezier::new(alpha_points).to_curve();
         Self {
             font_scale: 10.0,
-            font_color: Color::rgba(1.0, 1.0, 1.0, 0.0),
+            font_color: Color::srgba(1.0, 1.0, 1.0, 0.0),
             offset: Vec3::new(0.0, 10.0, 10.0),
             random_spray_intensity: 5.0,
             timer: Timer::from_seconds(1.0, TimerMode::Once),
@@ -69,7 +69,7 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
         ev.world_text.clone(),
         Text2dBundle {
             text: Text::from_section(ev.content.to_string(), text_style.clone())
-                .with_alignment(TextAlignment::Center),
+                .with_justify(JustifyText::Center),
             transform: Transform::from_translation(ev.pos + rand_offset + ev.world_text.offset)
                 .with_scale(Vec3::splat(ev.world_text.font_scale / FONT_SCALE_RATIO)),
             ..default()
@@ -107,12 +107,8 @@ fn animate_world_texts(
 
         transform.scale = world_text.scale_curve.position(t).y
             * Vec3::splat(world_text.font_scale / FONT_SCALE_RATIO);
-        text.sections[0].style.color = Color::rgba(
-            world_text.font_color.r(),
-            world_text.font_color.g(),
-            world_text.font_color.b(),
-            world_text.alpha_curve.position(t).y,
-        );
+        let new_alpha = world_text.alpha_curve.position(t).y;
+        text.sections[0].style.color = world_text.font_color.with_alpha(new_alpha);
     }
 }
 

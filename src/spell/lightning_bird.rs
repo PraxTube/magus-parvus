@@ -89,9 +89,13 @@ fn spawn_lightning_bird(commands: &mut Commands, assets: &Res<GameAssets>, trans
         .spawn((
             LightningBird::default(),
             animation_player,
-            SpriteSheetBundle {
+            SpriteBundle {
+                texture: assets.lightning_bird_texture.clone(),
                 transform,
-                texture_atlas: assets.lightning_bird.clone(),
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.lightning_bird_layout.clone(),
                 ..default()
             },
         ))
@@ -189,9 +193,13 @@ fn spawn_lightning_strikes(
             .spawn((
                 LightningStrike::default(),
                 animation_player,
-                SpriteSheetBundle {
+                SpriteBundle {
+                    texture: assets.lightning_strike_texture.clone(),
                     transform: Transform::from_translation(strike.pos),
-                    texture_atlas: assets.lightning_strike.clone(),
+                    ..default()
+                },
+                TextureAtlas {
+                    layout: assets.lightning_strike_layout.clone(),
                     ..default()
                 },
             ))
@@ -250,9 +258,9 @@ fn rotate_lightning_birds(
 }
 
 fn adjust_sprite_flip(
-    mut q_lightning_birds: Query<(&mut TextureAtlasSprite, &Transform), With<LightningBird>>,
+    mut q_lightning_birds: Query<(&Transform, &mut Sprite), With<LightningBird>>,
 ) {
-    for (mut sprite, transform) in &mut q_lightning_birds {
+    for (transform, mut sprite) in &mut q_lightning_birds {
         sprite.flip_y = transform.rotation.to_euler(EulerRot::ZYX).0.abs() > PI / 2.0;
     }
 }
@@ -265,16 +273,18 @@ fn despawn_lightning_birds(
     for (entity, transform, lightning_bird) in &q_lightning_birds {
         if lightning_bird.disabled {
             let mut animator = AnimationPlayer2D::default();
-            animator
-                .play(assets.lightning_bird_death_animations[0].clone())
-                .repeat();
+            animator.play(assets.lightning_bird_death_animations[0].clone());
             commands.spawn((
                 animator,
                 LightningBirdDeath,
-                SpriteSheetBundle {
+                SpriteBundle {
+                    texture: assets.lightning_bird_death_texture.clone(),
                     transform: Transform::from_translation(transform.translation)
                         .with_scale(Vec3::splat(3.0)),
-                    texture_atlas: assets.lightning_bird_death.clone(),
+                    ..default()
+                },
+                TextureAtlas {
+                    layout: assets.lightning_bird_death_layout.clone(),
                     ..default()
                 },
             ));

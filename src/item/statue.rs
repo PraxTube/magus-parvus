@@ -132,9 +132,13 @@ fn spawn_statue_blinks(
             AnimSprite::new(5, false),
             AnimSpriteTimer::new(0.1),
             YSort(10.0),
-            SpriteSheetBundle {
-                texture_atlas: assets.statue_blink.clone(),
+            SpriteBundle {
+                texture: assets.statue_blink_texture.clone(),
                 transform: Transform::from_translation(ev.statue.pos + BLINK_OFFSET),
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.statue_blink_layout.clone(),
                 ..default()
             },
         ));
@@ -152,9 +156,13 @@ fn spawn_statue_beams(
             AnimSprite::new(4, true),
             AnimSpriteTimer::new(0.05),
             YSort((BEAM_OFFSET.y - 1.0) * TRANSLATION_TO_PIXEL),
-            SpriteSheetBundle {
-                texture_atlas: assets.statue_beam.clone(),
+            SpriteBundle {
+                texture: assets.statue_beam_texture.clone(),
                 transform: Transform::from_translation(ev.statue.pos + BEAM_OFFSET),
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.statue_beam_layout.clone(),
                 ..default()
             },
         ));
@@ -217,7 +225,7 @@ fn trigger_statues(
         statue.pos = statue_transform.translation();
         ev_statue_triggered.send(StatueTriggered {
             statue: statue.clone(),
-        })
+        });
     }
 }
 
@@ -243,7 +251,7 @@ fn unlock_statues(
         active_items.push(statue.item.clone());
         ev_statue_unlocked.send(StatueUnlocked {
             statue: statue.clone(),
-        })
+        });
     }
 }
 

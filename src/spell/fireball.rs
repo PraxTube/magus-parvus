@@ -61,13 +61,17 @@ fn spawn_fireball(
                 piercing,
                 ..default()
             },
-            SpriteSheetBundle {
-                transform,
-                texture_atlas: assets.fireball.clone(),
-                ..default()
-            },
             AnimSprite::new(60, true),
             AnimSpriteTimer::new(0.05),
+            SpriteBundle {
+                texture: assets.fireball_texture.clone(),
+                transform,
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.fireball_layout.clone(),
+                ..default()
+            },
         ))
         .id();
 

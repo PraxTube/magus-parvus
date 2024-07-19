@@ -26,13 +26,17 @@ fn spawn_player(
             YSort(0.0),
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
-            SpriteSheetBundle {
+            StepsTimer::default(),
+            SpriteBundle {
+                texture: assets.player_texture.clone(),
                 transform: Transform::from_translation(PLAYER_SPAWN_POS)
                     .with_scale(Vec3::splat(2.0)),
-                texture_atlas: assets.player.clone(),
                 ..default()
             },
-            StepsTimer::default(),
+            TextureAtlas {
+                layout: assets.player_layout.clone(),
+                ..default()
+            },
         ))
         .id();
 

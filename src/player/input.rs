@@ -70,9 +70,9 @@ fn fetch_scroll_events(
     }
 }
 
-fn zoom_camera(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+fn zoom_camera(keys: Res<ButtonInput<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
     let mut zoom = 0.0;
-    if keys.just_pressed(KeyCode::Plus) {
+    if keys.just_pressed(KeyCode::Backspace) {
         zoom -= 1.0;
     }
     if keys.just_pressed(KeyCode::Minus) {
@@ -84,40 +84,40 @@ fn zoom_camera(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>)
     }
 }
 
-fn player_movement(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+fn player_movement(keys: Res<ButtonInput<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
     let mut direction = Vec2::default();
 
-    if keys.pressed(KeyCode::J) || keys.pressed(KeyCode::S) {
+    if keys.pressed(KeyCode::KeyJ) || keys.pressed(KeyCode::KeyS) {
         direction += Vec2::new(0.0, -1.0);
     }
-    if keys.pressed(KeyCode::K) || keys.pressed(KeyCode::W) {
+    if keys.pressed(KeyCode::KeyK) || keys.pressed(KeyCode::KeyW) {
         direction += Vec2::new(0.0, 1.0);
     }
-    if keys.pressed(KeyCode::F) || keys.pressed(KeyCode::D) {
+    if keys.pressed(KeyCode::KeyF) || keys.pressed(KeyCode::KeyD) {
         direction += Vec2::new(1.0, 0.0);
     }
-    if keys.pressed(KeyCode::A) {
+    if keys.pressed(KeyCode::KeyA) {
         direction += Vec2::new(-1.0, 0.0);
     }
 
     player_input.move_direction = direction.normalize_or_zero();
 }
 
-fn input_escape(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+fn input_escape(keys: Res<ButtonInput<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
     player_input.escape = keys.just_pressed(KeyCode::Escape);
 }
 
-fn input_casting(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
-    player_input.casting = keys.just_pressed(KeyCode::I);
+fn input_casting(keys: Res<ButtonInput<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+    player_input.casting = keys.just_pressed(KeyCode::KeyI);
 }
 
 fn toggle_fullscreen(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     gamepads: Res<Gamepads>,
-    button_inputs: Res<Input<GamepadButton>>,
+    button_inputs: Res<ButtonInput<GamepadButton>>,
     mut player_input: ResMut<PlayerInput>,
 ) {
-    let mut pressed = keys.just_pressed(KeyCode::B);
+    let mut pressed = keys.just_pressed(KeyCode::KeyB);
     for gamepad in gamepads.iter() {
         if button_inputs.just_pressed(GamepadButton::new(gamepad, GamepadButtonType::DPadUp)) {
             pressed = true;
@@ -127,8 +127,8 @@ fn toggle_fullscreen(
     player_input.toggle_fullscreen = pressed;
 }
 
-fn toggle_spell_book(keys: Res<Input<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
-    let pressed = keys.just_pressed(KeyCode::H);
+fn toggle_spell_book(keys: Res<ButtonInput<KeyCode>>, mut player_input: ResMut<PlayerInput>) {
+    let pressed = keys.just_pressed(KeyCode::KeyH);
     player_input.toggle_spell_book = pressed;
 }
 

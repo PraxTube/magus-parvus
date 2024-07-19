@@ -104,7 +104,7 @@ fn toggle_full_screen(
 
 #[cfg(not(target_arch = "wasm32"))]
 fn take_screenshot(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     main_window: Query<Entity, With<PrimaryWindow>>,
     mut screenshot_manager: ResMut<ScreenshotManager>,
     mut counter: Local<u32>,

@@ -21,8 +21,7 @@ const DISTANCE: f32 = 100.0;
 const SPRITES: usize = 18;
 const SPRITE_TIME: f32 = 0.075;
 
-const START_ALBEDO: f32 = 1.0;
-const SCREEN_COLOR: Color = Color::rgba(0.0, 0.0, 0.0, START_ALBEDO);
+const SCREEN_COLOR: Color = Color::srgba(0.0, 0.0, 0.0, 1.0);
 
 #[derive(Component)]
 struct Death {
@@ -78,10 +77,14 @@ fn spawn_deaths(
                 YSort(100.0),
                 AnimSprite::new(SPRITES, true),
                 AnimSpriteTimer::new(SPRITE_TIME),
-                SpriteSheetBundle {
+                SpriteBundle {
+                    texture: assets.death_texture.clone(),
                     transform: Transform::from_translation(pos + offset)
                         .with_scale(Vec3::splat(SCALE)),
-                    texture_atlas: assets.death.clone(),
+                    ..default()
+                },
+                TextureAtlas {
+                    layout: assets.death_layout.clone(),
                     ..default()
                 },
             ));
@@ -109,16 +112,11 @@ fn tick_screen_effect_timers(time: Res<Time>, mut q_screen_effects: Query<&mut S
     }
 }
 
-fn animate_screen_effects(mut q_screen_effects: Query<(&ScreenEffect, &mut BackgroundColor)>) {
-    for (screen_effect, mut color) in &mut q_screen_effects {
+fn animate_screen_effects(mut q_screen_effects: Query<(&ScreenEffect, &mut UiImage)>) {
+    for (screen_effect, mut image) in &mut q_screen_effects {
         let time =
             screen_effect.timer.elapsed_secs() / screen_effect.timer.duration().as_secs_f32();
-        *color = BackgroundColor(Color::rgba(
-            SCREEN_COLOR.r(),
-            SCREEN_COLOR.g(),
-            SCREEN_COLOR.b(),
-            (1.0 - time) * START_ALBEDO,
-        ));
+        image.color = SCREEN_COLOR.with_alpha(1.0 - time);
     }
 }
 
@@ -153,9 +151,9 @@ fn spawn_screen_effects(
                 },
                 image: UiImage {
                     texture: assets.white_pixel.clone(),
+                    color: SCREEN_COLOR,
                     ..default()
                 },
-                background_color: BackgroundColor(SCREEN_COLOR),
                 ..default()
             },
         ));

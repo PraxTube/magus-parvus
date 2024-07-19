@@ -15,8 +15,8 @@ fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
     }
 }
 
-fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut TextureAtlasSprite, &Player)>) {
-    let (mut indices, mut sprite, player) = match q_player.get_single_mut() {
+fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut TextureAtlas, &Player)>) {
+    let (mut indices, mut layout, player) = match q_player.get_single_mut() {
         Ok(p) => (p.0, p.1, p.2),
         Err(_) => return,
     };
@@ -26,11 +26,11 @@ fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut TextureAtlas
     if new_indices.0 != indices.first {
         indices.first = new_indices.0;
         indices.last = new_indices.1;
-        sprite.index = indices.first;
+        layout.index = indices.first;
     }
 }
 
-fn adjust_sprite_flip(mut q_player: Query<(&mut TextureAtlasSprite, &Player)>) {
+fn adjust_sprite_flip(mut q_player: Query<(&mut Sprite, &Player)>) {
     let (mut sprite, player) = match q_player.get_single_mut() {
         Ok(p) => (p.0, p.1),
         Err(_) => return,

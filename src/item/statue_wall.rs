@@ -32,13 +32,17 @@ fn spawn_wall(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3, flip
         EarthWall::default(),
         animator,
         YSort(0.0),
-        SpriteSheetBundle {
+        SpriteBundle {
+            texture: assets.earth_wall_texture.clone(),
             transform: Transform::from_translation(pos),
-            texture_atlas: assets.earth_wall.clone(),
-            sprite: TextureAtlasSprite {
+            sprite: Sprite {
                 flip_x,
                 ..default()
             },
+            ..default()
+        },
+        TextureAtlas {
+            layout: assets.earth_wall_layout.clone(),
             ..default()
         },
     ));

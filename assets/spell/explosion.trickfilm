@@ -1,12 +1,10 @@
-[
-    (
-        name: "blink",
+{
+    "blink": (
         keyframes: KeyframesRange((start: 14, end: 16)),
         duration: 0.5,
     ),
-    (
-        name: "explode",
+    "explode": (
         keyframes: KeyframesRange((start: 0, end: 14)),
         duration: 1.0,
     ),
-]
+}

@@ -11,7 +11,7 @@ use crate::{
 use super::{debug_spell::DebugSpell, Spell, SpellCasted};
 
 fn double_j_escape(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     mut q_player: Query<&mut Player>,
     mut timer: Local<Timer>,
@@ -28,7 +28,7 @@ fn double_j_escape(
     }
 
     timer.tick(time.delta());
-    if keys.just_pressed(KeyCode::J) {
+    if keys.just_pressed(KeyCode::KeyJ) {
         if timer.finished() {
             timer.set_duration(duration);
             timer.reset();

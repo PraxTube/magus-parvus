@@ -15,6 +15,12 @@ fn spawn_statue_counter(mut commands: Commands, assets: Res<GameAssets>) {
                 texture: assets.statue_ui_icon.clone(),
                 ..default()
             },
+            style: Style {
+                position_type: PositionType::Relative,
+                width: Val::Px(48.0),
+                height: Val::Px(80.0),
+                ..default()
+            },
             ..default()
         })
         .id();
@@ -78,7 +84,7 @@ impl Plugin for StatueCounterUiPlugin {
         app.add_systems(OnEnter(GameState::Gaming), (spawn_statue_counter,))
             .add_systems(
                 Update,
-                (update_text_counter,).run_if(resource_exists::<MaxItems>()),
+                (update_text_counter,).run_if(resource_exists::<MaxItems>),
             );
     }
 }

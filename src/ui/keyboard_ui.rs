@@ -43,118 +43,109 @@ fn icon_index(icon: Icon) -> usize {
 
 fn spawn_icon(
     commands: &mut Commands,
-    texture_atlas: Handle<TextureAtlas>,
+    assets: &Res<GameAssets>,
     icon: Icon,
     offset: Vec2,
     animated: bool,
 ) {
     let index = icon_index(icon);
 
-    if !(animated) {
-        commands.spawn((
-            KeyboardIcon,
-            SpriteSheetBundle {
-                texture_atlas,
-                sprite: TextureAtlasSprite { index, ..default() },
-                transform: Transform::from_translation(
-                    offset.extend(0.0) + ANCHOR + PLAYER_SPAWN_POS,
-                )
-                .with_scale(Vec3::splat(0.75)),
-                ..default()
-            },
-        ));
-        return;
-    }
-
-    commands.spawn((
-        Collider::cuboid(16.0, 16.0),
+    let mut icon = commands.spawn((
         KeyboardIcon,
-        AnimationIndices {
-            first: index,
-            last: index + 1,
-        },
-        FrameTimer(Timer::from_seconds(BLINK_TIME, TimerMode::Repeating)),
-        SpriteSheetBundle {
-            texture_atlas,
-            sprite: TextureAtlasSprite { index, ..default() },
+        SpriteBundle {
+            texture: assets.keyboard_ui_texture.clone(),
             transform: Transform::from_translation(offset.extend(0.0) + ANCHOR + PLAYER_SPAWN_POS)
                 .with_scale(Vec3::splat(0.75)),
             ..default()
         },
+        TextureAtlas {
+            layout: assets.keyboard_ui_layout.clone(),
+            index,
+        },
     ));
+
+    if animated {
+        icon.insert((
+            Collider::cuboid(16.0, 16.0),
+            AnimationIndices {
+                first: index,
+                last: index + 1,
+            },
+            FrameTimer(Timer::from_seconds(BLINK_TIME, TimerMode::Repeating)),
+        ));
+    }
 }
 
 fn spawn_keyboard_ui(mut commands: Commands, assets: Res<GameAssets>) {
-    let texture_atlas = assets.keyboard_ui.clone();
     let button_dis = 30.0;
     let arrow_dis = 55.0;
 
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::J,
         Vec2::new(0.0, -button_dis),
         true,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::Down,
         Vec2::new(0.0, -arrow_dis),
         false,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::K,
         Vec2::new(0.0, button_dis),
         true,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::Up,
         Vec2::new(0.0, arrow_dis),
         false,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::A,
         Vec2::new(-button_dis, 0.0),
         true,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::Left,
         Vec2::new(-arrow_dis, 0.0),
         false,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::D,
         Vec2::new(button_dis, 0.0),
         true,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::Right,
         Vec2::new(arrow_dis, 0.0),
         false,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::I,
         Vec2::new(400.0, 150.0),
         true,
     );
     spawn_icon(
         &mut commands,
-        texture_atlas.clone(),
+        &assets,
         Icon::H,
         Vec2::new(30.0, 800.0),
         true,

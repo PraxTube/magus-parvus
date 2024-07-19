@@ -1,5 +1,6 @@
 use bevy::{
-    input::{keyboard::KeyCode, keyboard::KeyboardInput},
+    color::palettes::css::RED,
+    input::keyboard::{KeyCode, KeyboardInput},
     prelude::*,
     window::PrimaryWindow,
 };
@@ -7,7 +8,7 @@ use bevy::{
 use crate::player::{Player, PlayerChangedState, PlayerState};
 use crate::{GameAssets, GameState};
 
-const TRANSPARENT_BACKGROUND: Color = Color::rgba(0.0, 0.0, 0.0, 0.7);
+const TRANSPARENT_BACKGROUND: Color = Color::srgba(0.0, 0.0, 0.0, 0.7);
 const FONT_SIZE_INPUT: f32 = 32.0;
 const CHAR_SIZE: f32 = 2.5;
 const CHAR_OFFSET: f32 = 1.5;
@@ -50,7 +51,7 @@ fn spawn_text_field(
         Ok(w) => w,
         Err(err) => {
             error!(
-                "there is not exactly one primary window, not casting spel, {}",
+                "there is not exactly one primary window, not casting spell, {}",
                 err
             );
             return;
@@ -123,7 +124,7 @@ fn spawn_text_field(
                     TextStyle {
                         font: assets.font.clone(),
                         font_size: FONT_SIZE_INPUT,
-                        color: Color::RED,
+                        color: RED.into(),
                     },
                 ),
                 ..default()
@@ -181,7 +182,7 @@ fn update_cursor_text(
         if target.sections[0].style.color != Color::NONE {
             target.sections[0].style.color = Color::NONE;
         } else {
-            target.sections[0].style.color = Color::RED;
+            target.sections[0].style.color = RED.into();
         }
     }
 }
@@ -190,7 +191,7 @@ fn push_chars(
     mut typing_state: ResMut<TypingState>,
     mut typing_submit_events: EventWriter<TypingSubmitEvent>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     q_player: Query<&Player>,
 ) {
     let player_state = match q_player.get_single() {
@@ -210,29 +211,29 @@ fn push_chars(
 
         if ev.state.is_pressed() {
             let maybe_char = match ev.key_code {
-                Some(KeyCode::A) => Some('a'),
-                Some(KeyCode::B) => Some('b'),
-                Some(KeyCode::C) => Some('c'),
-                Some(KeyCode::D) => Some('d'),
-                Some(KeyCode::E) => Some('e'),
-                Some(KeyCode::F) => Some('f'),
-                Some(KeyCode::G) => Some('g'),
-                Some(KeyCode::H) => Some('h'),
-                Some(KeyCode::I) => Some('i'),
-                Some(KeyCode::J) => Some('j'),
-                Some(KeyCode::K) => Some('k'),
-                Some(KeyCode::L) => Some('l'),
-                Some(KeyCode::M) => Some('m'),
-                Some(KeyCode::N) => Some('n'),
-                Some(KeyCode::O) => Some('o'),
-                Some(KeyCode::P) => Some('p'),
-                Some(KeyCode::Q) => Some('q'),
-                Some(KeyCode::R) => Some('r'),
-                Some(KeyCode::S) => Some('s'),
-                Some(KeyCode::T) => Some('t'),
-                Some(KeyCode::U) => Some('u'),
-                Some(KeyCode::V) => Some('v'),
-                Some(KeyCode::W) => {
+                KeyCode::KeyA => Some('a'),
+                KeyCode::KeyB => Some('b'),
+                KeyCode::KeyC => Some('c'),
+                KeyCode::KeyD => Some('d'),
+                KeyCode::KeyE => Some('e'),
+                KeyCode::KeyF => Some('f'),
+                KeyCode::KeyG => Some('g'),
+                KeyCode::KeyH => Some('h'),
+                KeyCode::KeyI => Some('i'),
+                KeyCode::KeyJ => Some('j'),
+                KeyCode::KeyK => Some('k'),
+                KeyCode::KeyL => Some('l'),
+                KeyCode::KeyM => Some('m'),
+                KeyCode::KeyN => Some('n'),
+                KeyCode::KeyO => Some('o'),
+                KeyCode::KeyP => Some('p'),
+                KeyCode::KeyQ => Some('q'),
+                KeyCode::KeyR => Some('r'),
+                KeyCode::KeyS => Some('s'),
+                KeyCode::KeyT => Some('t'),
+                KeyCode::KeyU => Some('u'),
+                KeyCode::KeyV => Some('v'),
+                KeyCode::KeyW => {
                     if !control_active {
                         Some('w')
                     } else {
@@ -240,11 +241,11 @@ fn push_chars(
                         None
                     }
                 }
-                Some(KeyCode::X) => Some('x'),
-                Some(KeyCode::Y) => Some('y'),
-                Some(KeyCode::Z) => Some('z'),
-                Some(KeyCode::Space) => Some(' '),
-                Some(KeyCode::Minus) => Some('-'),
+                KeyCode::KeyX => Some('x'),
+                KeyCode::KeyY => Some('y'),
+                KeyCode::KeyZ => Some('z'),
+                KeyCode::Space => Some(' '),
+                KeyCode::Minus => Some('-'),
                 _ => None,
             };
 
@@ -255,12 +256,12 @@ fn push_chars(
                 typing_state.just_typed_char = false;
             }
 
-            if ev.key_code == Some(KeyCode::Return) {
+            if ev.key_code == KeyCode::Enter {
                 let text = typing_state.buf.clone();
                 typing_submit_events.send(TypingSubmitEvent { value: text });
             }
 
-            if ev.key_code == Some(KeyCode::Back) {
+            if ev.key_code == KeyCode::Backspace {
                 if !control_active {
                     typing_state.buf.pop();
                 } else {

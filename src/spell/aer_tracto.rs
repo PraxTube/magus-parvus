@@ -42,13 +42,17 @@ fn spawn_air_pull(
     let entity = commands
         .spawn((
             AerTracto::new(pull_intensity),
-            SpriteSheetBundle {
-                transform,
-                texture_atlas: assets.aer_tracto.clone(),
-                ..default()
-            },
             AnimSprite::new(7, false),
             AnimSpriteTimer::new(0.10),
+            SpriteBundle {
+                texture: assets.aer_tracto_texture.clone(),
+                transform,
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.aer_tracto_layout.clone(),
+                ..default()
+            },
         ))
         .id();
 

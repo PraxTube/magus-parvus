@@ -74,7 +74,7 @@ fn update_bgm_volumes(
 ) {
     let volume = game_audio.main_volume * BGM_VOLUME;
     for bgm in &q_bgms {
-        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.id()) {
             instance.set_volume(volume, AudioTween::default());
         }
     }
@@ -92,7 +92,7 @@ fn mute_bgms(
     ev_statue_unlocked_delayed.clear();
 
     for bgm in &q_bgms {
-        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.id()) {
             commands.spawn(UnmuteTimer::default());
             instance.set_volume(
                 0.0,
@@ -124,7 +124,7 @@ fn unmute_bgms(
     }
 
     for bgm in &q_bgms {
-        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.id()) {
             instance.set_volume(
                 game_audio.main_volume * BGM_VOLUME,
                 AudioTween::new(Duration::from_secs_f32(5.0), AudioEasing::InPowi(2)),
@@ -145,7 +145,7 @@ fn despawn_normal_bgm(
     ev_trigger_final_act.clear();
 
     for (entity, bgm) in &q_bgms {
-        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.id()) {
             instance.stop(AudioTween::default());
         }
         commands.entity(entity).despawn_recursive();
@@ -163,7 +163,7 @@ fn fade_out_boss_bgm(
     ev_demon_boss_death.clear();
 
     for bgm in &q_bgms {
-        if let Some(instance) = audio_instances.get_mut(bgm.handle.clone()) {
+        if let Some(instance) = audio_instances.get_mut(bgm.handle.id()) {
             instance.set_volume(
                 0.0,
                 AudioTween::new(Duration::from_secs_f32(2.5), AudioEasing::Linear),

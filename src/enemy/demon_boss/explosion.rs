@@ -52,9 +52,13 @@ fn spawn_normal_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos
         },
         animator,
         YSort(1.0),
-        SpriteSheetBundle {
-            texture_atlas: assets.demon_boss_explosion.clone(),
+        SpriteBundle {
+            texture: assets.demon_boss_explosion_texture.clone(),
             transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
+            ..default()
+        },
+        TextureAtlas {
+            layout: assets.demon_boss_explosion_layout.clone(),
             ..default()
         },
     ));
@@ -79,9 +83,13 @@ fn spawn_strike_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos
             DemonBossStrikeExplosion { damage: 2.0 },
             animator,
             YSort(0.0),
-            SpriteSheetBundle {
-                texture_atlas: assets.demon_boss_explosion2.clone(),
+            SpriteBundle {
+                texture: assets.demon_boss_explosion2_texture.clone(),
                 transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.5)),
+                ..default()
+            },
+            TextureAtlas {
+                layout: assets.demon_boss_explosion2_layout.clone(),
                 ..default()
             },
         ))
@@ -203,7 +211,7 @@ fn despawn_colliders(
 
 fn spawn_strike_explosions(
     mut commands: Commands,
-    q_demon_boss: Query<(&Transform, &DemonBoss, &TextureAtlasSprite)>,
+    q_demon_boss: Query<(&Transform, &DemonBoss, &Sprite)>,
     mut q_strike_hitbox: Query<&mut DemonBossStrike>,
 ) {
     let (transform, demon_boss, sprite) = match q_demon_boss.get_single() {
