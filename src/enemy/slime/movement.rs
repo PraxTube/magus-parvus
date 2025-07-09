@@ -2,7 +2,8 @@ use rand::{self, Rng};
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
-
+use bevy::input::ButtonInput;
+use bevy::input::keyboard::KeyCode;
 use super::{Enemy, SlimeEnemy, SlimeState, JUMP_TIME, MAX_JUMP_SPEED, RANDOM_OFFSET_INTENSITY};
 use crate::player::Player;
 
@@ -39,6 +40,9 @@ fn update_jump_position(
 
 fn move_slimes(mut q_slimes: Query<(&mut Velocity, &SlimeEnemy)>) {
     for (mut velocity, slime) in &mut q_slimes {
+        if slime.frozen { 
+            continue;
+        }
         if slime.state == SlimeState::Staggering {
             continue;
         }
@@ -52,8 +56,42 @@ fn move_slimes(mut q_slimes: Query<(&mut Velocity, &SlimeEnemy)>) {
 
 pub struct SlimeMovementPlugin;
 
+// impl Plugin for SlimeMovementPlugin {
+//     fn build(&self, app: &mut App) {
+//         app.add_systems(Update, (update_jump_position, move_slimes));
+//     }
+// }
 impl Plugin for SlimeMovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (update_jump_position, move_slimes));
+        app.add_systems(Update, (
+            set_slime_frozen_state,
+            update_jump_position, 
+            move_slimes
+        ));
     }
 }
+
+// 辅助函数：判断史莱姆是否被冻结
+// fn set_slime_frozen_state(
+//     mut query: Query<&mut SlimeEnemy, With<SlimeEnemy>>,
+//     keyboard_input: Res<Input<KeyCode>>,
+// ) {
+//     if keyboard_input.just_pressed(KeyCode::KeyH) {
+//         for mut slime in query.iter_mut() {
+//             slime.frozen =!slime.frozen;
+//         }
+//     }
+// }
+
+
+fn set_slime_frozen_state(
+    mut query: Query<&mut SlimeEnemy, With<SlimeEnemy>>,
+    keys: Res<ButtonInput<KeyCode>>,
+) {
+    if keys.just_pressed(KeyCode::KeyH) {
+        for mut slime in query.iter_mut() {
+            slime.frozen = !slime.frozen;
+        }
+    }
+}
+
