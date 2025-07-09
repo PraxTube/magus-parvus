@@ -42,6 +42,7 @@ pub enum SlimeState {
     Jumping,
     Staggering,
     Dying,
+
 }
 
 #[derive(Component)]
@@ -54,6 +55,7 @@ struct SlimeEnemy {
     death_timer: Timer,
     staggering_timer: Timer,
     disabled: bool,
+    frozen: bool,
 }
 
 #[derive(Event)]
@@ -72,6 +74,7 @@ impl Default for SlimeEnemy {
             death_timer: Timer::from_seconds(0.070 * 6.0, TimerMode::Once),
             staggering_timer: Timer::from_seconds(STAGGERING_TIME, TimerMode::Repeating),
             disabled: false,
+            frozen: false,
         }
     }
 }
