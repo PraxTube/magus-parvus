@@ -58,6 +58,16 @@ impl Statue {
             unlocked: false,
         }
     }
+
+    // 添加公共方法来获取 unlocked 字段的值
+    pub fn is_unlocked(&self) -> bool {
+        self.unlocked
+    }
+
+    // 添加公共方法来设置 unlocked 字段的值
+    pub fn set_unlocked(&mut self, unlocked: bool) {
+        self.unlocked = unlocked;
+    }
 }
 
 impl UnlockTimer {
@@ -236,7 +246,7 @@ fn unlock_statues(
     mut ev_statue_unlocked: EventWriter<StatueUnlocked>,
 ) {
     for mut statue in &mut q_statues {
-        if statue.unlocked {
+        if statue.is_unlocked() {
             continue;
         }
         if !statue.all_enemies_spawned {
@@ -247,7 +257,7 @@ fn unlock_statues(
             continue;
         }
 
-        statue.unlocked = true;
+        statue.set_unlocked(true);
         active_items.push(statue.item.clone());
         ev_statue_unlocked.send(StatueUnlocked {
             statue: statue.clone(),
