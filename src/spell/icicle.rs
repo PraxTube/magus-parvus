@@ -49,15 +49,14 @@ fn spawn_icicle(commands: &mut Commands, assets: &Res<GameAssets>, transform: Tr
             YSort(10.0),
             AnimSprite::new(30, true),
             AnimSpriteTimer::new(0.05),
-            SpriteBundle {
-                texture: assets.icicle_texture.clone(),
-                transform,
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.icicle_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.icicle_texture.clone(),
+                TextureAtlas {
+                    layout: assets.icicle_layout.clone(),
+                    ..default()
+                },
+            ),
+            transform,
         ))
         .id();
 
@@ -65,11 +64,11 @@ fn spawn_icicle(commands: &mut Commands, assets: &Res<GameAssets>, transform: Tr
         .spawn((
             Collider::cuboid(25.0, 4.0),
             Sensor,
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(5.0, 0.0, 0.0))),
+            Transform::from_translation(Vec3::new(5.0, 0.0, 0.0)),
         ))
         .id();
 
-    commands.entity(entity).push_children(&[collider]);
+    commands.entity(entity).add_children(&[collider]);
 }
 
 fn spawn_scutum_glaciei(
@@ -99,19 +98,18 @@ fn spawn_scutum_glaciei(
 }
 
 fn spawn_icicle_shatter(commands: &mut Commands, assets: &Res<GameAssets>, position: Vec3) {
-    commands.spawn((
+    let _ = commands.spawn((
         YSort(10.0),
         AnimSprite::new(49, false),
         AnimSpriteTimer::new(0.02),
-        SpriteBundle {
-            texture: assets.icicle_shatter_texture.clone(),
-            transform: Transform::from_translation(position),
-            ..default()
-        },
-        TextureAtlas {
-            layout: assets.icicle_shatter_layout.clone(),
-            ..default()
-        },
+        Sprite::from_atlas_image(
+            assets.icicle_shatter_texture.clone(),
+            TextureAtlas {
+                layout: assets.icicle_shatter_layout.clone(),
+                ..default()
+            },
+        ),
+        Transform::from_translation(position),
     ));
 }
 
@@ -145,7 +143,7 @@ fn move_icicles(
 
 fn rotate_icicles(time: Res<Time>, mut q_icicles: Query<&mut Transform, With<Icicle>>) {
     for mut transform in &mut q_icicles {
-        transform.rotate_z(DELTA_ROTATION * time.delta_seconds());
+        transform.rotate_z(DELTA_ROTATION * time.delta_secs());
     }
 }
 

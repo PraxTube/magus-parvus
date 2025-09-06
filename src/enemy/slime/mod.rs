@@ -30,7 +30,7 @@ impl Plugin for EnemySlimePlugin {
         .add_systems(
             Update,
             (change_slime_states)
-                .run_if(in_state(GameState::Gaming).or_else(in_state(GameState::GameOver))),
+                .run_if(in_state(GameState::Gaming).or(in_state(GameState::GameOver))),
         );
     }
 }

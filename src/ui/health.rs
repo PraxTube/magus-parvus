@@ -82,16 +82,12 @@ fn spawn_heart(commands: &mut Commands, assets: &Res<GameAssets>, index: usize) 
     commands
         .spawn((
             Heart { index },
-            ImageBundle {
-                image: UiImage {
-                    texture: assets.heart_full.clone(),
-                    ..default()
-                },
-                style: Style {
-                    width: Val::Percent(4.0),
-                    ..default()
-                },
-
+            ImageNode {
+                image: assets.heart_full.clone(),
+                ..default()
+            },
+            Node {
+                width: Val::Percent(4.0),
                 ..default()
             },
         ))
@@ -107,13 +103,10 @@ fn spawn_hearts(
         let root = commands
             .spawn((
                 HeartsContainer,
-                NodeBundle {
-                    style: Style {
-                        width: Val::Percent(90.0),
-                        top: Val::Percent(5.0),
-                        left: Val::Percent(5.0),
-                        ..default()
-                    },
+                Node {
+                    width: Val::Percent(90.0),
+                    top: Val::Percent(5.0),
+                    left: Val::Percent(5.0),
                     ..default()
                 },
             ))
@@ -121,7 +114,7 @@ fn spawn_hearts(
 
         for i in 0..ev.count {
             let heart_entity = spawn_heart(&mut commands, &assets, i);
-            commands.entity(root).push_children(&[heart_entity]);
+            commands.entity(root).add_children(&[heart_entity]);
         }
     }
 }
@@ -139,7 +132,7 @@ fn update_player_hearts(
     assets: Res<GameAssets>,
     mut shake: ResMut<CameraShake>,
     q_player: Query<&Health, With<Player>>,
-    mut q_hearts: Query<(&mut UiImage, &Heart)>,
+    mut q_hearts: Query<(&mut ImageNode, &Heart)>,
     mut ev_health_changed: EventReader<HealthChanged>,
 ) {
     for ev in ev_health_changed.read() {
@@ -153,9 +146,9 @@ fn update_player_hearts(
         let threshold_index = player_health.health as usize;
         for (mut ui_image, heart) in &mut q_hearts {
             if heart.index >= threshold_index {
-                ui_image.texture = assets.heart_empty.clone();
+                ui_image.image = assets.heart_empty.clone();
             } else {
-                ui_image.texture = assets.heart_full.clone();
+                ui_image.image = assets.heart_full.clone();
             }
         }
     }

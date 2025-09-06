@@ -52,16 +52,15 @@ fn spawn_icon(
 
     let mut icon = commands.spawn((
         KeyboardIcon,
-        SpriteBundle {
-            texture: assets.keyboard_ui_texture.clone(),
-            transform: Transform::from_translation(offset.extend(0.0) + ANCHOR + PLAYER_SPAWN_POS)
-                .with_scale(Vec3::splat(0.75)),
-            ..default()
-        },
-        TextureAtlas {
-            layout: assets.keyboard_ui_layout.clone(),
-            index,
-        },
+        Sprite::from_atlas_image(
+            assets.keyboard_ui_texture.clone(),
+            TextureAtlas {
+                layout: assets.keyboard_ui_layout.clone(),
+                index,
+            },
+        ),
+        Transform::from_translation(offset.extend(0.0) + ANCHOR + PLAYER_SPAWN_POS)
+            .with_scale(Vec3::splat(0.75)),
     ));
 
     if animated {

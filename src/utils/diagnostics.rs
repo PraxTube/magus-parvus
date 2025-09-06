@@ -39,7 +39,7 @@ impl Plugin for DiagnosticsPlugin {
         app.add_plugins((
             ScreenDiagnosticsPlugin {
                 timestep: 1.0,
-                style: Style {
+                style: Node {
                     position_type: PositionType::Absolute,
                     top: Val::Px(5.0),
                     left: Val::Px(15.0),

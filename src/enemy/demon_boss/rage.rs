@@ -32,14 +32,11 @@ fn spawn_rage_aura(
         .spawn((
             RageAura,
             YSort(-0.5),
-            SpriteBundle {
-                texture: assets.demon_boss_aura.clone(),
-                ..default()
-            },
+            Sprite::from_image(assets.demon_boss_aura.clone()),
         ))
         .id();
 
-    commands.entity(entity).push_children(&[aura]);
+    commands.entity(entity).add_children(&[aura]);
 }
 
 fn despawn_rage_aura(

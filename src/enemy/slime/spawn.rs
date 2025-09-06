@@ -26,15 +26,14 @@ fn spawn_slime(
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             YSort(0.0),
-            SpriteBundle {
-                texture: assets.slime_texture.clone(),
-                transform: Transform::from_translation(spawn_pos).with_scale(Vec3::splat(1.5)),
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.slime_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.slime_texture.clone(),
+                TextureAtlas {
+                    layout: assets.slime_layout.clone(),
+                    ..default()
+                },
+            ),
+            Transform::from_translation(spawn_pos).with_scale(Vec3::splat(1.5)),
         ))
         .id();
 
@@ -42,13 +41,11 @@ fn spawn_slime(
         .spawn((
             Collider::ball(6.0),
             ActiveEvents::COLLISION_EVENTS,
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-                0.0, -10.0, 0.0,
-            ))),
+            Transform::from_translation(Vec3::new(0.0, -10.0, 0.0)),
         ))
         .id();
 
-    commands.entity(entity).push_children(&[collider]);
+    commands.entity(entity).add_children(&[collider]);
 
     ev_play_sound.send(PlaySound {
         clip: assets.slime_land_sound.clone(),

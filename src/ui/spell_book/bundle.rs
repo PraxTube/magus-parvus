@@ -9,82 +9,70 @@ use super::{
 
 #[derive(Bundle)]
 pub struct BackgroundBundle {
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
+    z_index: ZIndex,
 }
 
 impl BackgroundBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
-            image_bundle: ImageBundle {
-                style: Style {
-                    height: Val::Percent(100.0),
-                    width: Val::Percent(100.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.spell_book_container.clone(),
-                    ..default()
-                },
-                z_index: ZIndex::Local(-1),
+            style: Node {
+                height: Val::Percent(100.0),
+                width: Val::Percent(100.0),
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            image: ImageNode::new(assets.spell_book_container.clone()),
+            z_index: ZIndex(-1),
         }
     }
 }
 
 #[derive(Bundle)]
 pub struct MovementHintUpBundle {
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
+    z_index: ZIndex,
 }
 
 impl MovementHintUpBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
-            image_bundle: ImageBundle {
-                style: Style {
-                    bottom: Val::Percent(53.0),
-                    right: Val::Percent(105.0),
-                    width: Val::Percent(10.0),
-                    aspect_ratio: Some(0.5),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.spell_book_hint_up.clone(),
-                    ..default()
-                },
-                z_index: ZIndex::Local(-1),
+            image: ImageNode::new(assets.spell_book_hint_up.clone()),
+            style: Node {
+                bottom: Val::Percent(53.0),
+                right: Val::Percent(105.0),
+                width: Val::Percent(10.0),
+                aspect_ratio: Some(0.5),
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            z_index: ZIndex(-1),
         }
     }
 }
 
 #[derive(Bundle)]
 pub struct MovementHintDownBundle {
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
+    z_index: ZIndex,
 }
 
 impl MovementHintDownBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
-            image_bundle: ImageBundle {
-                style: Style {
-                    top: Val::Percent(53.0),
-                    right: Val::Percent(105.0),
-                    width: Val::Percent(10.0),
-                    aspect_ratio: Some(0.5),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.spell_book_hint_down.clone(),
-                    ..default()
-                },
-                z_index: ZIndex::Local(-1),
+            style: Node {
+                top: Val::Percent(53.0),
+                right: Val::Percent(105.0),
+                width: Val::Percent(10.0),
+                aspect_ratio: Some(0.5),
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            image: ImageNode::new(assets.spell_book_hint_down.clone()),
+            z_index: ZIndex(-1),
         }
     }
 }
@@ -92,21 +80,20 @@ impl MovementHintDownBundle {
 #[derive(Bundle)]
 pub struct SpellbookViewIconBundle {
     spellbook_view_icon: SpellbookViewIcon,
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
 }
 
 impl Default for SpellbookViewIconBundle {
     fn default() -> Self {
         Self {
             spellbook_view_icon: SpellbookViewIcon,
-            image_bundle: ImageBundle {
-                style: Style {
-                    top: Val::Percent(16.5),
-                    left: Val::Percent(44.87),
-                    width: Val::Percent(10.26),
-                    height: Val::Percent(16.7),
-                    ..default()
-                },
+            image: ImageNode::default(),
+            style: Node {
+                top: Val::Percent(16.5),
+                left: Val::Percent(44.87),
+                width: Val::Percent(10.26),
+                height: Val::Percent(16.7),
                 ..default()
             },
         }
@@ -116,28 +103,27 @@ impl Default for SpellbookViewIconBundle {
 #[derive(Bundle)]
 pub struct SpellbookViewTitleBundle {
     spellbook_view_title: SpellbookViewTitle,
-    text_bundle: TextBundle,
+    style: Node,
+    text: Text,
+    text_style: TextFont,
+    text_color: TextColor,
 }
 
 impl SpellbookViewTitleBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
             spellbook_view_title: SpellbookViewTitle,
-            text_bundle: TextBundle {
-                text: Text::from_sections([TextSection {
-                    value: "NO SPELL YET".to_string(),
-                    style: TextStyle {
-                        font: assets.font.clone(),
-                        font_size: 20.0,
-                        color: Color::WHITE,
-                    },
-                }]),
-                style: Style {
-                    top: Val::Percent(45.0),
-                    left: Val::Percent(10.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
+            text: Text::from("NO SPELL YET"),
+            text_style: TextFont {
+                font: assets.font.clone(),
+                font_size: 20.0,
+                ..default()
+            },
+            text_color: TextColor(Color::WHITE),
+            style: Node {
+                top: Val::Percent(45.0),
+                left: Val::Percent(10.0),
+                position_type: PositionType::Absolute,
                 ..default()
             },
         }
@@ -147,7 +133,10 @@ impl SpellbookViewTitleBundle {
 #[derive(Bundle)]
 pub struct SpellbookViewDescriptionBundle {
     spellbook_view_description: SpellbookViewDescription,
-    text_bundle: TextBundle,
+    text: Text,
+    text_font: TextFont,
+    text_color: TextColor,
+    text_style: Node,
 }
 
 impl SpellbookViewDescriptionBundle {
@@ -156,22 +145,18 @@ impl SpellbookViewDescriptionBundle {
             + " You will get a new spell from each statue.\n";
         Self {
             spellbook_view_description: SpellbookViewDescription,
-            text_bundle: TextBundle {
-                text: Text::from_sections([TextSection {
-                    value,
-                    style: TextStyle {
-                        font: assets.font.clone(),
-                        font_size: 14.0,
-                        color: Color::WHITE,
-                    },
-                }]),
-                style: Style {
-                    top: Val::Percent(58.0),
-                    left: Val::Percent(10.0),
-                    width: Val::Percent(80.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
+            text: Text::from(value),
+            text_font: TextFont {
+                font: assets.font.clone(),
+                font_size: 14.0,
+                ..default()
+            },
+            text_color: TextColor(Color::WHITE),
+            text_style: Node {
+                top: Val::Percent(58.0),
+                left: Val::Percent(10.0),
+                width: Val::Percent(80.0),
+                position_type: PositionType::Absolute,
                 ..default()
             },
         }
@@ -180,28 +165,24 @@ impl SpellbookViewDescriptionBundle {
 
 #[derive(Bundle)]
 pub struct SpellbookViewBundle {
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
+    z_index: ZIndex,
 }
 
 impl SpellbookViewBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
-            image_bundle: ImageBundle {
-                style: Style {
-                    top: Val::Percent(20.0),
-                    left: Val::Percent(107.0),
-                    width: Val::Percent(110.0),
-                    height: Val::Percent(60.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.spell_book_view.clone(),
-                    ..default()
-                },
-                z_index: ZIndex::Local(-1),
+            image: ImageNode::new(assets.spell_book_view.clone()),
+            style: Node {
+                top: Val::Percent(20.0),
+                left: Val::Percent(107.0),
+                width: Val::Percent(110.0),
+                height: Val::Percent(60.0),
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            z_index: ZIndex(-1),
         }
     }
 }
@@ -209,27 +190,25 @@ impl SpellbookViewBundle {
 #[derive(Bundle)]
 pub struct SpellbookBundle {
     spellbook: SpellBook,
-    node_bundle: NodeBundle,
+    style: Node,
+    z_index: ZIndex,
 }
 
 impl Default for SpellbookBundle {
     fn default() -> Self {
         Self {
             spellbook: SpellBook,
-            node_bundle: NodeBundle {
-                style: Style {
-                    height: Val::Percent(80.0),
-                    width: Val::Percent(40.0),
-                    top: Val::Percent(10.0),
-                    left: Val::Percent(10.0),
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                z_index: ZIndex::Local(200),
+            style: Node {
+                height: Val::Percent(80.0),
+                width: Val::Percent(40.0),
+                top: Val::Percent(10.0),
+                left: Val::Percent(10.0),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            z_index: ZIndex(200),
         }
     }
 }
@@ -237,20 +216,17 @@ impl Default for SpellbookBundle {
 #[derive(Bundle)]
 pub struct MovingPanelBundle {
     scrolling_list: ScrollingList,
-    node_bundle: NodeBundle,
+    style: Node,
 }
 
 impl Default for MovingPanelBundle {
     fn default() -> Self {
         Self {
             scrolling_list: ScrollingList { index: 0 },
-            node_bundle: NodeBundle {
-                style: Style {
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
-                    row_gap: Val::Px(25.0),
-                    ..default()
-                },
+            style: Node {
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                row_gap: Val::Px(25.0),
                 ..default()
             },
         }
@@ -260,25 +236,20 @@ impl Default for MovingPanelBundle {
 #[derive(Bundle)]
 pub struct MovingPanelLabelBundle {
     label: Label,
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
 }
 
 impl MovingPanelLabelBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
             label: Label,
-            image_bundle: ImageBundle {
-                style: Style {
-                    width: Val::Px(78.0),
-                    height: Val::Px(78.0),
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.spell_field.clone(),
-                    ..default()
-                },
+            style: Node {
+                width: Val::Px(78.0),
+                height: Val::Px(78.0),
                 ..default()
             },
+            image: ImageNode::new(assets.spell_field.clone()),
         }
     }
 }
@@ -286,27 +257,22 @@ impl MovingPanelLabelBundle {
 #[derive(Bundle)]
 pub struct ScrollingIconBundle {
     scrolling_icon: ScrollingIcon,
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
 }
 
 impl ScrollingIconBundle {
     pub fn new(texture: Handle<Image>, index: usize) -> Self {
         Self {
             scrolling_icon: ScrollingIcon { index },
-            image_bundle: ImageBundle {
-                style: Style {
-                    top: Val::Px(7.0),
-                    left: Val::Px(7.0),
-                    width: Val::Px(64.0),
-                    height: Val::Px(64.0),
-                    ..default()
-                },
-                image: UiImage {
-                    texture,
-                    ..default()
-                },
+            style: Node {
+                top: Val::Px(7.0),
+                left: Val::Px(7.0),
+                width: Val::Px(64.0),
+                height: Val::Px(64.0),
                 ..default()
             },
+            image: ImageNode::new(texture),
         }
     }
 }
@@ -314,48 +280,40 @@ impl ScrollingIconBundle {
 #[derive(Bundle)]
 pub struct SelectorIconBundle {
     selector_icon: SelectorIcon,
-    image_bundle: ImageBundle,
+    image: ImageNode,
+    style: Node,
 }
 
 impl SelectorIconBundle {
     pub fn new(assets: &Res<GameAssets>) -> Self {
         Self {
             selector_icon: SelectorIcon,
-            image_bundle: ImageBundle {
-                style: Style {
-                    top: Val::Px(-15.0),
-                    left: Val::Px(-15.0),
-                    width: Val::Px(94.0),
-                    height: Val::Px(94.0),
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.spell_field_selector.clone(),
-                    ..default()
-                },
+            style: Node {
+                top: Val::Px(-15.0),
+                left: Val::Px(-15.0),
+                width: Val::Px(94.0),
+                height: Val::Px(94.0),
                 ..default()
             },
+            image: ImageNode::new(assets.spell_field_selector.clone()),
         }
     }
 }
 
 #[derive(Bundle)]
 pub struct ScrollableListBundle {
-    node_bundle: NodeBundle,
+    style: Node,
 }
 
 impl Default for ScrollableListBundle {
     fn default() -> Self {
         Self {
-            node_bundle: NodeBundle {
-                style: Style {
-                    top: Val::Percent(25.0),
-                    height: Val::Percent(55.0),
-                    flex_direction: FlexDirection::Column,
-                    align_self: AlignSelf::Stretch,
-                    overflow: Overflow::clip_y(),
-                    ..default()
-                },
+            style: Node {
+                top: Val::Percent(25.0),
+                height: Val::Percent(55.0),
+                flex_direction: FlexDirection::Column,
+                align_self: AlignSelf::Stretch,
+                overflow: Overflow::clip_y(),
                 ..default()
             },
         }

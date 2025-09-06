@@ -32,6 +32,8 @@ pub enum GameState {
 }
 
 fn main() {
+    console_error_panic_hook::set_once();
+
     App::new()
         .add_plugins((
             DefaultPlugins
@@ -59,7 +61,6 @@ fn main() {
             },
             Animation2DPlugin,
         ))
-        .insert_resource(Msaa::Off)
         .init_state::<GameState>()
         .add_loading_state(
             LoadingState::new(GameState::AssetLoading)

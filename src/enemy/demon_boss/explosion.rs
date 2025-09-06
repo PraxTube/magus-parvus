@@ -52,15 +52,14 @@ fn spawn_normal_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos
         },
         animator,
         YSort(1.0),
-        SpriteBundle {
-            texture: assets.demon_boss_explosion_texture.clone(),
-            transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
-            ..default()
-        },
-        TextureAtlas {
-            layout: assets.demon_boss_explosion_layout.clone(),
-            ..default()
-        },
+        Sprite::from_atlas_image(
+            assets.demon_boss_explosion_texture.clone(),
+            TextureAtlas {
+                layout: assets.demon_boss_explosion_layout.clone(),
+                ..default()
+            },
+        ),
+        Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
     ));
 }
 
@@ -74,7 +73,7 @@ fn spawn_strike_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos
             Sensor,
             Collider::ball(20.0),
             CollisionGroups::default(),
-            TransformBundle::default(),
+            Transform::default(),
         ))
         .id();
 
@@ -83,17 +82,16 @@ fn spawn_strike_explosion(commands: &mut Commands, assets: &Res<GameAssets>, pos
             DemonBossStrikeExplosion { damage: 2.0 },
             animator,
             YSort(0.0),
-            SpriteBundle {
-                texture: assets.demon_boss_explosion2_texture.clone(),
-                transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.5)),
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.demon_boss_explosion2_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.demon_boss_explosion2_texture.clone(),
+                TextureAtlas {
+                    layout: assets.demon_boss_explosion2_layout.clone(),
+                    ..default()
+                },
+            ),
+            Transform::from_translation(pos).with_scale(Vec3::splat(2.5)),
         ))
-        .push_children(&[collider]);
+        .add_children(&[collider]);
 }
 
 fn spawn_explosions(
@@ -165,10 +163,10 @@ fn change_animations(
                     Sensor,
                     Collider::ball(15.0),
                     CollisionGroups::default(),
-                    TransformBundle::default(),
+                    Transform::default(),
                 ))
                 .id();
-            commands.entity(entity).push_children(&[collider]);
+            commands.entity(entity).add_children(&[collider]);
             animator.play(assets.demon_boss_explosion_animations[1].clone());
         }
     }
@@ -179,7 +177,7 @@ fn despawn_explosions(
     q_explosions: Query<(Entity, &AnimationPlayer2D, &DemonBossExplosion)>,
 ) {
     for (entity, animator, explosion) in &q_explosions {
-        if explosion.activation_timer.finished() && animator.is_finished() {
+        if explosion.activation_timer.finished() && animator.finished() {
             commands.entity(entity).despawn_recursive();
         }
     }
@@ -190,7 +188,7 @@ fn despawn_strike_explosions(
     q_explosions: Query<(Entity, &AnimationPlayer2D), With<DemonBossStrikeExplosion>>,
 ) {
     for (entity, animator) in &q_explosions {
-        if animator.is_finished() {
+        if animator.finished() {
             commands.entity(entity).despawn_recursive();
         }
     }

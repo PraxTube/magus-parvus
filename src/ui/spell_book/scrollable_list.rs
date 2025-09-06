@@ -1,9 +1,8 @@
-use bevy::prelude::*;
-
 use crate::{
     item::{item_value::item_icon, ActiveItems},
     GameAssets,
 };
+use bevy::prelude::*;
 
 use super::bundle::{
     MovingPanelBundle, MovingPanelLabelBundle, ScrollableListBundle, ScrollingIconBundle,
@@ -51,28 +50,27 @@ pub fn spawn_scrollable_list(
 
     commands
         .spawn(ScrollableListBundle::default())
-        .push_children(&[moving_panel])
+        .add_children(&[moving_panel])
         .id()
 }
 
 fn scroll_lists(
     keys: Res<ButtonInput<KeyCode>>,
     active_items: Res<ActiveItems>,
-    mut q_scrollable_lists: Query<(&mut ScrollingList, &mut Style, &Parent, &Node)>,
-    q_nodes: Query<&Node>,
+    mut q_scrollable_lists: Query<(&mut ScrollingList, &mut Node, &Parent, &ComputedNode)>,
+    q_nodes: Query<&ComputedNode>,
 ) {
-    let (mut scrolling_list, mut style, parent, list_node) =
-        match q_scrollable_lists.get_single_mut() {
-            Ok(s) => s,
-            Err(_) => return,
-        };
+    let (mut scrolling_list, mut style, parent, list_node) = match q_scrollable_lists.get_single_mut() {
+        Ok(s) => s,
+        Err(_) => return,
+    };
     let items_height = list_node.size().y;
     let container_height = match q_nodes.get(parent.get()) {
         Ok(n) => n.size().y,
-        Err(_) => return,
+        _ => return,
     };
 
-    if active_items.len() == 0 {
+    if active_items.is_empty() {
         return;
     }
 
@@ -88,11 +86,7 @@ fn scroll_lists(
     }
 
     let max_scroll = (items_height - container_height).abs() + 2.0 * OFFSET;
-    let pos_index = if scrolling_list.index <= INDEX_THRESHOLD {
-        0
-    } else {
-        scrolling_list.index - INDEX_THRESHOLD
-    };
+    let pos_index = scrolling_list.index.saturating_sub(INDEX_THRESHOLD);
     let position = (-103.0 * pos_index as f32).clamp(-max_scroll, 0.0);
     style.top = Val::Px(position + OFFSET);
 }
@@ -121,7 +115,7 @@ fn update_selector_icon(
     }
 
     if let Some(icon) = icon {
-        commands.entity(icon).push_children(&[selector_entity]);
+        commands.entity(icon).add_children(&[selector_entity]);
     };
 }
 

@@ -40,8 +40,8 @@ impl Default for WorldText {
             vec2(0.533, 0.507),
             vec2(1.0, 0.0),
         ]];
-        let scale_curve = CubicBezier::new(scale_points).to_curve();
-        let alpha_curve = CubicBezier::new(alpha_points).to_curve();
+        let scale_curve = CubicBezier::new(scale_points).to_curve().unwrap();
+        let alpha_curve = CubicBezier::new(alpha_points).to_curve().unwrap();
         Self {
             font_scale: 10.0,
             font_color: Color::srgba(1.0, 1.0, 1.0, 0.0),
@@ -55,11 +55,12 @@ impl Default for WorldText {
 }
 
 fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &SpawnWorldText) {
-    let text_style = TextStyle {
+    let text_style = TextFont {
         font: assets.font.clone(),
         font_size: FONT_SCALE_RATIO,
-        color: ev.world_text.font_color,
+        ..default()
     };
+    let text_color = TextColor(ev.world_text.font_color);
 
     let mut rng = rand::thread_rng();
     let rand_offset = Vec3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0)
@@ -67,13 +68,15 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
 
     commands.spawn((
         ev.world_text.clone(),
-        Text2dBundle {
-            text: Text::from_section(ev.content.to_string(), text_style.clone())
-                .with_justify(JustifyText::Center),
-            transform: Transform::from_translation(ev.pos + rand_offset + ev.world_text.offset)
-                .with_scale(Vec3::splat(ev.world_text.font_scale / FONT_SCALE_RATIO)),
+        Text::from(ev.content.to_string()),
+        Node {
+            justify_items: JustifyItems::Center,
             ..default()
         },
+        text_color,
+        text_style,
+        Transform::from_translation(ev.pos + rand_offset + ev.world_text.offset)
+            .with_scale(Vec3::splat(ev.world_text.font_scale / FONT_SCALE_RATIO)),
     ));
 }
 
@@ -97,9 +100,9 @@ fn despawn_world_texts(mut commands: Commands, q_world_texts: Query<(Entity, &Wo
 
 fn animate_world_texts(
     time: Res<Time>,
-    mut q_world_texts: Query<(&mut Transform, &mut Text, &mut WorldText)>,
+    mut q_world_texts: Query<(&mut Transform, &mut TextColor, &mut WorldText)>,
 ) {
-    for (mut transform, mut text, mut world_text) in &mut q_world_texts {
+    for (mut transform, mut text_color, mut world_text) in &mut q_world_texts {
         world_text.timer.tick(time.delta());
 
         let duration = world_text.timer.duration().as_secs_f32();
@@ -108,7 +111,7 @@ fn animate_world_texts(
         transform.scale = world_text.scale_curve.position(t).y
             * Vec3::splat(world_text.font_scale / FONT_SCALE_RATIO);
         let new_alpha = world_text.alpha_curve.position(t).y;
-        text.sections[0].style.color = world_text.font_color.with_alpha(new_alpha);
+        text_color.0 = world_text.font_color.with_alpha(new_alpha);
     }
 }
 

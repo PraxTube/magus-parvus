@@ -93,8 +93,8 @@ fn play_sounds(
         if let Some(parent) = ev.parent {
             let audio_emitter = commands
                 .spawn((
-                    TransformBundle::default(),
-                    AudioEmitter {
+                    Transform::default(),
+                    SpatialAudioEmitter {
                         instances: vec![audio_instance],
                     },
                 ))
@@ -102,7 +102,7 @@ fn play_sounds(
 
             match commands.get_entity(parent) {
                 Some(mut r) => {
-                    r.push_children(&[audio_emitter]);
+                    r.add_children(&[audio_emitter]);
                 }
                 None => {
                     warn!("audio parent does not exist");

@@ -27,16 +27,11 @@ fn spawn_player(
             AnimationIndices { first: 0, last: 5 },
             FrameTimer(Timer::from_seconds(0.085, TimerMode::Repeating)),
             StepsTimer::default(),
-            SpriteBundle {
-                texture: assets.player_texture.clone(),
-                transform: Transform::from_translation(PLAYER_SPAWN_POS)
-                    .with_scale(Vec3::splat(2.0)),
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.player_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.player_texture.clone(),
+                TextureAtlas::from(assets.player_layout.clone()),
+            ),
+            Transform::from_translation(PLAYER_SPAWN_POS).with_scale(Vec3::splat(2.0)),
         ))
         .id();
 
@@ -53,14 +48,14 @@ fn spawn_player(
             //     Group::from_bits(0b1100).unwrap(),
             //     Group::from_bits(0b1100).unwrap(),
             // ),
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(0.0, -5.0, 0.0))),
+            Transform::from_translation(Vec3::new(0.0, -5.0, 0.0)),
         ))
         .id();
 
     commands
         .entity(entity)
         .insert(Player::new(collider))
-        .push_children(&[collider]);
+        .add_children(&[collider]);
 }
 
 fn despawn_player(

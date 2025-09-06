@@ -80,7 +80,7 @@ fn striking_to_idle(
         return;
     }
 
-    if animator.is_finished() {
+    if animator.finished() {
         demon_boss.state = DemonBossState::Idling;
     }
 
@@ -120,7 +120,7 @@ fn staggering_to_idle(
         return;
     }
 
-    if animator.is_finished() {
+    if animator.finished() {
         demon_boss.state = DemonBossState::Idling;
     }
 

@@ -8,7 +8,7 @@ pub struct SpeedTimer {
 }
 
 fn tick(time: Res<Time>, mut speed_timer: ResMut<SpeedTimer>) {
-    speed_timer.elapsed += time.delta_seconds();
+    speed_timer.elapsed += time.delta_secs();
 }
 
 pub struct SpeedTimerPlugin;

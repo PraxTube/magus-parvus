@@ -1,10 +1,8 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 #[cfg(not(target_arch = "wasm32"))]
-use bevy::render::view::screenshot::ScreenshotManager;
-#[cfg(not(target_arch = "wasm32"))]
 use bevy::window::{PrimaryWindow, WindowMode};
-use bevy_kira_audio::prelude::AudioReceiver;
+use bevy_kira_audio::prelude::SpatialAudioReceiver;
 use bevy_rapier2d::plugin::PhysicsSet;
 
 use super::camera_shake::{update_camera, CameraShake};
@@ -31,9 +29,12 @@ pub fn apply_y_sort(mut q_transforms: Query<(&mut Transform, &GlobalTransform, &
 }
 
 fn spawn_camera(mut commands: Commands) {
-    let mut camera = Camera2dBundle::default();
-    camera.projection.scaling_mode = ScalingMode::FixedVertical(400.0);
-    commands.spawn((MainCamera, AudioReceiver, camera));
+    let camera = Camera2d {};
+    let mut projection = OrthographicProjection::default_2d();
+    projection.scaling_mode = ScalingMode::FixedVertical {
+        viewport_height: 400.0,
+    };
+    commands.spawn((MainCamera, SpatialAudioReceiver, camera, projection));
 }
 
 fn update_camera_target(mut shake: ResMut<CameraShake>, q_player: Query<&Transform, With<Player>>) {
@@ -88,7 +89,7 @@ fn toggle_full_screen(
     }
 
     window.mode = if window.mode == WindowMode::Windowed {
-        WindowMode::Fullscreen
+        WindowMode::Fullscreen(MonitorSelection::Primary)
     } else {
         WindowMode::Windowed
     }
@@ -96,20 +97,18 @@ fn toggle_full_screen(
 
 #[cfg(not(target_arch = "wasm32"))]
 fn take_screenshot(
-    keys: Res<ButtonInput<KeyCode>>,
-    main_window: Query<Entity, With<PrimaryWindow>>,
-    mut screenshot_manager: ResMut<ScreenshotManager>,
+    mut commands: Commands,
+    input: Res<ButtonInput<KeyCode>>,
     mut counter: Local<u32>,
 ) {
-    if !keys.just_pressed(KeyCode::F12) {
-        return;
-    }
+    use bevy::render::view::screenshot::{save_to_disk, Screenshot};
 
-    let path = format!("./screenshot-{}.png", *counter);
-    *counter += 1;
-    match screenshot_manager.save_screenshot_to_disk(main_window.single(), path) {
-        Ok(()) => {}
-        Err(err) => error!("failed to take screenshot, {}", err),
+    if input.just_pressed(KeyCode::F12) {
+        let path = format!("./screenshot-{}.png", *counter);
+        *counter += 1;
+        commands
+            .spawn(Screenshot::primary_window())
+            .observe(save_to_disk(path));
     }
 }
 

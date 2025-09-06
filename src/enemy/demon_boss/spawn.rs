@@ -39,15 +39,14 @@ fn spawn_smokes(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3) {
         Smoke,
         animator,
         YSort(1.0),
-        SpriteBundle {
-            texture: assets.demon_boss_smoke_texture.clone(),
-            transform: Transform::from_translation(pos).with_scale(Vec3::splat(5.0)),
-            ..default()
-        },
-        TextureAtlas {
-            layout: assets.demon_boss_smoke_layout.clone(),
-            ..default()
-        },
+        Sprite::from_atlas_image(
+            assets.demon_boss_smoke_texture.clone(),
+            TextureAtlas {
+                layout: assets.demon_boss_smoke_layout.clone(),
+                ..default()
+            },
+        ),
+        Transform::from_translation(pos).with_scale(Vec3::splat(5.0)),
     ));
 }
 
@@ -85,11 +84,8 @@ fn spawn_demon_boss(
         .spawn((
             Shadow,
             YSort(-1.0),
-            SpriteBundle {
-                texture: assets.demon_boss_shadow.clone(),
-                transform: Transform::from_translation(Vec3::new(0.0, -44.0, 0.0)),
-                ..default()
-            },
+            Sprite::from_image(assets.demon_boss_shadow.clone()),
+            Transform::from_translation(Vec3::new(0.0, -44.0, 0.0)),
         ))
         .id();
     let collider = commands
@@ -98,7 +94,7 @@ fn spawn_demon_boss(
             Collider::ball(25.0),
             CollisionGroups::default(),
             ActiveEvents::COLLISION_EVENTS,
-            TransformBundle::from(Transform::from_translation(Vec3::new(0.0, -30.0, 0.0))),
+            Transform::from_translation(Vec3::new(0.0, -30.0, 0.0)),
         ))
         .id();
 
@@ -115,17 +111,16 @@ fn spawn_demon_boss(
             Health::new(100.0),
             animator,
             YSort(36.0 * SCALE * TRANSLATION_TO_PIXEL),
-            SpriteBundle {
-                texture: assets.demon_boss_texture.clone(),
-                transform: Transform::from_translation(pos).with_scale(Vec3::splat(SCALE)),
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.demon_boss_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.demon_boss_texture.clone(),
+                TextureAtlas {
+                    layout: assets.demon_boss_layout.clone(),
+                    ..default()
+                },
+            ),
+            Transform::from_translation(pos).with_scale(Vec3::splat(SCALE)),
         ))
-        .push_children(&[shadow, collider]);
+        .add_children(&[shadow, collider]);
 }
 
 fn spawn_demon_boss_delay(
@@ -150,7 +145,7 @@ fn despawn_demon_boss(
         Err(_) => return,
     };
 
-    if demon_boss.state == DemonBossState::Dying && animator.is_finished() {
+    if demon_boss.state == DemonBossState::Dying && animator.finished() {
         commands.entity(entity).despawn_recursive();
     }
 
@@ -178,7 +173,7 @@ fn despawn_shadow(
         return;
     }
 
-    let new_alpha = sprite.color.alpha() - time.delta_seconds();
+    let new_alpha = sprite.color.alpha() - time.delta_secs();
     sprite.color.set_alpha(new_alpha);
 }
 

@@ -9,6 +9,9 @@ edition = "2021"
 [profile.dev]
 opt-level = 1
 
+[profile.release]
+debug = true
+
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
@@ -20,16 +23,19 @@ panic = "abort"
 opt-level = 'z'
 lto = true
 codegen-units = 1
+debug = true
 
 [dependencies]
 rand = "0.8.5"
 chrono = "0.4.31"
 
-bevy = "0.14.0"
-bevy_screen_diagnostics = "0.6.0"
-bevy_asset_loader = { version = "0.21.0", features = ["2d"] }
-bevy_ecs_ldtk = { git = "https://github.com/MScottMcBee/bevy_ecs_ldtk", branch = "0.14", features = ["atlas"]}
-bevy_rapier2d = "0.27.0"
-bevy_kira_audio = "0.20.0"
-bevy_trickfilm = "0.7.0"
-noisy_bevy = "0.7.0"
+bevy = "0.15.0"
+bevy_screen_diagnostics = "0.7.0"
+bevy_asset_loader = { version = "0.22.0", features = ["2d"] }
+bevy_ecs_ldtk = { version = "0.11.0", features = ["atlas"]}
+bevy_rapier2d = "0.29.0"
+bevy_kira_audio = "0.22.0"
+bevy_trickfilm = "0.10.0"
+noisy_bevy = "0.8.0"
+wasm-bindgen = "0.2.101"
+console_error_panic_hook = "0.1.7"

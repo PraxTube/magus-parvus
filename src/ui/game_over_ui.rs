@@ -14,49 +14,49 @@ struct GameOverScreen;
 #[derive(Component, Deref, DerefMut)]
 struct AudioSilenceTimer(Timer);
 
-fn spawn_background(commands: &mut Commands, texture: Handle<Image>) {
+fn spawn_background(commands: &mut Commands, image: Handle<Image>) {
     commands.spawn((
         GameOverScreen,
-        ImageBundle {
-            style: Style {
-                height: Val::Vh(100.0),
-                width: Val::Vw(100.0),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            image: UiImage {
-                texture,
-                color: Color::srgba(0.2, 0.2, 0.2, 0.85),
-                ..default()
-            },
-            z_index: ZIndex::Local(100),
+        ImageNode {
+            image,
+            color: Color::srgba(0.2, 0.2, 0.2, 0.85),
             ..default()
         },
+        Node {
+            height: Val::Vh(100.0),
+            width: Val::Vw(100.0),
+            position_type: PositionType::Absolute,
+            ..default()
+        },
+        ZIndex(100),
     ));
 }
 
 fn spawn_title(commands: &mut Commands, font: Handle<Font>) -> Entity {
-    let text_style = TextStyle {
+    let text_font = TextFont {
         font,
         font_size: 100.0,
-        color: Color::WHITE,
+        ..default()
     };
-    let text_bundle = TextBundle::from_sections([TextSection::new(
-        "GAME OVER".to_string(),
-        text_style.clone(),
-    )]);
-    commands.spawn((GameOverScreen, text_bundle)).id()
+    let text_color = TextColor(Color::WHITE);
+    let text = Text::from("GAME OVER");
+
+    commands
+        .spawn((GameOverScreen, text, text_font, text_color))
+        .id()
 }
 
 fn spawn_time(commands: &mut Commands, font: Handle<Font>, time: f32) -> Entity {
-    let text = format!("TIME: {:.2} seconds", time);
-    let text_style = TextStyle {
+    let text = Text::from(format!("TIME: {time:.2} seconds"));
+    let text_style = TextFont {
         font,
         font_size: 60.0,
-        color: Color::WHITE,
+        ..default()
     };
-    let text_bundle = TextBundle::from_sections([TextSection::new(text, text_style.clone())]);
-    commands.spawn((GameOverScreen, text_bundle)).id()
+    let text_color = TextColor(Color::WHITE);
+    commands
+        .spawn((GameOverScreen, text, text_style, text_color))
+        .id()
 }
 
 fn spawn_text(commands: &mut Commands, font: Handle<Font>, time: f32) {
@@ -66,21 +66,18 @@ fn spawn_text(commands: &mut Commands, font: Handle<Font>, time: f32) {
     commands
         .spawn((
             GameOverScreen,
-            NodeBundle {
-                style: Style {
-                    top: Val::Percent(30.0),
-                    width: Val::Percent(100.0),
-                    flex_direction: FlexDirection::Column,
-                    row_gap: Val::Vh(10.0),
-                    align_items: AlignItems::Center,
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                z_index: ZIndex::Local(101),
+            Node {
+                top: Val::Percent(30.0),
+                width: Val::Percent(100.0),
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Vh(10.0),
+                align_items: AlignItems::Center,
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            ZIndex(101),
         ))
-        .push_children(&[title_text, time_text]);
+        .add_children(&[title_text, time_text]);
 }
 
 fn spawn_audio_silence_timer(commands: &mut Commands) {
@@ -117,7 +114,7 @@ fn reduce_audio_volume(
     }
 
     game_audio.main_volume =
-        (game_audio.main_volume - 1.0 / AUDIO_SILENCE_TIME * time.delta_seconds_f64()).max(0.0);
+        (game_audio.main_volume - 1.0 / AUDIO_SILENCE_TIME * time.delta_secs_f64()).max(0.0);
 }
 
 fn play_sound(assets: Res<GameAssets>, mut ev_play_sound: EventWriter<PlaySound>) {

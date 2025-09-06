@@ -78,10 +78,7 @@ fn spawn_lightning_bird(commands: &mut Commands, assets: &Res<GameAssets>, trans
             NoRotation {
                 offset: Vec3::new(0.0, -30.0, 0.0),
             },
-            SpriteBundle {
-                texture: assets.lightning_bird_shadow.clone(),
-                ..default()
-            },
+            Sprite::from_image(assets.lightning_bird_shadow.clone()),
         ))
         .id();
 
@@ -89,17 +86,16 @@ fn spawn_lightning_bird(commands: &mut Commands, assets: &Res<GameAssets>, trans
         .spawn((
             LightningBird::default(),
             animation_player,
-            SpriteBundle {
-                texture: assets.lightning_bird_texture.clone(),
-                transform,
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.lightning_bird_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.lightning_bird_texture.clone(),
+                TextureAtlas {
+                    layout: assets.lightning_bird_layout.clone(),
+                    ..default()
+                },
+            ),
+            transform,
         ))
-        .push_children(&[shadow]);
+        .add_children(&[shadow]);
 }
 
 fn spawn_lightning_birds(
@@ -181,9 +177,7 @@ fn spawn_lightning_strikes(
             .spawn((
                 Collider::ball(25.0),
                 Sensor,
-                TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-                    0.0, -24.0, 0.0,
-                ))),
+                Transform::from_translation(Vec3::new(0.0, -24.0, 0.0)),
             ))
             .id();
         let mut animation_player = AnimationPlayer2D::default();
@@ -193,17 +187,16 @@ fn spawn_lightning_strikes(
             .spawn((
                 LightningStrike::default(),
                 animation_player,
-                SpriteBundle {
-                    texture: assets.lightning_strike_texture.clone(),
-                    transform: Transform::from_translation(strike.pos),
-                    ..default()
-                },
-                TextureAtlas {
-                    layout: assets.lightning_strike_layout.clone(),
-                    ..default()
-                },
+                Sprite::from_atlas_image(
+                    assets.lightning_strike_texture.clone(),
+                    TextureAtlas {
+                        layout: assets.lightning_strike_layout.clone(),
+                        ..default()
+                    },
+                ),
+                Transform::from_translation(strike.pos),
             ))
-            .push_children(&[collider]);
+            .add_children(&[collider]);
         commands.entity(entity).despawn_recursive();
     }
 }
@@ -235,7 +228,7 @@ fn move_lightning_birds(
 ) {
     for mut transform in &mut q_lightning_birds {
         let dir = transform.local_x();
-        transform.translation += dir * SPEED * time.delta_seconds();
+        transform.translation += dir * SPEED * time.delta_secs();
     }
 }
 
@@ -277,16 +270,14 @@ fn despawn_lightning_birds(
             commands.spawn((
                 animator,
                 LightningBirdDeath,
-                SpriteBundle {
-                    texture: assets.lightning_bird_death_texture.clone(),
-                    transform: Transform::from_translation(transform.translation)
-                        .with_scale(Vec3::splat(3.0)),
-                    ..default()
-                },
-                TextureAtlas {
-                    layout: assets.lightning_bird_death_layout.clone(),
-                    ..default()
-                },
+                Sprite::from_atlas_image(
+                    assets.lightning_bird_death_texture.clone(),
+                    TextureAtlas {
+                        layout: assets.lightning_bird_death_layout.clone(),
+                        ..default()
+                    },
+                ),
+                Transform::from_translation(transform.translation).with_scale(Vec3::splat(3.0)),
             ));
             commands.entity(entity).despawn_recursive();
         }
@@ -298,7 +289,7 @@ fn despawn_lightning_strikes(
     q_lightning_strikes: Query<(Entity, &AnimationPlayer2D), With<LightningStrike>>,
 ) {
     for (entity, animation_player) in &q_lightning_strikes {
-        if animation_player.is_finished() {
+        if animation_player.finished() {
             commands.entity(entity).despawn_recursive();
         }
     }
@@ -309,7 +300,7 @@ fn despawn_lightning_bird_deaths(
     q_lightning_bird_deaths: Query<(Entity, &AnimationPlayer2D), With<LightningBirdDeath>>,
 ) {
     for (entity, animation_player) in &q_lightning_bird_deaths {
-        if animation_player.is_finished() {
+        if animation_player.finished() {
             commands.entity(entity).despawn_recursive();
         }
     }
