@@ -60,7 +60,6 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
         font_size: FONT_SCALE_RATIO,
         ..default()
     };
-    let text_color = TextColor(ev.world_text.font_color);
 
     let mut rng = rand::thread_rng();
     let rand_offset = Vec3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0)
@@ -69,11 +68,8 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
     commands.spawn((
         ev.world_text.clone(),
         Text::from(ev.content.to_string()),
-        TextLayout {
-            justify: JustifyText::Center,
-            ..default()
-        },
-        text_color,
+        TextLayout::new_with_justify(JustifyText::Center),
+        TextColor(ev.world_text.font_color),
         text_style,
         Transform::from_translation(ev.pos + rand_offset + ev.world_text.offset)
             .with_scale(Vec3::splat(ev.world_text.font_scale / FONT_SCALE_RATIO)),
