@@ -12,7 +12,7 @@ fn slime_sprite_indices(state: &SlimeState) -> (usize, usize) {
     }
 }
 
-fn update_indicies(mut q_slimes: Query<(&mut AnimationIndices, &mut ImageNode, &SlimeEnemy)>) {
+fn update_indicies(mut q_slimes: Query<(&mut AnimationIndices, &mut Sprite, &SlimeEnemy)>) {
     for (mut indices, mut image, slime) in &mut q_slimes {
         let new_indices = slime_sprite_indices(&slime.state);
 
