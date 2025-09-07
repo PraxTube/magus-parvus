@@ -2888,10 +2888,8 @@ dependencies = [
  "bevy_screen_diagnostics",
  "bevy_trickfilm",
  "chrono",
- "console_error_panic_hook",
  "noisy_bevy",
  "rand",
- "wasm-bindgen",
 ]
 
 [[package]]
