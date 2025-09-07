@@ -69,8 +69,8 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
     commands.spawn((
         ev.world_text.clone(),
         Text::from(ev.content.to_string()),
-        Node {
-            justify_items: JustifyItems::Center,
+        TextLayout {
+            justify: JustifyText::Center,
             ..default()
         },
         text_color,
