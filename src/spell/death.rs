@@ -77,16 +77,14 @@ fn spawn_deaths(
                 YSort(100.0),
                 AnimSprite::new(SPRITES, true),
                 AnimSpriteTimer::new(SPRITE_TIME),
-                SpriteBundle {
-                    texture: assets.death_texture.clone(),
-                    transform: Transform::from_translation(pos + offset)
-                        .with_scale(Vec3::splat(SCALE)),
-                    ..default()
-                },
-                TextureAtlas {
-                    layout: assets.death_layout.clone(),
-                    ..default()
-                },
+                Sprite::from_atlas_image(
+                    assets.death_texture.clone(),
+                    TextureAtlas {
+                        layout: assets.death_layout.clone(),
+                        ..default()
+                    },
+                ),
+                Transform::from_translation(pos + offset).with_scale(Vec3::splat(SCALE)),
             ));
         }
     }
@@ -112,7 +110,7 @@ fn tick_screen_effect_timers(time: Res<Time>, mut q_screen_effects: Query<&mut S
     }
 }
 
-fn animate_screen_effects(mut q_screen_effects: Query<(&ScreenEffect, &mut UiImage)>) {
+fn animate_screen_effects(mut q_screen_effects: Query<(&ScreenEffect, &mut ImageNode)>) {
     for (screen_effect, mut image) in &mut q_screen_effects {
         let time =
             screen_effect.timer.elapsed_secs() / screen_effect.timer.duration().as_secs_f32();
@@ -143,17 +141,14 @@ fn spawn_screen_effects(
     for _ in ev_kill_all.read() {
         commands.spawn((
             ScreenEffect::default(),
-            ImageBundle {
-                style: Style {
-                    height: Val::Percent(100.0),
-                    width: Val::Percent(100.0),
-                    ..default()
-                },
-                image: UiImage {
-                    texture: assets.white_pixel.clone(),
-                    color: SCREEN_COLOR,
-                    ..default()
-                },
+            Node {
+                height: Val::Percent(100.0),
+                width: Val::Percent(100.0),
+                ..default()
+            },
+            ImageNode {
+                image: assets.white_pixel.clone(),
+                color: SCREEN_COLOR,
                 ..default()
             },
         ));

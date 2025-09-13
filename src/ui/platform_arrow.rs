@@ -28,13 +28,7 @@ fn spawn_arrow(
         return;
     }
 
-    commands.spawn((
-        Arrow,
-        SpriteBundle {
-            texture: assets.platform_arrow.clone(),
-            ..default()
-        },
-    ));
+    commands.spawn((Arrow, Sprite::from_image(assets.platform_arrow.clone())));
 }
 
 fn despawn_arrow(

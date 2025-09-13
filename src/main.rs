@@ -59,7 +59,6 @@ fn main() {
             },
             Animation2DPlugin,
         ))
-        .insert_resource(Msaa::Off)
         .init_state::<GameState>()
         .add_loading_state(
             LoadingState::new(GameState::AssetLoading)

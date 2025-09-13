@@ -12,19 +12,18 @@ fn spawn_vignette(
     }
     ev_trigger_final_act.clear();
 
-    commands.spawn(ImageBundle {
-        style: Style {
+    commands.spawn((
+        Node {
             width: Val::Percent(100.0),
             height: Val::Percent(100.0),
             ..default()
         },
-        image: UiImage {
-            texture: assets.vignette.clone(),
+        ImageNode {
+            image: assets.vignette.clone(),
             color: Color::BLACK,
             ..default()
         },
-        ..default()
-    });
+    ));
 }
 
 pub struct VignettePlugin;

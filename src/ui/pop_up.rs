@@ -20,31 +20,29 @@ impl PopUp {
 }
 
 fn spawn_item_title(commands: &mut Commands, font: Handle<Font>, text: String) -> Entity {
-    let text_style = TextStyle {
+    let text_font = TextFont {
         font,
         font_size: 40.0,
-        color: Color::WHITE,
-    };
-    let text_bundle = TextBundle {
-        text: Text::from_sections([TextSection::new(text, text_style)]),
         ..default()
     };
-    commands.spawn(text_bundle).id()
+    let text_color = TextColor(Color::WHITE);
+    let text = Text::from(text);
+    commands.spawn((text, text_font, text_color)).id()
 }
 
 fn spawn_item_description(commands: &mut Commands, font: Handle<Font>, text: String) -> Entity {
-    let text_style = TextStyle {
+    let text_font = TextFont {
         font,
         font_size: 24.0,
-        color: Color::WHITE,
-    };
-    let text_bundle = TextBundle {
-        text: Text::from_sections([TextSection::new(text, text_style)]),
         ..default()
     };
-    commands
-        .spawn(text_bundle.with_text_justify(JustifyText::Center))
-        .id()
+    let text_color = TextColor(Color::WHITE);
+    let text = Text::from(text);
+    let layout = TextLayout {
+        justify: JustifyText::Center,
+        ..default()
+    };
+    commands.spawn((text, text_font, text_color, layout)).id()
 }
 
 fn spawn_pop_up(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlockedDelayed) {
@@ -54,21 +52,18 @@ fn spawn_pop_up(commands: &mut Commands, font: Handle<Font>, ev: &StatueUnlocked
     commands
         .spawn((
             PopUp::new(),
-            NodeBundle {
-                style: Style {
-                    top: Val::Percent(20.0),
-                    width: Val::Percent(100.0),
-                    flex_direction: FlexDirection::Column,
-                    row_gap: Val::Vh(10.0),
-                    align_items: AlignItems::Center,
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                z_index: ZIndex::Local(101),
+            Node {
+                top: Val::Percent(20.0),
+                width: Val::Percent(100.0),
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Vh(10.0),
+                align_items: AlignItems::Center,
+                position_type: PositionType::Absolute,
                 ..default()
             },
+            ZIndex(101),
         ))
-        .push_children(&[title, description]);
+        .add_children(&[title, description]);
 }
 
 fn spawn_pop_ups(

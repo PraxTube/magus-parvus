@@ -65,30 +65,26 @@ fn iid_from_map_indices(x_index: i32, y_index: i32) -> String {
 fn spawn_world_borders(mut commands: Commands) {
     commands.spawn((
         Collider::cuboid(10.0, 2600.0),
-        TransformBundle::from_transform(Transform::from_translation(Vec3::new(0.0, 2600.0, 0.0))),
+        Transform::from_translation(Vec3::new(0.0, 2600.0, 0.0)),
     ));
     commands.spawn((
         Collider::cuboid(10.0, 2600.0),
-        TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-            5120.0, 2600.0, 0.0,
-        ))),
+        Transform::from_translation(Vec3::new(5120.0, 2600.0, 0.0)),
     ));
     commands.spawn((
         Collider::cuboid(2600.0, 10.0),
-        TransformBundle::from_transform(Transform::from_translation(Vec3::new(2610.0, 55.0, 0.0))),
+        Transform::from_translation(Vec3::new(2610.0, 55.0, 0.0)),
     ));
     commands.spawn((
         Collider::cuboid(2600.0, 10.0),
-        TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-            2610.0, 5120.0, 0.0,
-        ))),
+        Transform::from_translation(Vec3::new(2610.0, 5120.0, 0.0)),
     ));
 }
 
 fn spawn_ldtk_world(mut commands: Commands, assets: Res<GameAssets>) {
     commands.spawn(LdtkWorldBundle {
         transform: Transform::from_translation(Vec3::new(0.0, 0.0, -BACKGROUND_ZINDEX_ABS)),
-        ldtk_handle: assets.level.clone(),
+        ldtk_handle: assets.level.clone().into(),
         ..Default::default()
     });
 }

@@ -61,26 +61,23 @@ fn spawn_text_field(
     let root = commands
         .spawn((
             CastingText,
-            NodeBundle {
-                style: Style {
-                    justify_content: JustifyContent::FlexStart,
-                    align_items: AlignItems::Center,
-                    width: Val::Px((2.0 * CHAR_SIZE + CHAR_OFFSET) * CHAR_PIXEL_FACTOR),
-                    height: Val::Px(42.0),
-                    position_type: PositionType::Absolute,
-                    right: Val::Px(window.width() / 2.0 - 40.0),
-                    top: Val::Px(window.height() / 2.0 - 100.0),
-                    ..default()
-                },
-                background_color: TRANSPARENT_BACKGROUND.into(),
+            Node {
+                justify_content: JustifyContent::FlexStart,
+                align_items: AlignItems::Center,
+                width: Val::Px((2.0 * CHAR_SIZE + CHAR_OFFSET) * CHAR_PIXEL_FACTOR),
+                height: Val::Px(42.0),
+                position_type: PositionType::Absolute,
+                right: Val::Px(window.width() / 2.0 - 40.0),
+                top: Val::Px(window.height() / 2.0 - 100.0),
                 ..default()
             },
+            BackgroundColor(TRANSPARENT_BACKGROUND),
         ))
         .id();
 
     let input_pointer = commands
-        .spawn(TextBundle {
-            style: Style {
+        .spawn((
+            Node {
                 margin: UiRect {
                     left: Val::Px(10.0),
                     right: Val::Px(5.0),
@@ -88,58 +85,48 @@ fn spawn_text_field(
                 },
                 ..default()
             },
-            text: Text::from_section(
-                ">".to_string(),
-                TextStyle {
-                    font: assets.font.clone(),
-                    font_size: FONT_SIZE_INPUT,
-                    color: Color::WHITE,
-                },
-            ),
-            ..default()
-        })
+            Text::from(">"),
+            TextFont {
+                font: assets.font.clone(),
+                font_size: FONT_SIZE_INPUT,
+                ..default()
+            },
+            TextColor(Color::WHITE),
+        ))
         .id();
     let text = commands
         .spawn((
             TypingBuffer,
-            TextBundle {
-                text: Text::from_section(
-                    "".to_string(),
-                    TextStyle {
-                        font: assets.font.clone(),
-                        font_size: FONT_SIZE_INPUT,
-                        color: Color::WHITE,
-                    },
-                ),
+            Text::from(""),
+            TextFont {
+                font: assets.font.clone(),
+                font_size: FONT_SIZE_INPUT,
                 ..default()
             },
+            TextColor(Color::WHITE),
         ))
         .id();
     let cursor = commands
         .spawn((
             TypingCursor,
-            TextBundle {
-                text: Text::from_section(
-                    "_".to_string(),
-                    TextStyle {
-                        font: assets.font.clone(),
-                        font_size: FONT_SIZE_INPUT,
-                        color: RED.into(),
-                    },
-                ),
+            Text::from("_"),
+            TextFont {
+                font: assets.font.clone(),
+                font_size: FONT_SIZE_INPUT,
                 ..default()
             },
+            TextColor(Color::WHITE),
         ))
         .id();
 
     commands
         .entity(root)
-        .push_children(&[input_pointer, text, cursor]);
+        .add_children(&[input_pointer, text, cursor]);
 }
 
 fn update_buffer_container(
     typing_state: Res<TypingState>,
-    mut q_buffer_container: Query<&mut Style, With<CastingText>>,
+    mut q_buffer_container: Query<&mut Node, With<CastingText>>,
 ) {
     if !typing_state.is_changed() {
         return;
@@ -156,22 +143,23 @@ fn update_buffer_container(
 
 fn update_buffer_text(
     typing_state: Res<TypingState>,
-    mut q_typing_buffer_text: Query<&mut Text, With<TypingBuffer>>,
+    q_typing_buffer_text: Query<Entity, With<TypingBuffer>>,
+    mut writer: TextUiWriter,
 ) {
     if !typing_state.is_changed() {
         return;
     }
 
-    let mut text = match q_typing_buffer_text.get_single_mut() {
+    let text = match q_typing_buffer_text.get_single() {
         Ok(t) => t,
         Err(_) => return,
     };
-    text.sections[0].value.clone_from(&typing_state.buf);
+    *writer.text(text, 0) = typing_state.buf.clone();
 }
 
 fn update_cursor_text(
     mut timer: ResMut<TypingCursorTimer>,
-    mut query: Query<&mut Text, With<TypingCursor>>,
+    mut query: Query<&mut TextColor, With<TypingCursor>>,
     time: Res<Time>,
 ) {
     if !timer.0.tick(time.delta()).just_finished() {
@@ -179,10 +167,10 @@ fn update_cursor_text(
     }
 
     for mut target in query.iter_mut() {
-        if target.sections[0].style.color != Color::NONE {
-            target.sections[0].style.color = Color::NONE;
+        if target.0 != Color::NONE {
+            target.0 = Color::NONE;
         } else {
-            target.sections[0].style.color = RED.into();
+            target.0 = RED.into();
         }
     }
 }

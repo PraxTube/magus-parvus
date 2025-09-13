@@ -1,8 +1,6 @@
 mod bundle;
 mod scrollable_list;
 
-use bevy::prelude::*;
-
 use crate::{
     item::{
         item_value::{item_description, item_icon, item_title},
@@ -11,6 +9,7 @@ use crate::{
     player::{PlayerChangedState, PlayerState},
     GameAssets, GameState,
 };
+use bevy::prelude::*;
 
 use bundle::{
     BackgroundBundle, MovementHintDownBundle, MovementHintUpBundle, SpellbookBundle,
@@ -49,7 +48,7 @@ fn spawn_spell_book_view(commands: &mut Commands, assets: &Res<GameAssets>) -> E
 
     commands
         .spawn(SpellbookViewBundle::new(assets))
-        .push_children(&[icon, title, description])
+        .add_children(&[icon, title, description])
         .id()
 }
 
@@ -70,7 +69,7 @@ fn spawn_spell_book(
         let scrollable_list = spawn_scrollable_list(&mut commands, &assets, &active_items);
         let view = spawn_spell_book_view(&mut commands, &assets);
 
-        commands.spawn(SpellbookBundle::default()).push_children(&[
+        commands.spawn(SpellbookBundle::default()).add_children(&[
             background,
             scrollable_list,
             hint_up,
@@ -101,12 +100,13 @@ fn update_view(
     assets: Res<GameAssets>,
     active_items: Res<ActiveItems>,
     q_scrolling_list: Query<&ScrollingList>,
-    mut q_view_icon: Query<&mut UiImage, With<SpellbookViewIcon>>,
-    mut q_view_title: Query<&mut Text, With<SpellbookViewTitle>>,
-    mut q_view_description: Query<
-        &mut Text,
+    mut q_view_icon: Query<&mut ImageNode, With<SpellbookViewIcon>>,
+    q_view_title: Query<Entity, With<SpellbookViewTitle>>,
+    q_view_description: Query<
+        Entity,
         (With<SpellbookViewDescription>, Without<SpellbookViewTitle>),
     >,
+    mut writer: TextUiWriter,
 ) {
     if active_items.is_empty() {
         return;
@@ -120,11 +120,11 @@ fn update_view(
         Ok(i) => i,
         Err(_) => return,
     };
-    let mut title = match q_view_title.get_single_mut() {
+    let title = match q_view_title.get_single() {
         Ok(i) => i,
         Err(_) => return,
     };
-    let mut description = match q_view_description.get_single_mut() {
+    let description = match q_view_description.get_single() {
         Ok(i) => i,
         Err(_) => return,
     };
@@ -138,9 +138,10 @@ fn update_view(
     let target_title = item_title(item);
     let target_description = item_description(item);
 
-    if icon.texture != target_texture {
-        icon.texture = target_texture;
+    if icon.image != target_texture {
+        icon.image = target_texture;
     }
-    title.sections[0].value = target_title;
-    description.sections[0].value = target_description;
+
+    *writer.text(title, 0) = target_title;
+    *writer.text(description, 0) = target_description;
 }

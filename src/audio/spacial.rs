@@ -8,7 +8,7 @@ const MAX_DISTANCE: f64 = 500.0;
 fn update(
     game_audio: &Res<GameAudio>,
     receiver_transform: &GlobalTransform,
-    emitters: &Query<(&GlobalTransform, &AudioEmitter)>,
+    emitters: &Query<(&GlobalTransform, &SpatialAudioEmitter)>,
     audio_instances: &mut Assets<AudioInstance>,
 ) {
     for (emitter_transform, emitter) in emitters {
@@ -29,8 +29,8 @@ fn update(
 
 fn update_volumes(
     game_audio: Res<GameAudio>,
-    receiver: Query<&GlobalTransform, With<AudioReceiver>>,
-    emitters: Query<(&GlobalTransform, &AudioEmitter)>,
+    receiver: Query<&GlobalTransform, With<SpatialAudioReceiver>>,
+    emitters: Query<(&GlobalTransform, &SpatialAudioEmitter)>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
     if let Ok(receiver_transform) = receiver.get_single() {
@@ -44,7 +44,7 @@ fn update_volumes(
 }
 
 fn cleanup_stopped_spacial_instances(
-    mut emitters: Query<&mut AudioEmitter>,
+    mut emitters: Query<&mut SpatialAudioEmitter>,
     instances: ResMut<Assets<AudioInstance>>,
 ) {
     for mut emitter in emitters.iter_mut() {

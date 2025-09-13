@@ -50,7 +50,7 @@ impl CameraShake {
 }
 
 fn decay_shake_trauma(time: Res<Time>, mut shake: ResMut<CameraShake>) {
-    shake.reduce_trauma(time.delta_seconds());
+    shake.reduce_trauma(time.delta_secs());
 }
 
 pub fn update_camera(

@@ -63,15 +63,14 @@ fn spawn_fireball(
             },
             AnimSprite::new(60, true),
             AnimSpriteTimer::new(0.05),
-            SpriteBundle {
-                texture: assets.fireball_texture.clone(),
-                transform,
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.fireball_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.fireball_texture.clone(),
+                TextureAtlas {
+                    layout: assets.fireball_layout.clone(),
+                    ..default()
+                },
+            ),
+            transform,
         ))
         .id();
 
@@ -79,13 +78,11 @@ fn spawn_fireball(
         .spawn((
             Collider::ball(5.0),
             Sensor,
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-                -25.0, 0.0, 0.0,
-            ))),
+            Transform::from_translation(Vec3::new(-25.0, 0.0, 0.0)),
         ))
         .id();
 
-    commands.entity(entity).push_children(&[collider]);
+    commands.entity(entity).add_children(&[collider]);
 }
 
 fn spawn_fireballs(
@@ -149,7 +146,7 @@ fn spawn_ignis_pila(
             PI
         }
     } else {
-        Vec2::X.angle_between(-closest_enemy + player_pos.truncate())
+        Vec2::X.angle_to(-closest_enemy + player_pos.truncate())
     };
 
     for ev in ev_spell_casted.read() {
@@ -190,7 +187,7 @@ fn spawn_inferno_pila(
 fn scale_fireballs(time: Res<Time>, mut q_fireballs: Query<&mut Transform, With<Fireball>>) {
     for mut transform in &mut q_fireballs {
         if transform.scale.x < SCALE {
-            transform.scale += Vec3::ONE * SCALE / SCALE_TIME * time.delta_seconds();
+            transform.scale += Vec3::ONE * SCALE / SCALE_TIME * time.delta_secs();
         }
     }
 }
@@ -198,7 +195,7 @@ fn scale_fireballs(time: Res<Time>, mut q_fireballs: Query<&mut Transform, With<
 fn move_fireballs(time: Res<Time>, mut q_fireballs: Query<&mut Transform, With<Fireball>>) {
     for mut transform in &mut q_fireballs {
         let dir = -transform.local_x();
-        transform.translation += dir * SPEED * time.delta_seconds();
+        transform.translation += dir * SPEED * time.delta_secs();
     }
 }
 

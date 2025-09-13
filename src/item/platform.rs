@@ -35,15 +35,14 @@ fn spawn_platform(mut commands: Commands, assets: Res<GameAssets>) {
         Platform,
         animator,
         YSort(-10.0),
-        SpriteBundle {
-            texture: assets.platform_texture.clone(),
-            transform: Transform::from_translation(PLAYER_SPAWN_POS + OFFSET),
-            ..default()
-        },
-        TextureAtlas {
-            layout: assets.platform_layout.clone(),
-            ..default()
-        },
+        Sprite::from_atlas_image(
+            assets.platform_texture.clone(),
+            TextureAtlas {
+                layout: assets.platform_layout.clone(),
+                ..default()
+            },
+        ),
+        Transform::from_translation(PLAYER_SPAWN_POS + OFFSET),
     ));
 }
 
@@ -66,31 +65,18 @@ fn spawn_trigger_item(
         PlatformItem::default(),
         Sensor,
         Collider::ball(15.0),
-        SpriteBundle {
-            texture: assets.platform_item.clone(),
-            transform: Transform::from_translation(PLAYER_SPAWN_POS + OFFSET),
-            ..default()
-        },
+        Sprite::from_image(assets.platform_item.clone()),
+        Transform::from_translation(PLAYER_SPAWN_POS + OFFSET),
     ));
     commands.spawn((
         PlatformItemComponent,
-        SpriteBundle {
-            texture: assets.platform_item_shadow.clone(),
-            transform: Transform::from_translation(
-                PLAYER_SPAWN_POS + OFFSET + Vec3::new(0.0, 0.0, -4.0),
-            ),
-            ..default()
-        },
+        Sprite::from_image(assets.platform_item_shadow.clone()),
+        Transform::from_translation(PLAYER_SPAWN_POS + OFFSET + Vec3::new(0.0, 0.0, -4.0)),
     ));
     commands.spawn((
         PlatformItemComponent,
-        SpriteBundle {
-            texture: assets.platform_item_highlight.clone(),
-            transform: Transform::from_translation(
-                PLAYER_SPAWN_POS + OFFSET + Vec3::new(0.0, -OFFSET.y, -5.0),
-            ),
-            ..default()
-        },
+        Sprite::from_image(assets.platform_item_highlight.clone()),
+        Transform::from_translation(PLAYER_SPAWN_POS + OFFSET + Vec3::new(0.0, -OFFSET.y, -5.0)),
     ));
 }
 
@@ -165,7 +151,7 @@ fn hover_platform_item(
 
     let sign = if item.move_up { 1.0 } else { -1.0 };
 
-    transform.translation += sign * Vec3::Y * ITEM_SPEED * time.delta_seconds();
+    transform.translation += sign * Vec3::Y * ITEM_SPEED * time.delta_secs();
 }
 
 fn trigger_final_act(

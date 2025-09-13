@@ -10,71 +10,63 @@ struct TextCounter;
 
 fn spawn_statue_counter(mut commands: Commands, assets: Res<GameAssets>) {
     let image = commands
-        .spawn(ImageBundle {
-            image: UiImage {
-                texture: assets.statue_ui_icon.clone(),
+        .spawn((
+            ImageNode {
+                image: assets.statue_ui_icon.clone(),
                 ..default()
             },
-            style: Style {
+            Node {
                 position_type: PositionType::Relative,
                 width: Val::Px(48.0),
                 height: Val::Px(80.0),
                 ..default()
             },
-            ..default()
-        })
+        ))
         .id();
     let text = commands
         .spawn((
             TextCounter,
-            TextBundle {
-                style: Style {
-                    top: Val::Px(24.0),
-                    ..default()
-                },
-                text: Text::from_sections([TextSection {
-                    value: String::new(),
-                    style: TextStyle {
-                        font: assets.font.clone(),
-                        font_size: 30.0,
-                        color: Color::WHITE,
-                    },
-                }]),
+            Node {
+                top: Val::Px(24.0),
                 ..default()
             },
+            Text::from(String::new()),
+            TextFont {
+                font: assets.font.clone(),
+                font_size: 30.0,
+                ..default()
+            },
+            TextColor(Color::WHITE),
         ))
         .id();
 
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                top: Val::Px(10.0),
-                right: Val::Px(25.0),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
+        .spawn(Node {
+            top: Val::Px(10.0),
+            right: Val::Px(25.0),
+            position_type: PositionType::Absolute,
             ..default()
         })
-        .push_children(&[image, text]);
+        .add_children(&[image, text]);
 }
 
 fn update_text_counter(
     active_items: Res<ActiveItems>,
     max_items: Res<MaxItems>,
-    mut q_text_counter: Query<&mut Text, With<TextCounter>>,
+    mut q_text_counter: Query<Entity, With<TextCounter>>,
     mut ev_statue_unlocked_delayed: EventReader<StatueUnlockedDelayed>,
+    mut writer: TextUiWriter,
 ) {
     if ev_statue_unlocked_delayed.is_empty() {
         return;
     }
     ev_statue_unlocked_delayed.clear();
 
-    let mut text = match q_text_counter.get_single_mut() {
+    let text = match q_text_counter.get_single_mut() {
         Ok(t) => t,
         Err(_) => return,
     };
-
-    text.sections[0].value = format!(" {}/{}", active_items.len(), max_items.0);
+    *writer.text(text, 0) = format!(" {}/{}", active_items.len(), max_items.0);
 }
 
 pub struct StatueCounterUiPlugin;

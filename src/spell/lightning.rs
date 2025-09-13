@@ -38,15 +38,14 @@ fn spawn_lightning(commands: &mut Commands, assets: &Res<GameAssets>, transform:
             Lightning::default(),
             AnimSprite::new(SPRITES_COUNT, false),
             AnimSpriteTimer::new(SPRITES_TIME),
-            SpriteBundle {
-                texture: assets.lightning_texture.clone(),
-                transform,
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.lightning_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.lightning_texture.clone(),
+                TextureAtlas {
+                    layout: assets.lightning_layout.clone(),
+                    ..default()
+                },
+            ),
+            transform,
         ))
         .id();
 
@@ -54,15 +53,11 @@ fn spawn_lightning(commands: &mut Commands, assets: &Res<GameAssets>, transform:
         .spawn((
             Collider::ball(5.0),
             Sensor,
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-                0.0,
-                -SPRITE_HEIGHT_HALF,
-                0.0,
-            ))),
+            Transform::from_translation(Vec3::new(0.0, -SPRITE_HEIGHT_HALF, 0.0)),
         ))
         .id();
 
-    commands.entity(entity).push_children(&[collider]);
+    commands.entity(entity).add_children(&[collider]);
 }
 
 fn spawn_fulgur(

@@ -44,15 +44,14 @@ fn spawn_air_pull(
             AerTracto::new(pull_intensity),
             AnimSprite::new(7, false),
             AnimSpriteTimer::new(0.10),
-            SpriteBundle {
-                texture: assets.aer_tracto_texture.clone(),
-                transform,
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.aer_tracto_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.aer_tracto_texture.clone(),
+                TextureAtlas {
+                    layout: assets.aer_tracto_layout.clone(),
+                    ..default()
+                },
+            ),
+            transform,
         ))
         .id();
 
@@ -60,11 +59,11 @@ fn spawn_air_pull(
         .spawn((
             Collider::ball(15.0),
             Sensor,
-            TransformBundle::from_transform(Transform::from_translation(Vec3::new(0.0, 0.0, 0.0))),
+            Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
         ))
         .id();
 
-    commands.entity(entity).push_children(&[collider]);
+    commands.entity(entity).add_children(&[collider]);
 }
 
 fn spawn_aer_tracto(

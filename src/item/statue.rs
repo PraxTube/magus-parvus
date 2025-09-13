@@ -85,9 +85,7 @@ fn spawn_statues(
         let collider = commands
             .spawn((
                 Collider::cuboid(20.0, 10.0),
-                TransformBundle::from_transform(Transform::from_translation(Vec3::new(
-                    0.0, -20.0, 0.0,
-                ))),
+                Transform::from_translation(Vec3::new(0.0, -20.0, 0.0)),
             ))
             .id();
 
@@ -95,12 +93,9 @@ fn spawn_statues(
             .entity(entity)
             .insert(YSort(0.0 + BACKGROUND_ZINDEX_ABS))
             .insert(Statue::new(item.clone()))
-            .insert(SpriteBundle {
-                texture: assets.statue.clone(),
-                transform: Transform::from_translation(pos),
-                ..default()
-            })
-            .push_children(&[collider]);
+            .insert(Sprite::from_image(assets.statue.clone()))
+            .insert(Transform::from_translation(pos))
+            .add_children(&[collider]);
     }
 }
 
@@ -132,15 +127,14 @@ fn spawn_statue_blinks(
             AnimSprite::new(5, false),
             AnimSpriteTimer::new(0.1),
             YSort(10.0),
-            SpriteBundle {
-                texture: assets.statue_blink_texture.clone(),
-                transform: Transform::from_translation(ev.statue.pos + BLINK_OFFSET),
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.statue_blink_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.statue_blink_texture.clone(),
+                TextureAtlas {
+                    layout: assets.statue_blink_layout.clone(),
+                    ..default()
+                },
+            ),
+            Transform::from_translation(ev.statue.pos + BLINK_OFFSET),
         ));
     }
 }
@@ -156,15 +150,14 @@ fn spawn_statue_beams(
             AnimSprite::new(4, true),
             AnimSpriteTimer::new(0.05),
             YSort((BEAM_OFFSET.y - 1.0) * TRANSLATION_TO_PIXEL),
-            SpriteBundle {
-                texture: assets.statue_beam_texture.clone(),
-                transform: Transform::from_translation(ev.statue.pos + BEAM_OFFSET),
-                ..default()
-            },
-            TextureAtlas {
-                layout: assets.statue_beam_layout.clone(),
-                ..default()
-            },
+            Sprite::from_atlas_image(
+                assets.statue_beam_texture.clone(),
+                TextureAtlas {
+                    layout: assets.statue_beam_layout.clone(),
+                    ..default()
+                },
+            ),
+            Transform::from_translation(ev.statue.pos + BEAM_OFFSET),
         ));
     }
 }

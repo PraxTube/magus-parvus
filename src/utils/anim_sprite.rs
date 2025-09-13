@@ -51,24 +51,26 @@ impl AnimSpriteTimer {
 
 fn animate_sprites(
     time: Res<Time>,
-    mut query: Query<(&mut AnimSprite, &mut AnimSpriteTimer, &mut TextureAtlas)>,
+    mut query: Query<(&mut AnimSprite, &mut AnimSpriteTimer, &mut Sprite)>,
 ) {
-    for (mut asprite, mut timer, mut layout) in &mut query {
-        if layout.index > asprite.sprites {
-            asprite.disabled = true;
-            continue;
-        }
+    for (mut asprite, mut timer, mut sprite) in &mut query {
+        if let Some(layout) = sprite.texture_atlas.as_mut() {
+            if layout.index > asprite.sprites {
+                asprite.disabled = true;
+                continue;
+            }
 
-        timer.timer.tick(time.delta());
-        if timer.timer.just_finished() {
-            if layout.index == asprite.sprites {
-                if asprite.repeating {
-                    layout.index = 0;
+            timer.timer.tick(time.delta());
+            if timer.timer.just_finished() {
+                if layout.index == asprite.sprites {
+                    if asprite.repeating {
+                        layout.index = 0;
+                    } else {
+                        asprite.disabled = true;
+                    }
                 } else {
-                    asprite.disabled = true;
+                    layout.index += 1;
                 }
-            } else {
-                layout.index += 1;
             }
         }
     }
@@ -76,16 +78,18 @@ fn animate_sprites(
 
 fn animate_complex_sprites(
     time: Res<Time>,
-    mut q_sprites: Query<(&AnimationIndices, &mut FrameTimer, &mut TextureAtlas)>,
+    mut q_sprites: Query<(&AnimationIndices, &mut FrameTimer, &mut Sprite)>,
 ) {
-    for (indices, mut timer, mut layout) in &mut q_sprites {
+    for (indices, mut timer, mut sprite) in &mut q_sprites {
         timer.tick(time.delta());
         if timer.just_finished() {
-            layout.index = if layout.index == indices.last {
-                indices.first
-            } else {
-                layout.index + 1
-            };
+            if let Some(layout) = sprite.texture_atlas.as_mut() {
+                layout.index = if layout.index == indices.last {
+                    indices.first
+                } else {
+                    layout.index + 1
+                };
+            }
         }
     }
 }

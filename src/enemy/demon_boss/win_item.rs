@@ -42,15 +42,14 @@ fn spawn_win_item(
         Sensor,
         animator,
         YSort(0.0),
-        SpriteBundle {
-            texture: assets.portal_texture.clone(),
-            transform: Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
-            ..default()
-        },
-        TextureAtlas {
-            layout: assets.portal_layout.clone(),
-            ..default()
-        },
+        Sprite::from_atlas_image(
+            assets.portal_texture.clone(),
+            TextureAtlas {
+                layout: assets.portal_layout.clone(),
+                ..default()
+            },
+        ),
+        Transform::from_translation(pos).with_scale(Vec3::splat(2.0)),
     ));
 }
 
@@ -84,7 +83,7 @@ fn switch_animations(
         Err(_) => return,
     };
 
-    if animator.is_finished() {
+    if animator.finished() {
         animator.play(assets.portal_animations[1].clone()).repeat();
     }
 }

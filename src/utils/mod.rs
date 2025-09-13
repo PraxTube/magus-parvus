@@ -32,7 +32,7 @@ pub fn quat_from_vec2(direction: Vec2) -> Quat {
     if direction == Vec2::ZERO {
         return Quat::IDENTITY;
     }
-    Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, Vec2::X.angle_between(direction))
+    Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, Vec2::X.angle_to(direction))
 }
 
 #[allow(dead_code)]

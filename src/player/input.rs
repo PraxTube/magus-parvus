@@ -38,7 +38,7 @@ pub fn fetch_mouse_world_coords(
 
     if let Some(world_position) = window
         .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor).ok())
         .map(|ray| ray.origin.truncate())
     {
         mouse_coords.0 = world_position;
@@ -113,13 +113,12 @@ fn input_casting(keys: Res<ButtonInput<KeyCode>>, mut player_input: ResMut<Playe
 
 fn toggle_fullscreen(
     keys: Res<ButtonInput<KeyCode>>,
-    gamepads: Res<Gamepads>,
-    button_inputs: Res<ButtonInput<GamepadButton>>,
+    gamepads: Query<&Gamepad>,
     mut player_input: ResMut<PlayerInput>,
 ) {
     let mut pressed = keys.just_pressed(KeyCode::KeyB);
     for gamepad in gamepads.iter() {
-        if button_inputs.just_pressed(GamepadButton::new(gamepad, GamepadButtonType::DPadUp)) {
+        if gamepad.just_pressed(GamepadButton::DPadUp) {
             pressed = true;
         }
     }

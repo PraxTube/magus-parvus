@@ -20,19 +20,16 @@ fn spawn_wall(commands: &mut Commands, assets: &Res<GameAssets>, pos: Vec3, flip
     commands.spawn((
         animator,
         YSort(0.0),
-        SpriteBundle {
-            texture: assets.earth_wall_texture.clone(),
-            transform: Transform::from_translation(pos),
-            sprite: Sprite {
-                flip_x,
+        Sprite {
+            image: assets.earth_wall_texture.clone(),
+            flip_x,
+            texture_atlas: Some(TextureAtlas {
+                layout: assets.earth_wall_layout.clone(),
                 ..default()
-            },
+            }),
             ..default()
         },
-        TextureAtlas {
-            layout: assets.earth_wall_layout.clone(),
-            ..default()
-        },
+        Transform::from_translation(pos),
     ));
 }
 
@@ -48,7 +45,7 @@ fn spawn_collider(commands: &mut Commands, pos: Vec3, offset: f32) {
     commands.spawn((
         Collider::polyline(vertices, None),
         CollisionGroups::default(),
-        TransformBundle::from_transform(Transform::from_translation(pos)),
+        Transform::from_translation(pos),
     ));
 }
 
