@@ -54,7 +54,7 @@ fn spawn_health_damage_text(
             Err(_) => continue,
         };
 
-        ev_spawn_damage_text.send(SpawnWorldText {
+        ev_spawn_damage_text.write(SpawnWorldText {
             world_text: WorldText::default(),
             pos,
             content: ev.health_change.to_string(),
@@ -69,7 +69,7 @@ fn check_health_changed(
     for (entity, mut health) in &mut q_healths {
         if health.health != health.old_health {
             let health_change = (health.health - health.old_health).abs();
-            ev_health_changed.send(HealthChanged {
+            ev_health_changed.write(HealthChanged {
                 entity,
                 health_change,
             });
@@ -124,7 +124,7 @@ fn despawn_hearts(
     q_hearts_containers: Query<Entity, With<HeartsContainer>>,
 ) {
     for entity in &q_hearts_containers {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
@@ -163,7 +163,7 @@ fn full_heal_player(
     }
     ev_trigger_final_act.clear();
 
-    let mut health = match q_player.get_single_mut() {
+    let mut health = match q_player.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };

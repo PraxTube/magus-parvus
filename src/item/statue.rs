@@ -109,7 +109,7 @@ fn spawn_statue_trigger_marks(
             offset: Vec3::new(0.0, 35.0, 10.0),
             ..default()
         };
-        ev_spawn_world_text.send(SpawnWorldText {
+        ev_spawn_world_text.write(SpawnWorldText {
             world_text,
             pos: ev.statue.pos,
             content: "!".to_string(),
@@ -178,8 +178,8 @@ fn despawn_unlock_timers(
 ) {
     for (entity, unlock_timer) in &q_unlock_timers {
         if unlock_timer.disabled {
-            ev_statue_unlocked_delayed.send(StatueUnlockedDelayed(unlock_timer.ev.clone()));
-            commands.entity(entity).despawn_recursive();
+            ev_statue_unlocked_delayed.write(StatueUnlockedDelayed(unlock_timer.ev.clone()));
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -199,7 +199,7 @@ fn trigger_statues(
     mut q_statues: Query<(&GlobalTransform, &mut Statue)>,
     mut ev_statue_triggered: EventWriter<StatueTriggered>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
@@ -216,7 +216,7 @@ fn trigger_statues(
 
         statue.triggered = true;
         statue.pos = statue_transform.translation();
-        ev_statue_triggered.send(StatueTriggered {
+        ev_statue_triggered.write(StatueTriggered {
             statue: statue.clone(),
         });
     }
@@ -242,7 +242,7 @@ fn unlock_statues(
 
         statue.unlocked = true;
         active_items.push(statue.item.clone());
-        ev_statue_unlocked.send(StatueUnlocked {
+        ev_statue_unlocked.write(StatueUnlocked {
             statue: statue.clone(),
         });
     }
@@ -259,7 +259,7 @@ fn despawn_statues(
     ev_trigger_final_act.clear();
 
     for entity in &q_statues {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
@@ -274,7 +274,7 @@ fn despawn_statue_beams(
     ev_trigger_final_act.clear();
 
     for entity in &q_statue_beams {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

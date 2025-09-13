@@ -103,14 +103,14 @@ fn reduce_audio_volume(
     mut game_audio: ResMut<GameAudio>,
     mut q_audio_silence_timer: Query<(Entity, &mut AudioSilenceTimer)>,
 ) {
-    let (entity, mut timer) = match q_audio_silence_timer.get_single_mut() {
+    let (entity, mut timer) = match q_audio_silence_timer.single_mut() {
         Ok(t) => t,
         Err(_) => return,
     };
 
     timer.tick(time.delta());
     if timer.just_finished() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     game_audio.main_volume =
@@ -118,7 +118,7 @@ fn reduce_audio_volume(
 }
 
 fn play_sound(assets: Res<GameAssets>, mut ev_play_sound: EventWriter<PlaySound>) {
-    ev_play_sound.send(PlaySound {
+    ev_play_sound.write(PlaySound {
         clip: assets.game_over_sound.clone(),
         ..default()
     });

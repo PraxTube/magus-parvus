@@ -87,7 +87,7 @@ fn change_slime_states(
             SlimeState::Idling => {
                 slime.jump_cooldown_timer.tick(time.delta());
                 if slime.jump_cooldown_timer.just_finished() {
-                    ev_play_sound.send(PlaySound {
+                    ev_play_sound.write(PlaySound {
                         clip: assets.slime_jump_sound.clone(),
                         volume: 0.75,
                         rand_speed_intensity: 0.2,
@@ -100,7 +100,7 @@ fn change_slime_states(
             SlimeState::Jumping => {
                 slime.jumping_timer.tick(time.delta());
                 if slime.jumping_timer.just_finished() {
-                    ev_play_sound.send(PlaySound {
+                    ev_play_sound.write(PlaySound {
                         clip: assets.slime_land_sound.clone(),
                         rand_speed_intensity: 0.2,
                         parent: Some(entity),
@@ -112,7 +112,7 @@ fn change_slime_states(
             SlimeState::Staggering => {
                 slime.staggering_timer.tick(time.delta());
                 if slime.staggering_timer.just_finished() {
-                    ev_play_sound.send(PlaySound {
+                    ev_play_sound.write(PlaySound {
                         clip: assets.slime_hit_sound.clone(),
                         parent: Some(entity),
                         ..default()

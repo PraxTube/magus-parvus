@@ -8,7 +8,7 @@ fn kill_player(
     mut q_player: Query<&mut Health, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let mut player_health = match q_player.get_single_mut() {
+    let mut player_health = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };

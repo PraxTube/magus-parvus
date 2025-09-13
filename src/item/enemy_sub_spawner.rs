@@ -61,7 +61,7 @@ fn despawn_sub_spawners(
 ) {
     for (entity, enemy_spawner) in &q_enemy_sub_spawners {
         if enemy_spawner.disabled {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -92,7 +92,7 @@ fn spawn_enemy(
     };
 
     sub_spawner.current_index += 1;
-    ev_spawn_slime_enemy.send(SpawnSlimeEnemy { pos });
+    ev_spawn_slime_enemy.write(SpawnSlimeEnemy { pos });
 }
 
 fn spawn_enemies(

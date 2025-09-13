@@ -20,7 +20,7 @@ impl Default for StepsTimer {
 }
 
 fn tick_steps_timers(time: Res<Time>, mut q_steps_timer: Query<&mut StepsTimer>) {
-    match q_steps_timer.get_single_mut() {
+    match q_steps_timer.single_mut() {
         Ok(mut t) => t.tick(time.delta()),
         Err(_) => return,
     };
@@ -32,11 +32,11 @@ fn play_step_sounds(
     q_steps_timer: Query<&StepsTimer>,
     mut ev_play_sound: EventWriter<PlaySound>,
 ) {
-    let player_state = match q_player.get_single() {
+    let player_state = match q_player.single() {
         Ok(p) => p.state,
         Err(_) => return,
     };
-    let steps_timer = match q_steps_timer.get_single() {
+    let steps_timer = match q_steps_timer.single() {
         Ok(t) => t,
         Err(_) => return,
     };
@@ -48,7 +48,7 @@ fn play_step_sounds(
         return;
     }
 
-    ev_play_sound.send(PlaySound {
+    ev_play_sound.write(PlaySound {
         clip: assets.player_step_sound.clone(),
         volume: 1.5,
         rand_speed_intensity: RAND_SPEED_INTENSITY,

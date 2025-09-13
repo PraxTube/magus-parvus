@@ -57,7 +57,7 @@ pub fn update_camera(
     mut q_camera: Query<&mut Transform, With<MainCamera>>,
     shake: ResMut<CameraShake>,
 ) {
-    let mut transform = match q_camera.get_single_mut() {
+    let mut transform = match q_camera.single_mut() {
         Ok(t) => t,
         Err(_) => return,
     };

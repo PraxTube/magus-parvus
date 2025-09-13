@@ -72,11 +72,11 @@ fn spawn_earth_prison(
     mut ev_spawn_demon_spells: EventReader<SpawnDemonSpell>,
     mut ev_play_sound: EventWriter<PlaySound>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
-    let demon_boss_pos = match q_demon_boss.get_single() {
+    let demon_boss_pos = match q_demon_boss.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
@@ -94,7 +94,7 @@ fn spawn_earth_prison(
             continue;
         }
 
-        ev_play_sound.send(PlaySound {
+        ev_play_sound.write(PlaySound {
             clip: assets.earth_wall_sound.clone(),
             ..default()
         });
@@ -129,7 +129,7 @@ fn despawn_earth_prison(
     }
 
     for (entity, _) in &q_earth_wall_colliders {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     for (mut earth_wall, mut animator) in &mut q_earth_walls {
@@ -150,7 +150,7 @@ fn despawn_walls(
         }
 
         if animator.finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

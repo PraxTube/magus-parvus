@@ -97,7 +97,7 @@ fn animate_complex_sprites(
 fn despawn_anim_sprites(mut commands: Commands, q_anim_sprites: Query<(Entity, &AnimSprite)>) {
     for (entity, asprite) in &q_anim_sprites {
         if asprite.disabled {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

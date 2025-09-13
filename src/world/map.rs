@@ -90,11 +90,11 @@ fn spawn_ldtk_world(mut commands: Commands, assets: Res<GameAssets>) {
 }
 
 fn adjust_chunks(mut level_set: Query<&mut LevelSet>, q_player: Query<&Transform, With<Player>>) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
-    let mut level_set = match level_set.get_single_mut() {
+    let mut level_set = match level_set.single_mut() {
         Ok(l) => l,
         Err(_) => return,
     };

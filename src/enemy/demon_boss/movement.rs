@@ -12,11 +12,11 @@ fn movement(
     mut q_demon_boss: Query<(&Transform, &mut Velocity, &DemonBoss)>,
     q_player: Query<&Transform, (With<Player>, Without<DemonBoss>)>,
 ) {
-    let (demon_boss_transform, mut velocity, demon_boss) = match q_demon_boss.get_single_mut() {
+    let (demon_boss_transform, mut velocity, demon_boss) = match q_demon_boss.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
-    let player_transform = match q_player.get_single() {
+    let player_transform = match q_player.single() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -44,7 +44,7 @@ fn despawn_cooldowns(
     for (entity, mut timer) in &mut q_timers {
         timer.tick(time.delta());
         if timer.just_finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

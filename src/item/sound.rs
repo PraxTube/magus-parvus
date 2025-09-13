@@ -10,7 +10,7 @@ fn spawn_item_unlock_sounds(
     mut ev_play_sound: EventWriter<PlaySound>,
 ) {
     for _ in ev_statue_unlocked_delayed.read() {
-        ev_play_sound.send(PlaySound {
+        ev_play_sound.write(PlaySound {
             clip: assets.item_unlock_sound.clone(),
             ..default()
         });

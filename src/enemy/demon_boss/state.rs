@@ -25,7 +25,7 @@ fn update_animation(
     assets: Res<GameAssets>,
     mut q_demon_boss: Query<(&mut AnimationPlayer2D, &DemonBoss)>,
 ) {
-    let (mut animator, demon_boss) = match q_demon_boss.get_single_mut() {
+    let (mut animator, demon_boss) = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -50,11 +50,11 @@ fn adjust_sprite_flip(
     mut q_demon_boss: Query<(&Transform, &mut Sprite, &DemonBoss)>,
     q_player: Query<&Transform, (With<Player>, Without<DemonBoss>)>,
 ) {
-    let (demon_boss_transform, mut sprite, demon_boss) = match q_demon_boss.get_single_mut() {
+    let (demon_boss_transform, mut sprite, demon_boss) = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
-    let player_transform = match q_player.get_single() {
+    let player_transform = match q_player.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -72,7 +72,7 @@ fn striking_to_idle(
     mut commands: Commands,
     mut q_demon_boss: Query<(&AnimationPlayer2D, &mut DemonBoss)>,
 ) {
-    let (animator, mut demon_boss) = match q_demon_boss.get_single_mut() {
+    let (animator, mut demon_boss) = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -94,7 +94,7 @@ fn casting_to_idle(
     mut q_demon_boss: Query<&mut DemonBoss>,
     mut ev_spawn_demon_spell: EventReader<SpawnDemonSpell>,
 ) {
-    let mut demon_boss = match q_demon_boss.get_single_mut() {
+    let mut demon_boss = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -112,7 +112,7 @@ fn staggering_to_idle(
     mut commands: Commands,
     mut q_demon_boss: Query<(&mut DemonBoss, &AnimationPlayer2D)>,
 ) {
-    let (mut demon_boss, animator) = match q_demon_boss.get_single_mut() {
+    let (mut demon_boss, animator) = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -138,11 +138,11 @@ fn switch_to_striking(
     if !q_strike_cooldowns.is_empty() {
         return;
     }
-    let (demon_boss_transform, mut demon_boss) = match q_demon_boss.get_single_mut() {
+    let (demon_boss_transform, mut demon_boss) = match q_demon_boss.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
@@ -173,15 +173,15 @@ fn switch_to_casting(
     if !q_demon_spell_cooldown.is_empty() {
         return;
     }
-    let (demon_boss_transform, mut demon_boss) = match q_demon_boss.get_single_mut() {
+    let (demon_boss_transform, mut demon_boss) = match q_demon_boss.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
-    let last_spell_timer = match q_last_spell_timer.get_single() {
+    let last_spell_timer = match q_last_spell_timer.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -210,7 +210,7 @@ fn switch_to_moving(
     if !q_movement_cooldowns.is_empty() {
         return;
     }
-    let mut demon_boss = match q_demon_boss.get_single_mut() {
+    let mut demon_boss = match q_demon_boss.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };

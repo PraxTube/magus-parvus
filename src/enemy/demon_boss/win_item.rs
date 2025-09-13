@@ -21,7 +21,7 @@ fn spawn_win_item(
     time: Res<Time>,
     mut q_delay: Query<(Entity, &mut WinItemDelay)>,
 ) {
-    let (entity, mut delay) = match q_delay.get_single_mut() {
+    let (entity, mut delay) = match q_delay.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -31,7 +31,7 @@ fn spawn_win_item(
         return;
     }
     let pos = delay.pos;
-    commands.entity(entity).despawn_recursive();
+    commands.entity(entity).despawn();
 
     let mut animator = AnimationPlayer2D::default();
     animator.play(assets.portal_animations[0].clone());
@@ -63,7 +63,7 @@ fn spawn_win_item_delay(
     }
     ev_demon_boss_death.clear();
 
-    let pos = match q_demon_boss.get_single() {
+    let pos = match q_demon_boss.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
@@ -78,7 +78,7 @@ fn switch_animations(
     assets: Res<GameAssets>,
     mut q_win_item: Query<&mut AnimationPlayer2D, With<WinItem>>,
 ) {
-    let mut animator = match q_win_item.get_single_mut() {
+    let mut animator = match q_win_item.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -92,11 +92,11 @@ fn adjust_flip(
     q_player: Query<&Transform, With<Player>>,
     mut q_win_item: Query<(&Transform, &mut Sprite), (With<WinItem>, Without<Player>)>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
-    let (pos, mut sprite) = match q_win_item.get_single_mut() {
+    let (pos, mut sprite) = match q_win_item.single_mut() {
         Ok(r) => (r.0.translation, r.1),
         Err(_) => return,
     };
@@ -110,11 +110,11 @@ fn trigger_win(
     q_win_item: Query<Entity, With<WinItem>>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
-    let player = match q_player.get_single_mut() {
+    let player = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
-    let item_entity = match q_win_item.get_single() {
+    let item_entity = match q_win_item.single() {
         Ok(r) => r,
         Err(_) => return,
     };

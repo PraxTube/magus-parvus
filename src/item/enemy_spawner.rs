@@ -111,7 +111,7 @@ fn despawn_spawners(
             }
         }
 
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

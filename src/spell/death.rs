@@ -62,7 +62,7 @@ fn spawn_deaths(
     q_player: Query<&Transform, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let pos = match q_player.get_single() {
+    let pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
@@ -128,8 +128,8 @@ fn despawn_deaths(
             continue;
         }
 
-        ev_kill_all.send(KillAll);
-        commands.entity(entity).despawn_recursive();
+        ev_kill_all.write(KillAll);
+        commands.entity(entity).despawn();
     }
 }
 
@@ -161,7 +161,7 @@ fn despawn_screen_effects(
 ) {
     for (entity, screen_effect) in &q_screen_effects {
         if screen_effect.disabled {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

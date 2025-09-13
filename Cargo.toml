@@ -25,11 +25,11 @@ codegen-units = 1
 rand = "0.8.5"
 chrono = "0.4.31"
 
-bevy = "0.15.0"
-bevy_screen_diagnostics = "0.7.0"
-bevy_asset_loader = { version = "0.22.0", features = ["2d"] }
-bevy_ecs_ldtk = { version = "0.11.0", features = ["atlas"]}
-bevy_rapier2d = "0.29.0"
-bevy_kira_audio = "0.22.0"
-bevy_trickfilm = "0.10.0"
-noisy_bevy = "0.8.0"
+bevy = "0.16"
+bevy_screen_diagnostics = "0.8"
+bevy_asset_loader = { version = "0.23", features = ["2d"] }
+bevy_ecs_ldtk = { version = "0.12", features = ["atlas"]}
+bevy_rapier2d = "0.30"
+bevy_kira_audio = "0.23"
+bevy_trickfilm = "0.11"
+noisy_bevy = "0.10"

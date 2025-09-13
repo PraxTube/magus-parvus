@@ -167,7 +167,7 @@ fn despawn_keyboard_ui(
     }
 
     for entity in &q_icons {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

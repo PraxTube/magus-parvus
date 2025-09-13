@@ -57,15 +57,15 @@ pub fn spawn_scrollable_list(
 fn scroll_lists(
     keys: Res<ButtonInput<KeyCode>>,
     active_items: Res<ActiveItems>,
-    mut q_scrollable_lists: Query<(&mut ScrollingList, &mut Node, &Parent, &ComputedNode)>,
+    mut q_scrollable_lists: Query<(&mut ScrollingList, &mut Node, &ChildOf, &ComputedNode)>,
     q_nodes: Query<&ComputedNode>,
 ) {
-    let (mut scrolling_list, mut style, parent, list_node) = match q_scrollable_lists.get_single_mut() {
+    let (mut scrolling_list, mut style, child, list_node) = match q_scrollable_lists.single_mut() {
         Ok(s) => s,
         Err(_) => return,
     };
     let items_height = list_node.size().y;
-    let container_height = match q_nodes.get(parent.get()) {
+    let container_height = match q_nodes.get(child.parent()) {
         Ok(n) => n.size().y,
         _ => return,
     };
@@ -97,11 +97,11 @@ fn update_selector_icon(
     q_selector_icon: Query<Entity, With<SelectorIcon>>,
     q_scrollable_icons: Query<(Entity, &ScrollingIcon)>,
 ) {
-    let scrolling_list = match q_scrollable_lists.get_single() {
+    let scrolling_list = match q_scrollable_lists.single() {
         Ok(l) => l,
         Err(_) => return,
     };
-    let selector_entity = match q_selector_icon.get_single() {
+    let selector_entity = match q_selector_icon.single() {
         Ok(s) => s,
         Err(_) => return,
     };

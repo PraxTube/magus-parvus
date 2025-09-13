@@ -45,7 +45,7 @@ fn spawn_demon_spell(
     q_demon_spells: Query<&DemonSpellCast>,
     q_demon_spell_cooldowns: Query<&DemonSpellCooldown>,
 ) {
-    let demon_boss = match q_demon_boss.get_single() {
+    let demon_boss = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -81,8 +81,8 @@ fn relay_demon_spells(
     for (entity, mut demon_spell) in &mut q_demon_spells {
         demon_spell.timer.tick(time.delta());
         if demon_spell.timer.just_finished() {
-            ev_spawn_demon_spell.send(SpawnDemonSpell(demon_spell.clone()));
-            commands.entity(entity).despawn_recursive();
+            ev_spawn_demon_spell.write(SpawnDemonSpell(demon_spell.clone()));
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -95,7 +95,7 @@ fn despawn_spell_cooldowns(
     for (entity, mut cooldown) in &mut q_demon_spell_cooldowns {
         cooldown.timer.tick(time.delta());
         if cooldown.timer.just_finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -109,7 +109,7 @@ fn reset_last_spell_timer(
     mut q_last_spell_timer: Query<&mut LastSpellTimer>,
     mut ev_spawn_demon_spell: EventReader<SpawnDemonSpell>,
 ) {
-    let mut timer = match q_last_spell_timer.get_single_mut() {
+    let mut timer = match q_last_spell_timer.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
