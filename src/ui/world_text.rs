@@ -67,7 +67,7 @@ fn spawn_world_text(commands: &mut Commands, assets: &Res<GameAssets>, ev: &Spaw
 
     commands.spawn((
         ev.world_text.clone(),
-        Text::from(ev.content.to_string()),
+        Text2d::from(ev.content.to_string()),
         TextLayout::new_with_justify(JustifyText::Center),
         TextColor(ev.world_text.font_color),
         text_style,
