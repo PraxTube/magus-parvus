@@ -119,7 +119,7 @@ fn spawn_explosion_delays(
     q_player: Query<&Transform, With<Player>>,
     mut ev_spawn_demon_spells: EventReader<SpawnDemonSpell>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
@@ -178,7 +178,7 @@ fn despawn_explosions(
 ) {
     for (entity, animator, explosion) in &q_explosions {
         if explosion.activation_timer.finished() && animator.finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -189,7 +189,7 @@ fn despawn_strike_explosions(
 ) {
     for (entity, animator) in &q_explosions {
         if animator.finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -202,7 +202,7 @@ fn despawn_colliders(
     for (entity, mut timer) in &mut q_colliders {
         timer.tick(time.delta());
         if timer.just_finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -212,11 +212,11 @@ fn spawn_strike_explosions(
     q_demon_boss: Query<(&Transform, &DemonBoss, &Sprite)>,
     mut q_strike_hitbox: Query<&mut DemonBossStrike>,
 ) {
-    let (transform, demon_boss, sprite) = match q_demon_boss.get_single() {
+    let (transform, demon_boss, sprite) = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
-    let mut strike = match q_strike_hitbox.get_single_mut() {
+    let mut strike = match q_strike_hitbox.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };

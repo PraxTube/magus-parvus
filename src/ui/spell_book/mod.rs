@@ -84,14 +84,14 @@ fn despawn_spell_bock(
     q_spell_book: Query<Entity, With<SpellBook>>,
     mut ev_player_changed_state: EventReader<PlayerChangedState>,
 ) {
-    let entity = match q_spell_book.get_single() {
+    let entity = match q_spell_book.single() {
         Ok(e) => e,
         Err(_) => return,
     };
 
     for ev in ev_player_changed_state.read() {
         if ev.old_state == PlayerState::SpellBook {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -112,19 +112,19 @@ fn update_view(
         return;
     }
 
-    let scrolling_list = match q_scrolling_list.get_single() {
+    let scrolling_list = match q_scrolling_list.single() {
         Ok(s) => s,
         Err(_) => return,
     };
-    let mut icon = match q_view_icon.get_single_mut() {
+    let mut icon = match q_view_icon.single_mut() {
         Ok(i) => i,
         Err(_) => return,
     };
-    let title = match q_view_title.get_single() {
+    let title = match q_view_title.single() {
         Ok(i) => i,
         Err(_) => return,
     };
-    let description = match q_view_description.get_single() {
+    let description = match q_view_description.single() {
         Ok(i) => i,
         Err(_) => return,
     };

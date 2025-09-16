@@ -43,11 +43,11 @@ pub fn quat_from_vec3(direction: Vec3) -> Quat {
 /// there is no way to inherit position but not rotation from the parent entity transform yet
 /// see: https://github.com/bevyengine/bevy/issues/1780
 fn reset_rotations(
-    mut q_transforms: Query<(&Parent, &mut Transform, &NoRotation)>,
+    mut q_transforms: Query<(&ChildOf, &mut Transform, &NoRotation)>,
     q_parents: Query<&Transform, Without<NoRotation>>,
 ) {
-    for (parent, mut transform, no_rotation) in q_transforms.iter_mut() {
-        if let Ok(parent_transform) = q_parents.get(parent.get()) {
+    for (child, mut transform, no_rotation) in q_transforms.iter_mut() {
+        if let Ok(parent_transform) = q_parents.get(child.parent()) {
             let rot_inv = parent_transform.rotation.inverse();
             transform.rotation = rot_inv;
             transform.translation = rot_inv.mul_vec3(no_rotation.offset);

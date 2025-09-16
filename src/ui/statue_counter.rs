@@ -62,7 +62,7 @@ fn update_text_counter(
     }
     ev_statue_unlocked_delayed.clear();
 
-    let text = match q_text_counter.get_single_mut() {
+    let text = match q_text_counter.single_mut() {
         Ok(t) => t,
         Err(_) => return,
     };

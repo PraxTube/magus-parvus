@@ -33,7 +33,7 @@ fn update_volumes(
     emitters: Query<(&GlobalTransform, &SpatialAudioEmitter)>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
-    if let Ok(receiver_transform) = receiver.get_single() {
+    if let Ok(receiver_transform) = receiver.single() {
         update(
             &game_audio,
             receiver_transform,

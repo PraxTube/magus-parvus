@@ -27,11 +27,11 @@ pub fn fetch_mouse_world_coords(
     q_window: Query<&Window, With<PrimaryWindow>>,
     q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
-    let (camera, camera_transform) = match q_camera.get_single() {
+    let (camera, camera_transform) = match q_camera.single() {
         Ok(c) => (c.0, c.1),
         Err(_) => return,
     };
-    let window = match q_window.get_single() {
+    let window = match q_window.single() {
         Ok(w) => w,
         Err(_) => return,
     };

@@ -72,7 +72,7 @@ fn spawn_aer_tracto(
     q_player: Query<&Transform, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
@@ -121,7 +121,7 @@ fn spawn_aer_pello(
     q_player: Query<&Transform, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };

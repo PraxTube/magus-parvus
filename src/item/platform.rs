@@ -92,10 +92,10 @@ fn despawn_trigger_item(
     ev_trigger_final_act.clear();
 
     for entity in &q_platform_items {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     for entity in &q_platform_components {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
@@ -109,7 +109,7 @@ fn trigger_platform(
     }
     ev_trigger_final_act.clear();
 
-    let mut animator = match q_platform.get_single_mut() {
+    let mut animator = match q_platform.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -126,7 +126,7 @@ fn play_trigger_sound(
     }
     ev_trigger_final_act.clear();
 
-    ev_play_sound.send(PlaySound {
+    ev_play_sound.write(PlaySound {
         clip: assets.item_unlock_sound.clone(),
         reverse: true,
         ..default()
@@ -137,7 +137,7 @@ fn hover_platform_item(
     time: Res<Time>,
     mut q_platform_item: Query<(&mut Transform, &mut PlatformItem)>,
 ) {
-    let (mut transform, mut item) = match q_platform_item.get_single_mut() {
+    let (mut transform, mut item) = match q_platform_item.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -160,11 +160,11 @@ fn trigger_final_act(
     mut ev_collision_events: EventReader<CollisionEvent>,
     mut ev_trigger_final_act: EventWriter<TriggerFinalAct>,
 ) {
-    let player = match q_player.get_single_mut() {
+    let player = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
-    let item_entity = match q_final_act.get_single() {
+    let item_entity = match q_final_act.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -181,7 +181,7 @@ fn trigger_final_act(
             continue;
         }
 
-        ev_trigger_final_act.send(TriggerFinalAct);
+        ev_trigger_final_act.write(TriggerFinalAct);
     }
 }
 

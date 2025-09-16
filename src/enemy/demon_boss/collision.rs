@@ -14,7 +14,7 @@ use crate::ui::health::Health;
 fn fireball_collisions(
     mut q_enemies: Query<(&DemonBoss, &mut Health)>,
     mut q_fireballs: Query<&mut Fireball>,
-    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
+    q_colliders: Query<&ChildOf, (With<Collider>, Without<Enemy>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
     for ev in ev_collision_events.read() {
@@ -24,11 +24,11 @@ fn fireball_collisions(
         };
 
         let source_parent = match q_colliders.get(*source) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
         let target_parent = match q_colliders.get(*target) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
 
@@ -65,7 +65,7 @@ fn lightning_collisions(
     mut q_enemies: Query<(&DemonBoss, &mut Health)>,
     q_lightnings: Query<&Lightning>,
     q_lightning_strikes: Query<&LightningStrike>,
-    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>)>,
+    q_colliders: Query<&ChildOf, (With<Collider>, Without<Enemy>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
     for ev in ev_collision_events.read() {
@@ -75,11 +75,11 @@ fn lightning_collisions(
         };
 
         let source_parent = match q_colliders.get(*source) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
         let target_parent = match q_colliders.get(*target) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
 
@@ -114,7 +114,7 @@ fn lightning_collisions(
 fn icicle_collisions(
     mut q_enemies: Query<(&DemonBoss, &mut Health)>,
     q_icicles: Query<&Icicle>,
-    q_colliders: Query<&Parent, With<Collider>>,
+    q_colliders: Query<&ChildOf, With<Collider>>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
     for ev in ev_collision_events.read() {
@@ -124,11 +124,11 @@ fn icicle_collisions(
         };
 
         let source_parent = match q_colliders.get(*source) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
         let target_parent = match q_colliders.get(*target) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
 
@@ -159,7 +159,7 @@ fn icicle_collisions(
 fn aer_tracto_collisions(
     mut q_enemies: Query<(&mut DemonBoss, &mut Health, &mut Velocity)>,
     q_aer_tractos: Query<(&Transform, &AerTracto)>,
-    q_colliders: Query<&Parent, With<Collider>>,
+    q_colliders: Query<&ChildOf, With<Collider>>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
     for ev in ev_collision_events.read() {
@@ -169,11 +169,11 @@ fn aer_tracto_collisions(
         };
 
         let source_parent = match q_colliders.get(*source) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
         let target_parent = match q_colliders.get(*target) {
-            Ok(p) => p.get(),
+            Ok(c) => c.parent(),
             Err(_) => continue,
         };
 

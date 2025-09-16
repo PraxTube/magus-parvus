@@ -47,7 +47,7 @@ fn spawn_slime(
 
     commands.entity(entity).add_children(&[collider]);
 
-    ev_play_sound.send(PlaySound {
+    ev_play_sound.write(PlaySound {
         clip: assets.slime_land_sound.clone(),
         rand_speed_intensity: 0.2,
         parent: Some(entity),
@@ -74,7 +74,7 @@ fn despawn_slimes(
 ) {
     for (entity, health, mut slime) in &mut q_slimes {
         if health.health <= 0.0 && slime.state != SlimeState::Dying {
-            ev_play_sound.send(PlaySound {
+            ev_play_sound.write(PlaySound {
                 clip: assets.slime_death_sound.clone(),
                 parent: Some(entity),
                 ..default()
@@ -82,7 +82,7 @@ fn despawn_slimes(
             slime.state = SlimeState::Dying;
         }
         if slime.disabled {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

@@ -29,7 +29,7 @@ fn activate_phantasma(
     mut q_colliders: Query<&mut CollisionGroups>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let (children, mut sprite) = match q_player.get_single_mut() {
+    let (children, mut sprite) = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -57,7 +57,7 @@ fn deactivate_phantasma(
     mut q_colliders: Query<&mut CollisionGroups>,
     mut q_timers: Query<(Entity, &mut PhantasmaTimer)>,
 ) {
-    let (children, mut sprite) = match q_player.get_single_mut() {
+    let (children, mut sprite) = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -75,7 +75,7 @@ fn deactivate_phantasma(
                 };
             }
 
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

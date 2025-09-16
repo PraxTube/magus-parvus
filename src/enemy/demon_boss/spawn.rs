@@ -57,7 +57,7 @@ fn spawn_demon_boss(
     q_smoke: Query<Entity, (With<Smoke>, Without<SpawnDelay>)>,
     mut q_delay: Query<(Entity, &mut SpawnDelay)>,
 ) {
-    let (entity, mut delay) = match q_delay.get_single_mut() {
+    let (entity, mut delay) = match q_delay.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -66,7 +66,7 @@ fn spawn_demon_boss(
     if !delay.just_finished() {
         return;
     }
-    commands.entity(entity).despawn_recursive();
+    commands.entity(entity).despawn();
 
     let pos = PLAYER_SPAWN_POS + SPAWN_POS;
     if q_smoke.is_empty() {
@@ -140,18 +140,18 @@ fn despawn_demon_boss(
     mut q_demon_boss: Query<(Entity, &Health, &mut DemonBoss, &AnimationPlayer2D)>,
     mut ev_demon_boss_death: EventWriter<DemonBossDeath>,
 ) {
-    let (entity, health, mut demon_boss, animator) = match q_demon_boss.get_single_mut() {
+    let (entity, health, mut demon_boss, animator) = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
 
     if demon_boss.state == DemonBossState::Dying && animator.finished() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     if health.health <= 0.0 && demon_boss.state != DemonBossState::Dying {
         demon_boss.state = DemonBossState::Dying;
-        ev_demon_boss_death.send(DemonBossDeath);
+        ev_demon_boss_death.write(DemonBossDeath);
     }
 }
 
@@ -160,11 +160,11 @@ fn despawn_shadow(
     q_demon_boss: Query<&DemonBoss>,
     mut q_shadow: Query<&mut Sprite, With<Shadow>>,
 ) {
-    let demon_boss = match q_demon_boss.get_single() {
+    let demon_boss = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
-    let mut sprite = match q_shadow.get_single_mut() {
+    let mut sprite = match q_shadow.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -182,7 +182,7 @@ fn despawn_demon_colliders(
     q_demon_boss: Query<&DemonBoss>,
     q_demon_colliders: Query<Entity, With<DemonCollider>>,
 ) {
-    let demon_boss = match q_demon_boss.get_single() {
+    let demon_boss = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -192,7 +192,7 @@ fn despawn_demon_colliders(
     }
 
     for entity in &q_demon_colliders {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

@@ -115,7 +115,7 @@ fn unmute_bgms(
         unmute_timer.tick(time.delta());
         if unmute_timer.just_finished() {
             unmute = true;
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 
@@ -148,7 +148,7 @@ fn despawn_normal_bgm(
         if let Some(instance) = audio_instances.get_mut(bgm.handle.id()) {
             instance.stop(AudioTween::default());
         }
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

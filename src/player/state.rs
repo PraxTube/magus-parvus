@@ -23,13 +23,13 @@ fn player_changed_state(
     mut ev_changed_state: EventWriter<PlayerChangedState>,
     mut old_state: Local<PlayerState>,
 ) {
-    let player = match q_player.get_single() {
+    let player = match q_player.single() {
         Ok(p) => p,
         Err(_) => return,
     };
 
     if player.state != *old_state {
-        ev_changed_state.send(PlayerChangedState {
+        ev_changed_state.write(PlayerChangedState {
             old_state: *old_state,
             new_state: player.state,
         });
@@ -38,7 +38,7 @@ fn player_changed_state(
 }
 
 fn switch_player_mode(player_input: Res<PlayerInput>, mut q_player: Query<&mut Player>) {
-    let mut player = match q_player.get_single_mut() {
+    let mut player = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -78,7 +78,7 @@ fn switch_player_mode(player_input: Res<PlayerInput>, mut q_player: Query<&mut P
 }
 
 fn tick_staggering_timer(time: Res<Time>, mut q_player: Query<&mut Player>) {
-    let mut player = match q_player.get_single_mut() {
+    let mut player = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };

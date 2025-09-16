@@ -35,7 +35,7 @@ fn spawn_player(
         ))
         .id();
 
-    ev_spawn_player_hears.send(SpawnPlayerHearts {
+    ev_spawn_player_hears.write(SpawnPlayerHearts {
         count: PLAYER_HEALTH as usize,
     });
 
@@ -63,13 +63,13 @@ fn despawn_player(
     mut next_state: ResMut<NextState<GameState>>,
     q_player: Query<(Entity, &Health), With<Player>>,
 ) {
-    let (entity, health) = match q_player.get_single() {
+    let (entity, health) = match q_player.single() {
         Ok(p) => p,
         Err(_) => return,
     };
 
     if health.health <= 0.0 {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
         next_state.set(GameState::GameOver);
     }
 }

@@ -10,7 +10,7 @@ fn update_jump_position(
     mut q_slimes: Query<(&Transform, &mut SlimeEnemy), (With<Enemy>, Without<Player>)>,
     q_player: Query<&Transform, With<Player>>,
 ) {
-    let player_transform = match q_player.get_single() {
+    let player_transform = match q_player.single() {
         Ok(p) => p,
         Err(_) => return,
     };

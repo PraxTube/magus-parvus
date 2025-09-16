@@ -17,7 +17,7 @@ fn spawn_rage_aura(
         return;
     }
 
-    let (entity, demon_boss) = match q_demon_boss.get_single() {
+    let (entity, demon_boss) = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -44,7 +44,7 @@ fn despawn_rage_aura(
     q_demon_boss: Query<&DemonBoss>,
     q_demon_boss_aura: Query<Entity, With<RageAura>>,
 ) {
-    let demon_boss = match q_demon_boss.get_single() {
+    let demon_boss = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -54,12 +54,12 @@ fn despawn_rage_aura(
     }
 
     for entity in &q_demon_boss_aura {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
 fn tick_timer(time: Res<Time>, mut q_demon_boss: Query<&mut DemonBoss>) {
-    let mut demon_boss = match q_demon_boss.get_single_mut() {
+    let mut demon_boss = match q_demon_boss.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };

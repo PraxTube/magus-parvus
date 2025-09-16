@@ -27,7 +27,7 @@ fn spawn_strike_cooldown(
     if !q_strike_cooldowns.is_empty() {
         return;
     }
-    let demon_boss = match q_demon_boss.get_single() {
+    let demon_boss = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -48,7 +48,7 @@ fn despawn_strike_cooldown(
     for (entity, mut cooldown) in &mut q_strike_cooldowns {
         cooldown.timer.tick(time.delta());
         if cooldown.timer.just_finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -57,11 +57,11 @@ fn strike(
     q_demon_boss: Query<(&DemonBoss, &AnimationPlayer2D)>,
     mut q_strike_hitbox: Query<&mut DemonBossStrike>,
 ) {
-    let (demon_boss, animator) = match q_demon_boss.get_single() {
+    let (demon_boss, animator) = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
-    let mut strike = match q_strike_hitbox.get_single_mut() {
+    let mut strike = match q_strike_hitbox.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };

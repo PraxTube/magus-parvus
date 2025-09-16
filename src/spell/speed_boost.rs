@@ -26,7 +26,7 @@ fn activate_speed_boost(
     mut q_player: Query<&mut Stats, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let mut player_stats = match q_player.get_single_mut() {
+    let mut player_stats = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -45,7 +45,7 @@ fn deactivate_speed_boost(
     mut q_player: Query<&mut Stats, With<Player>>,
     mut q_timers: Query<(Entity, &mut SpeedBoostTimer)>,
 ) {
-    let mut player_stats = match q_player.get_single_mut() {
+    let mut player_stats = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -59,7 +59,7 @@ fn deactivate_speed_boost(
             if deactivate {
                 player_stats.move_speed = Stats::default().move_speed;
             }
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

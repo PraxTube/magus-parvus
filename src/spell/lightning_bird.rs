@@ -104,7 +104,7 @@ fn spawn_lightning_birds(
     q_player: Query<(&Transform, &Player)>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let (player_transform, player) = match q_player.get_single() {
+    let (player_transform, player) = match q_player.single() {
         Ok(p) => (p.0, p.1),
         Err(_) => return,
     };
@@ -128,7 +128,7 @@ fn spawn_flap_sounds(
 ) {
     for (entity, lightning_bird) in &q_lightning_birds {
         if lightning_bird.flap_timer.just_finished() {
-            ev_play_sound.send(PlaySound {
+            ev_play_sound.write(PlaySound {
                 clip: assets.lightning_bird_flap_sound.clone(),
                 parent: Some(entity),
                 ..default()
@@ -197,7 +197,7 @@ fn spawn_lightning_strikes(
                 Transform::from_translation(strike.pos),
             ))
             .add_children(&[collider]);
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
@@ -236,7 +236,7 @@ fn rotate_lightning_birds(
     q_player: Query<&Transform, With<Player>>,
     mut q_lightning_birds: Query<(&mut Transform, &mut LightningBird), Without<Player>>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation.truncate(),
         Err(_) => return,
     };
@@ -279,7 +279,7 @@ fn despawn_lightning_birds(
                 ),
                 Transform::from_translation(transform.translation).with_scale(Vec3::splat(3.0)),
             ));
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -290,7 +290,7 @@ fn despawn_lightning_strikes(
 ) {
     for (entity, animation_player) in &q_lightning_strikes {
         if animation_player.finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -301,7 +301,7 @@ fn despawn_lightning_bird_deaths(
 ) {
     for (entity, animation_player) in &q_lightning_bird_deaths {
         if animation_player.finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

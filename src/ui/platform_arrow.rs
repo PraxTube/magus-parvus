@@ -36,7 +36,7 @@ fn despawn_arrow(
     q_player: Query<&Transform, With<Player>>,
     q_arrow: Query<Entity, With<Arrow>>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
@@ -50,7 +50,7 @@ fn despawn_arrow(
     }
 
     for entity in &q_arrow {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
@@ -58,11 +58,11 @@ fn update_arrow(
     q_camera: Query<&Transform, With<MainCamera>>,
     mut q_arrow: Query<&mut Transform, (With<Arrow>, Without<MainCamera>)>,
 ) {
-    let camera_pos = match q_camera.get_single() {
+    let camera_pos = match q_camera.single() {
         Ok(r) => r.translation,
         Err(_) => return,
     };
-    let mut transform = match q_arrow.get_single_mut() {
+    let mut transform = match q_arrow.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };

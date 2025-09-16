@@ -47,7 +47,7 @@ fn spawn_text_field(
     assets: &Res<GameAssets>,
     q_window: &Query<&Window, With<PrimaryWindow>>,
 ) {
-    let window = match q_window.get_single() {
+    let window = match q_window.single() {
         Ok(w) => w,
         Err(err) => {
             error!(
@@ -132,7 +132,7 @@ fn update_buffer_container(
         return;
     }
 
-    let mut style = match q_buffer_container.get_single_mut() {
+    let mut style = match q_buffer_container.single_mut() {
         Ok(s) => s,
         Err(_) => return,
     };
@@ -150,7 +150,7 @@ fn update_buffer_text(
         return;
     }
 
-    let text = match q_typing_buffer_text.get_single() {
+    let text = match q_typing_buffer_text.single() {
         Ok(t) => t,
         Err(_) => return,
     };
@@ -182,7 +182,7 @@ fn push_chars(
     keys: Res<ButtonInput<KeyCode>>,
     q_player: Query<&Player>,
 ) {
-    let player_state = match q_player.get_single() {
+    let player_state = match q_player.single() {
         Ok(p) => p.state,
         Err(_) => return,
     };
@@ -246,7 +246,7 @@ fn push_chars(
 
             if ev.key_code == KeyCode::Enter {
                 let text = typing_state.buf.clone();
-                typing_submit_events.send(TypingSubmitEvent { value: text });
+                typing_submit_events.write(TypingSubmitEvent { value: text });
             }
 
             if ev.key_code == KeyCode::Backspace {
@@ -280,14 +280,14 @@ fn despawn_casting_text(
     q_casting_text: Query<Entity, With<CastingText>>,
     mut ev_player_changed_state: EventReader<PlayerChangedState>,
 ) {
-    let entity = match q_casting_text.get_single() {
+    let entity = match q_casting_text.single() {
         Ok(e) => e,
         Err(_) => return,
     };
 
     for ev in ev_player_changed_state.read() {
         if ev.old_state == PlayerState::Casting {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

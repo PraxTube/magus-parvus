@@ -60,7 +60,7 @@ fn spawn_walls(
     }
     ev_trigger_final_act.clear();
 
-    ev_play_sound.send(PlaySound {
+    ev_play_sound.write(PlaySound {
         clip: assets.earth_wall_sound.clone(),
         ..default()
     });

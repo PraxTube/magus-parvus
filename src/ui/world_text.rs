@@ -89,7 +89,7 @@ fn spawn_world_texts(
 fn despawn_world_texts(mut commands: Commands, q_world_texts: Query<(Entity, &WorldText)>) {
     for (entity, world_text) in &q_world_texts {
         if world_text.timer.just_finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

@@ -14,14 +14,14 @@ fn spawn_deaths(
     mut ev_spell_casted: EventReader<SpellCasted>,
     mut ev_spawn_world_text: EventWriter<SpawnWorldText>,
 ) {
-    let pos = match q_player.get_single() {
+    let pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
 
     for ev in ev_spell_casted.read() {
         if ev.spell == Spell::Flub {
-            ev_spawn_world_text.send(SpawnWorldText {
+            ev_spawn_world_text.write(SpawnWorldText {
                 world_text: WorldText {
                     offset: Vec3::new(0.0, 20.0, 10.0),
                     ..default()
@@ -46,7 +46,7 @@ fn spawn_deaths(
             let scale_curve = CubicBezier::new(scale_points).to_curve().unwrap();
             let alpha_curve = CubicBezier::new(alpha_points).to_curve().unwrap();
 
-            ev_spawn_world_text.send(SpawnWorldText {
+            ev_spawn_world_text.write(SpawnWorldText {
                 world_text: WorldText {
                     offset: Vec3::new(0.0, -10.0, 10.0),
                     font_scale: 8.0,

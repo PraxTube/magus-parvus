@@ -16,7 +16,7 @@ fn player_sprite_indicies(state: &PlayerState) -> (usize, usize) {
 }
 
 fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut Sprite, &Player)>) {
-    let (mut indices, mut image, player) = match q_player.get_single_mut() {
+    let (mut indices, mut image, player) = match q_player.single_mut() {
         Ok(p) => (p.0, p.1, p.2),
         Err(_) => return,
     };
@@ -33,7 +33,7 @@ fn update_indicies(mut q_player: Query<(&mut AnimationIndices, &mut Sprite, &Pla
 }
 
 fn adjust_sprite_flip(mut q_player: Query<(&mut Sprite, &Player)>) {
-    let (mut sprite, player) = match q_player.get_single_mut() {
+    let (mut sprite, player) = match q_player.single_mut() {
         Ok(p) => (p.0, p.1),
         Err(_) => return,
     };

@@ -73,7 +73,7 @@ fn spawn_statue_walls(
         let count = wall_count(offset);
 
         if count > 0 {
-            ev_play_sound.send(PlaySound {
+            ev_play_sound.write(PlaySound {
                 clip: assets.earth_wall_sound.clone(),
                 ..default()
             });
@@ -99,7 +99,7 @@ fn despawn_statue_walls(
         }
 
         if animator.finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -115,7 +115,7 @@ fn despawn_earth_wall_colliders(
     ev_statue_unlocked.clear();
 
     for entity in &q_earth_wall_colliders {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

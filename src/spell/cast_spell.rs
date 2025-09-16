@@ -16,7 +16,7 @@ fn double_j_escape(
     mut q_player: Query<&mut Player>,
     mut timer: Local<Timer>,
 ) {
-    let mut player = match q_player.get_single_mut() {
+    let mut player = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -59,7 +59,7 @@ fn submit_spell(
     mut ev_typing_submit_event: EventReader<TypingSubmitEvent>,
     mut ev_spell_casted: EventWriter<SpellCasted>,
 ) {
-    let mut player = match q_player.get_single_mut() {
+    let mut player = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -68,7 +68,7 @@ fn submit_spell(
         player.state = PlayerState::Idling;
         if let Ok(spell) = &ev.value.parse::<Spell>() {
             if debug_spell.active || is_spell_active(&active_items, spell) {
-                ev_spell_casted.send(SpellCasted {
+                ev_spell_casted.write(SpellCasted {
                     spell: spell.clone(),
                 });
             }

@@ -11,10 +11,10 @@ use super::{Player, PlayerState, STAGGERING_INTENSITY};
 fn slime_collisions(
     mut q_player: Query<(&mut Velocity, &mut Player, &mut Health, &Transform)>,
     q_enemies: Query<(&Transform, &Enemy), Without<Player>>,
-    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>, Without<Player>)>,
+    q_colliders: Query<&ChildOf, (With<Collider>, Without<Enemy>, Without<Player>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
-    let (mut velocity, mut player, mut health, player_transform) = match q_player.get_single_mut() {
+    let (mut velocity, mut player, mut health, player_transform) = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -27,19 +27,19 @@ fn slime_collisions(
 
         let enemy_parent = if &player.collider_entity == source {
             match q_colliders.get(*target) {
-                Ok(parent) => parent,
+                Ok(c) => c.parent(),
                 Err(_) => continue,
             }
         } else if &player.collider_entity == target {
             match q_colliders.get(*source) {
-                Ok(parent) => parent,
+                Ok(c) => c.parent(),
                 Err(_) => continue,
             }
         } else {
             continue;
         };
 
-        let (enemy_transform, enemy) = match q_enemies.get(enemy_parent.get()) {
+        let (enemy_transform, enemy) = match q_enemies.get(enemy_parent) {
             Ok(e) => (e.0, e.1),
             Err(_) => continue,
         };
@@ -63,14 +63,14 @@ fn slime_collisions(
 fn demon_boss_collisions(
     mut q_player: Query<(&mut Velocity, &mut Player, &mut Health, &Transform)>,
     q_demon_boss: Query<(Entity, &Transform, &DemonBoss), Without<Player>>,
-    q_colliders: Query<&Parent, (With<Collider>, Without<DemonBoss>, Without<Player>)>,
+    q_colliders: Query<&ChildOf, (With<Collider>, Without<DemonBoss>, Without<Player>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
-    let (mut velocity, mut player, mut health, player_transform) = match q_player.get_single_mut() {
+    let (mut velocity, mut player, mut health, player_transform) = match q_player.single_mut() {
         Ok(r) => r,
         Err(_) => return,
     };
-    let (demon_boss_entity, enemy_transform, demon_boss) = match q_demon_boss.get_single() {
+    let (demon_boss_entity, enemy_transform, demon_boss) = match q_demon_boss.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -83,19 +83,19 @@ fn demon_boss_collisions(
 
         let enemy_parent = if &player.collider_entity == source {
             match q_colliders.get(*target) {
-                Ok(parent) => parent,
+                Ok(c) => c.parent(),
                 Err(_) => continue,
             }
         } else if &player.collider_entity == target {
             match q_colliders.get(*source) {
-                Ok(parent) => parent,
+                Ok(c) => c.parent(),
                 Err(_) => continue,
             }
         } else {
             continue;
         };
 
-        if demon_boss_entity != enemy_parent.get() {
+        if demon_boss_entity != enemy_parent {
             continue;
         }
 
@@ -115,10 +115,10 @@ fn demon_boss_explosion_collisions(
     mut q_player: Query<(&mut Velocity, &mut Player, &mut Health, &Transform)>,
     q_explosions: Query<(&Transform, &DemonBossExplosion), Without<Player>>,
     q_strike_explosions: Query<(&Transform, &DemonBossStrikeExplosion), Without<Player>>,
-    q_colliders: Query<&Parent, (With<Collider>, Without<Enemy>, Without<Player>)>,
+    q_colliders: Query<&ChildOf, (With<Collider>, Without<Enemy>, Without<Player>)>,
     mut ev_collision_events: EventReader<CollisionEvent>,
 ) {
-    let (mut velocity, mut player, mut health, player_transform) = match q_player.get_single_mut() {
+    let (mut velocity, mut player, mut health, player_transform) = match q_player.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
@@ -131,21 +131,21 @@ fn demon_boss_explosion_collisions(
 
         let enemy_parent = if &player.collider_entity == source {
             match q_colliders.get(*target) {
-                Ok(parent) => parent,
+                Ok(c) => c.parent(),
                 Err(_) => continue,
             }
         } else if &player.collider_entity == target {
             match q_colliders.get(*source) {
-                Ok(parent) => parent,
+                Ok(c) => c.parent(),
                 Err(_) => continue,
             }
         } else {
             continue;
         };
 
-        let (explosion_pos, damage) = if let Ok(r) = q_explosions.get(enemy_parent.get()) {
+        let (explosion_pos, damage) = if let Ok(r) = q_explosions.get(enemy_parent) {
             (r.0.translation, r.1.damage)
-        } else if let Ok(r) = q_strike_explosions.get(enemy_parent.get()) {
+        } else if let Ok(r) = q_strike_explosions.get(enemy_parent) {
             (r.0.translation, r.1.damage)
         } else {
             continue;

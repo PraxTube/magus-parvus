@@ -34,11 +34,16 @@ fn spawn_camera(mut commands: Commands) {
     projection.scaling_mode = ScalingMode::FixedVertical {
         viewport_height: 400.0,
     };
-    commands.spawn((MainCamera, SpatialAudioReceiver, camera, projection));
+    commands.spawn((
+        MainCamera,
+        SpatialAudioReceiver,
+        camera,
+        Projection::Orthographic(projection),
+    ));
 }
 
 fn update_camera_target(mut shake: ResMut<CameraShake>, q_player: Query<&Transform, With<Player>>) {
-    let player_transform = match q_player.get_single() {
+    let player_transform = match q_player.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -47,19 +52,23 @@ fn update_camera_target(mut shake: ResMut<CameraShake>, q_player: Query<&Transfo
 
 fn zoom_camera(
     debug_spell: Res<DebugSpell>,
-    mut q_projection: Query<&mut OrthographicProjection, With<MainCamera>>,
+    mut q_projection: Query<&mut Projection, With<MainCamera>>,
     player_input: Res<PlayerInput>,
 ) {
     if !debug_spell.active {
         return;
     }
 
-    let mut projection = match q_projection.get_single_mut() {
+    let mut projection = match q_projection.single_mut() {
         Ok(p) => p,
         Err(_) => return,
     };
 
-    projection.scale = (projection.scale + player_input.zoom).clamp(1.0, 10.0);
+    let Projection::Orthographic(mut orth) = projection.clone() else {
+        return;
+    };
+    orth.scale = (orth.scale + player_input.zoom).clamp(1.0, 10.0);
+    *projection = Projection::Orthographic(orth)
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -72,7 +81,7 @@ fn toggle_full_screen(
         return;
     }
 
-    let mut window = match main_window.get_single_mut() {
+    let mut window = match main_window.single_mut() {
         Ok(w) => w,
         Err(err) => {
             error!("there is not exactly one window, {}", err);
@@ -80,7 +89,7 @@ fn toggle_full_screen(
         }
     };
 
-    let player_state = match q_player.get_single() {
+    let player_state = match q_player.single() {
         Ok(p) => p.state,
         Err(_) => return,
     };
@@ -89,7 +98,7 @@ fn toggle_full_screen(
     }
 
     window.mode = if window.mode == WindowMode::Windowed {
-        WindowMode::Fullscreen(MonitorSelection::Primary)
+        WindowMode::Fullscreen(MonitorSelection::Primary, VideoModeSelection::Current)
     } else {
         WindowMode::Windowed
     }

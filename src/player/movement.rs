@@ -11,7 +11,7 @@ fn player_movement(
     mut q_player: Query<(&mut Velocity, &mut Player, &Stats)>,
     player_input: Res<PlayerInput>,
 ) {
-    let (mut velocity, mut player, stats) = match q_player.get_single_mut() {
+    let (mut velocity, mut player, stats) = match q_player.single_mut() {
         Ok(p) => (p.0, p.1, p.2),
         Err(_) => return,
     };

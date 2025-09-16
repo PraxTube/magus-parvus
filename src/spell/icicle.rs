@@ -77,7 +77,7 @@ fn spawn_scutum_glaciei(
     q_player: Query<&Transform, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
@@ -121,7 +121,7 @@ fn despawn_icicles(
     for (entity, transform, icicle) in &q_icicles {
         if icicle.disabled {
             spawn_icicle_shatter(&mut commands, &assets, transform.translation);
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -130,7 +130,7 @@ fn move_icicles(
     q_player: Query<&Transform, With<Player>>,
     mut q_icicles: Query<&mut Transform, (With<Icicle>, Without<Player>)>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };

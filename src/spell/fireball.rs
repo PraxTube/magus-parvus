@@ -92,7 +92,7 @@ fn spawn_fireballs(
     q_enemies: Query<&Transform, With<Enemy>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let (player_transform, player) = match q_player.get_single() {
+    let (player_transform, player) = match q_player.single() {
         Ok(p) => (p.0, p.1),
         Err(_) => return,
     };
@@ -127,7 +127,7 @@ fn spawn_ignis_pila(
     q_enemies: Query<&Transform, With<Enemy>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let (player_pos, player) = match q_player.get_single() {
+    let (player_pos, player) = match q_player.single() {
         Ok(p) => (p.0.translation, p.1),
         Err(_) => return,
     };
@@ -167,7 +167,7 @@ fn spawn_inferno_pila(
     q_player: Query<&Transform, With<Player>>,
     mut ev_spell_casted: EventReader<SpellCasted>,
 ) {
-    let player_pos = match q_player.get_single() {
+    let player_pos = match q_player.single() {
         Ok(p) => p.translation,
         Err(_) => return,
     };
@@ -211,7 +211,7 @@ fn tick_fireball_timers(time: Res<Time>, mut q_fireballs: Query<&mut Fireball>) 
 fn despawn_fireballs(mut commands: Commands, q_fireballs: Query<(Entity, &Fireball)>) {
     for (entity, fireball) in &q_fireballs {
         if fireball.disabled {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

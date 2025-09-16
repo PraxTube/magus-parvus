@@ -85,7 +85,7 @@ fn despawn_pop_ups(
         pop_up.timer.tick(time.delta());
 
         if pop_up.timer.just_finished() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

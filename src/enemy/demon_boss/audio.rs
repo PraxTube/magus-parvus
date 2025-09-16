@@ -23,7 +23,7 @@ impl Default for DemonBossStepsTimer {
 }
 
 fn tick_timers(time: Res<Time>, mut q_steps_timer: Query<&mut DemonBossStepsTimer>) {
-    match q_steps_timer.get_single_mut() {
+    match q_steps_timer.single_mut() {
         Ok(mut t) => t.tick(time.delta()),
         Err(_) => return,
     };
@@ -35,11 +35,11 @@ fn play_step_sounds(
     q_steps_timer: Query<&DemonBossStepsTimer>,
     mut ev_play_sound: EventWriter<PlaySound>,
 ) {
-    let (entity, demon_boss_state) = match q_demon_boss.get_single() {
+    let (entity, demon_boss_state) = match q_demon_boss.single() {
         Ok(r) => (r.0, r.1.state),
         Err(_) => return,
     };
-    let steps_timer = match q_steps_timer.get_single() {
+    let steps_timer = match q_steps_timer.single() {
         Ok(r) => r,
         Err(_) => return,
     };
@@ -51,7 +51,7 @@ fn play_step_sounds(
         return;
     }
 
-    ev_play_sound.send(PlaySound {
+    ev_play_sound.write(PlaySound {
         clip: assets.demon_boss_step_sound.clone(),
         rand_speed_intensity: RAND_SPEED_INTENSITY,
         parent: Some(entity),
@@ -70,7 +70,7 @@ fn play_cast_vocals(
             DemonSpell::EarthPrison => assets.demon_boss_vocal_earth_prison_sound.clone(),
         };
 
-        play_sound.send(PlaySound {
+        play_sound.write(PlaySound {
             clip: vocals,
             ..default()
         });
@@ -86,7 +86,7 @@ fn play_git_gud(
         return;
     }
 
-    play_sound.send(PlaySound {
+    play_sound.write(PlaySound {
         clip: assets.git_gud.clone(),
         ..default()
     });

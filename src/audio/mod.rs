@@ -3,7 +3,7 @@ mod spacial;
 
 use rand::{thread_rng, Rng};
 
-use bevy::{prelude::*, utils::HashSet};
+use bevy::{platform::collections::HashSet, prelude::*};
 use bevy_kira_audio::prelude::{AudioPlugin, AudioSource, *};
 
 pub struct GameAudioPlugin;
@@ -100,7 +100,7 @@ fn play_sounds(
                 ))
                 .id();
 
-            match commands.get_entity(parent) {
+            match commands.get_entity(parent).ok() {
                 Some(mut r) => {
                     r.add_children(&[audio_emitter]);
                 }
