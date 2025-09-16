@@ -43,8 +43,12 @@ fn spawn_deaths(
                 vec2(0.533, 0.507),
                 vec2(1.0, 0.0),
             ]];
-            let scale_curve = CubicBezier::new(scale_points).to_curve().unwrap();
-            let alpha_curve = CubicBezier::new(alpha_points).to_curve().unwrap();
+            let Ok(scale_curve) = CubicBezier::new(scale_points).to_curve() else {
+                continue;
+            };
+            let Ok(alpha_curve) = CubicBezier::new(alpha_points).to_curve() else {
+                continue;
+            };
 
             ev_spawn_world_text.write(SpawnWorldText {
                 world_text: WorldText {

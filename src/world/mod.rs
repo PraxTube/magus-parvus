@@ -28,6 +28,8 @@ impl Plugin for WorldPlugin {
 }
 
 fn configure_physics(mut rapier_config: Query<&mut RapierConfiguration>) {
-    let mut rapier_config = rapier_config.single_mut().unwrap();
+    let Ok(mut rapier_config) = rapier_config.single_mut() else {
+        return;
+    };
     rapier_config.gravity = Vec2::ZERO;
 }

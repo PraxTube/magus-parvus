@@ -44,10 +44,6 @@ fn spawn_player(
             Collider::ball(4.0),
             ActiveEvents::COLLISION_EVENTS,
             CollisionGroups::default(),
-            // CollisionGroups::new(
-            //     Group::from_bits(0b1100).unwrap(),
-            //     Group::from_bits(0b1100).unwrap(),
-            // ),
             Transform::from_translation(Vec3::new(0.0, -5.0, 0.0)),
         ))
         .id();
